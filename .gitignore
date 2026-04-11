@@ -2,6 +2,7 @@
 
 .vscode/
 .vscode
+nativewind-env.d.ts
 
 # dependencies
 node_modules/
