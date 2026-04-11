@@ -21,17 +21,17 @@ export default function Index() {
           <View className="w-full gap-6">
             <View className="gap-6">
               <Pressable className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
-                <Text className="font-itim text-lg text-white">Continuar como aventureiro</Text>
+                <Text className="font-itim text-lg text-center text-white">Continuar como aventureiro</Text>
               </Pressable>
       
               <View className="flex-row justify-center items-center gap-3">
-                <View className="w-28 h-px bg-white" />
+                <View className="w-1/3 h-px bg-white" />
                 <Text className="text-white font-itim">Ou</Text>
-                <View className="w-28 h-px bg-white" />
+                <View className="w-1/3 h-px bg-white" />
               </View>
 
               <Pressable className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
-                <Text className="font-itim text-lg">Contiuar como comerciante</Text>
+                <Text className="font-itim text-lg text-center">Contiuar como comerciante</Text>
               </Pressable>
             </View>
 
