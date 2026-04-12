@@ -1,6 +1,11 @@
 import { Text, View, ImageBackground, Image, Pressable, ScrollView } from "react-native";
+import { Redirect } from "expo-router"
 
 export default function Index() {
+
+  // Apenas em desenvolvimento para testar novas telas
+  return <Redirect href={"./user/signup"} />
+
   return (
     <ImageBackground
       source={{ uri: "https://www.voelivre.com.br/wp-content/uploads/2025/03/adobestock_515087389Reduzi.jpg" }}
@@ -10,7 +15,7 @@ export default function Index() {
       <ScrollView>
         <View className="justify-center items-center bg-black/40 h-screen p-10">
           <View className="mb-7">
-            <Image className="w-40 h-40" source={require("../../assets/logo/logo.png")} />
+            <Image className="w-40 h-40" source={require("@/assets/logo/logo.png")} />
           </View>
 
           <View className="justify-center mb-16 gap-3 w-full">
