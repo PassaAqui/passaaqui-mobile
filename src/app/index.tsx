@@ -1,10 +1,10 @@
 import { Text, View, ImageBackground, Image, Pressable, ScrollView } from "react-native";
-import { Redirect } from "expo-router"
+import { Redirect, Link } from "expo-router"
 
 export default function Index() {
 
   // Apenas em desenvolvimento para testar novas telas
-  return <Redirect href={"./user/login"} />
+  return <Redirect href={"/shopkeeper/signup"} />
 
   return (
     <ImageBackground
@@ -25,9 +25,9 @@ export default function Index() {
 
           <View className="w-full gap-6">
             <View className="gap-6">
-              <Pressable className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
+              <Link href={"/user/login"} className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
                 <Text className="font-itim text-lg text-center text-white">Continuar como aventureiro</Text>
-              </Pressable>
+              </Link>
       
               <View className="flex-row justify-center items-center gap-3">
                 <View className="w-1/3 h-px bg-white" />
@@ -35,9 +35,9 @@ export default function Index() {
                 <View className="w-1/3 h-px bg-white" />
               </View>
 
-              <Pressable className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
+              <Link href={"/shopkeeper/signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
                 <Text className="font-itim text-lg text-center">Contiuar como comerciante</Text>
-              </Pressable>
+              </Link>
             </View>
 
           </View>
