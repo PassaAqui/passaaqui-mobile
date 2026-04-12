@@ -1,4 +1,4 @@
-import { Text, View, ImageBackground, Image, Pressable, ScrollView } from "react-native";
+import { Text, View, ImageBackground, Image, ScrollView } from "react-native";
 import { Redirect, Link } from "expo-router"
 
 export default function Index() {
