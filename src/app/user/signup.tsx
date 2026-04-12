@@ -1,4 +1,4 @@
-import { ImageBackground, ScrollView, View, Text, TextInput, Pressable } from "react-native";
+import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
 import { signUpSchema } from "@/src/schemas/user/signUpSchema";
 import { Link } from "expo-router";
@@ -63,121 +63,128 @@ export default function SignUp() {
       className="flex-1"
       resizeMode="cover"
     >
-      <ScrollView>
-        <View className="justify-center items-center bg-black/40 min-h-screen p-9 w-full">
-          <View className="flex-col justify-center items-center gap-3">
-            <UserIcon />
-            <Text className="text-white text-3xl font-irishGrover text-center" adjustsFontSizeToFit numberOfLines={1}>Criar uma conta</Text>
-          </View>
+      <View className="bg-black/40 inset-0 absolute" />
 
-          <View className="w-full gap-2">
-            <Text className="text-white font-itim text-lg">Nome</Text>
-            <TextInput
-              value={name}
-              onChangeText={(text) => {
-                  setName(text);
-                  if (error.name) {
-                      setError(prev => ({ ...prev, name: "" }));
-                  }
-              }}
-              className="bg-white rounded-lg p-4"
-              placeholder={"Digite seu nome"}
-            />
-            {error.name && (
-              <Text className="font-itim text-base text-red-300">{error.name}</Text>
-            )}
-
-            <Text className="text-white font-itim text-lg">Email</Text>
-            <TextInput
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={email}
-              onChangeText={(text) => {
-                  setEmail(text);
-                  if (error.email) {
-                      setError(prev => ({ ...prev, email: "" }));
-                  }
-              }}
-              className="bg-white rounded-lg p-4"
-              placeholder={"Digite seu email aqui"}
-            />
-            {error.email && (
-              <Text className="font-itim text-base text-red-300">{error.email}</Text>
-            )}
-
-            <Text className="text-white font-itim text-lg">CPF</Text>
-            <TextInput
-              keyboardType="numeric"
-              value={cpf}
-              onChangeText={(text) => {
-                setCpf(formatCpf(text));
-                if (error.cpf) setError(prev => ({ ...prev, cpf: "" }));
-              }}
-              className="bg-white rounded-lg p-4"
-              placeholder={"___.___.___-__"}
-            />
-            {error.cpf && (
-              <Text className="font-itim text-base text-red-300">{error.cpf}</Text>
-            )}
-
-            <Text className="text-white font-itim text-lg">Senha</Text>
-            <TextInput
-              secureTextEntry
-              value={password}
-              onChangeText={(text) => {
-                  setPassword(text);
-                  if (error.password) {
-                      setError(prev => ({ ...prev, password: "" }));
-                  }
-              }}
-              className="bg-white rounded-lg p-4"
-              placeholder={"Digite sua senha"}
-            />
-            {error.password && (
-              <Text className="font-itim text-base text-red-300">{error.password}</Text>
-            )}
-
-            <Text className="text-white font-itim text-lg">Confirmar senha</Text>
-            <TextInput
-              secureTextEntry
-              value={confirmPassword}
-              onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (error.confirmPassword) {
-                      setError(prev => ({ ...prev, confirmPassword: "" }));
-                  }
-              }}
-              className="bg-white rounded-lg p-4"
-              placeholder={"Confirme sua senha"}
-            />
-            {error.confirmPassword && (
-              <Text className="font-itim text-base text-red-300">{error.confirmPassword}</Text>
-            )}
-
-            <View className="flex-row items-center gap-2">
-              <Checkbox
-                      value={isChecked}
-                      onValueChange={(state) => {
-                          setChecked(state);
-                          if (error.terms) {
-                              setError(prev => ({ ...prev, terms: "" }))
-                          }
-                      }}
-                      color={isChecked? "#2463EB" : undefined}
-                      className="border-red-500"
-                  />
-                  <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.</Text>
+      <KeyboardAvoidingView
+        behavior="padding"
+        className="flex-1"
+      >
+        <ScrollView>
+          <View className="justify-center items-center min-h-screen p-9 w-full">
+            <View className="flex-col justify-center items-center gap-3">
+              <UserIcon />
+              <Text className="text-white text-3xl font-irishGrover text-center" adjustsFontSizeToFit numberOfLines={1}>Criar uma conta</Text>
             </View>
 
-            <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
-              <Text>Cadastrar</Text>
-            </Pressable>
+            <View className="w-full gap-2">
+              <Text className="text-white font-itim text-lg">Nome</Text>
+              <TextInput
+                value={name}
+                onChangeText={(text) => {
+                    setName(text);
+                    if (error.name) {
+                        setError(prev => ({ ...prev, name: "" }));
+                    }
+                }}
+                className="bg-white rounded-lg p-4"
+                placeholder={"Digite seu nome"}
+              />
+              {error.name && (
+                <Text className="font-itim text-base text-red-300">{error.name}</Text>
+              )}
 
-            <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/login"} className="text-cyan-500">Login</Link></Text>
+              <Text className="text-white font-itim text-lg">Email</Text>
+              <TextInput
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                value={email}
+                onChangeText={(text) => {
+                    setEmail(text);
+                    if (error.email) {
+                        setError(prev => ({ ...prev, email: "" }));
+                    }
+                }}
+                className="bg-white rounded-lg p-4"
+                placeholder={"Digite seu email aqui"}
+              />
+              {error.email && (
+                <Text className="font-itim text-base text-red-300">{error.email}</Text>
+              )}
+
+              <Text className="text-white font-itim text-lg">CPF</Text>
+              <TextInput
+                keyboardType="numeric"
+                value={cpf}
+                onChangeText={(text) => {
+                  setCpf(formatCpf(text));
+                  if (error.cpf) setError(prev => ({ ...prev, cpf: "" }));
+                }}
+                className="bg-white rounded-lg p-4"
+                placeholder={"___.___.___-__"}
+              />
+              {error.cpf && (
+                <Text className="font-itim text-base text-red-300">{error.cpf}</Text>
+              )}
+
+              <Text className="text-white font-itim text-lg">Senha</Text>
+              <TextInput
+                secureTextEntry
+                value={password}
+                onChangeText={(text) => {
+                    setPassword(text);
+                    if (error.password) {
+                        setError(prev => ({ ...prev, password: "" }));
+                    }
+                }}
+                className="bg-white rounded-lg p-4"
+                placeholder={"Digite sua senha"}
+              />
+              {error.password && (
+                <Text className="font-itim text-base text-red-300">{error.password}</Text>
+              )}
+
+              <Text className="text-white font-itim text-lg">Confirmar senha</Text>
+              <TextInput
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    if (error.confirmPassword) {
+                        setError(prev => ({ ...prev, confirmPassword: "" }));
+                    }
+                }}
+                className="bg-white rounded-lg p-4"
+                placeholder={"Confirme sua senha"}
+              />
+              {error.confirmPassword && (
+                <Text className="font-itim text-base text-red-300">{error.confirmPassword}</Text>
+              )}
+
+              <View className="flex-row items-center gap-2">
+                <Checkbox
+                        value={isChecked}
+                        onValueChange={(state) => {
+                            setChecked(state);
+                            if (error.terms) {
+                                setError(prev => ({ ...prev, terms: "" }))
+                            }
+                        }}
+                        color={isChecked? "#2463EB" : undefined}
+                        className="border-red-500"
+                    />
+                    <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.</Text>
+              </View>
+
+              <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
+                <Text>Cadastrar</Text>
+              </Pressable>
+
+              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/login"} className="text-cyan-500">Login</Link></Text>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   )
 }
