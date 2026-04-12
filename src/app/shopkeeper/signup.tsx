@@ -1,7 +1,9 @@
 import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { shopkeeperSignUpSchema } from "@/src/schemas/shopkeeper/signUpSchema";
 import { Link } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar"
 import Checkbox from "expo-checkbox";
 import ShopkeeperIcon from "@/src/components/shopkeeper/ShopkeeperIcon";
 
@@ -40,6 +42,10 @@ export default function SignUp() {
       terms: ""
   });
 
+  useEffect(() => {
+    NavigationBar.setVisibilityAsync("hidden");
+  }, []);
+
   const handleSubmit = () => {
     const result = shopkeeperSignUpSchema.safeParse({
       storeName,
@@ -76,6 +82,7 @@ export default function SignUp() {
       className="flex-1"
       resizeMode="cover"
     >
+      <StatusBar hidden />
       <View className="bg-black/40 inset-0 absolute" />
 
       <KeyboardAvoidingView
@@ -209,7 +216,7 @@ export default function SignUp() {
                 <Text>Cadastrar</Text>
               </Pressable>
 
-              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/login"} className="text-cyan-500">Login</Link></Text>
+              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/login"} className="text-cyan-500">Login</Link></Text>
             </View>
           </View>
         </ScrollView>
