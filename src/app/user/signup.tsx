@@ -1,6 +1,7 @@
 import { ImageBackground, ScrollView, View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
 import { signUpSchema } from "@/src/schemas/user/signUpSchema";
+import { Link } from "expo-router";
 import Checkbox from "expo-checkbox";
 import UserIcon from "@/src/components/user/UserIcon";
 
@@ -64,7 +65,7 @@ export default function SignUp() {
     >
       <ScrollView>
         <View className="justify-center items-center bg-black/40 min-h-screen p-9 w-full">
-          <View className="flex-col justify-center items-center">
+          <View className="flex-col justify-center items-center gap-3">
             <UserIcon />
             <Text className="text-white text-3xl font-irishGrover text-center" adjustsFontSizeToFit numberOfLines={1}>Criar uma conta</Text>
           </View>
@@ -173,7 +174,7 @@ export default function SignUp() {
               <Text>Cadastrar</Text>
             </Pressable>
 
-            <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Text className="text-cyan-500">Login</Text></Text>
+            <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/login"} className="text-cyan-500">Login</Link></Text>
           </View>
         </View>
       </ScrollView>
