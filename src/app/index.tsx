@@ -4,7 +4,7 @@ import { Redirect, Link } from "expo-router"
 export default function Index() {
 
   // Apenas em desenvolvimento para testar novas telas
-  //return <Redirect href={"/user/signup"} />
+  return <Redirect href={"/map"} />
 
   return (
     <ImageBackground
@@ -25,7 +25,7 @@ export default function Index() {
 
           <View className="w-full gap-6">
             <View className="gap-6">
-              <Link href={"/user/login"} className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
+              <Link href={"/user/auth/login"} className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
                 <Text className="font-itim text-lg text-center text-white">Continuar como aventureiro</Text>
               </Link>
       

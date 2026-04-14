@@ -91,7 +91,7 @@ const handleSubmit = () => {
                 <Text className="font-itim text-lg">Entrar</Text>
               </Pressable>
 
-              <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/signup"} className="text-cyan-500">Cadastre-se</Link></Text>
+              <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/auth/signup"} className="text-cyan-500">Cadastre-se</Link></Text>
             </View>
           </View>
         </ScrollView>
