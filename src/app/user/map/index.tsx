@@ -35,17 +35,54 @@ export default function Index() {
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
 
-    if (granted) {
-      const currentPosition = await getCurrentPositionAsync();
-      setLocation(currentPosition);
+    if (!granted) {
+      // Colocar um modal aqui falando que recomendamos ativar a localização para uma melhor experiência com o aplicativo...
+      console.log("[WARN LOCATION]: Permissão negada");
+      return;
     }
+
+    const currentPosition = await getCurrentPositionAsync({
+      accuracy: LocationAccuracy.Balanced
+    });
+    setLocation(currentPosition);
+    // colocar um tratamento pra ver se o usuário está em Recife ou não. Se não tiver, aparecer um modal falando que o app só funciona em recife ou algo assim
+
+    return true;
   }
 
   useEffect(() => {
-    requestLocationPermission();
+    let subscription: {remove: () => void } | null = null;
+
+    async function getLocation() {
+      const isLocationPermission = await requestLocationPermission();
+
+      if (isLocationPermission) {
+        subscription = await watchPositionAsync({
+          accuracy: LocationAccuracy.Highest,
+          timeInterval: 1000,
+          distanceInterval: 1
+        }, (response) => {
+          setLocation(response);
+          mapRef.current?.animateCamera({
+            center: {
+              latitude: response.coords.latitude,
+              longitude: response.coords.longitude
+            },
+            zoom: 19
+          });
+        });
+      }
+    }
+
+    getLocation();
+
+    return () => {
+      subscription?.remove()
+    }
   }, []);
 
 
+  /*
   useEffect(() => {
     watchPositionAsync({
       accuracy: LocationAccuracy.Highest,
@@ -62,7 +99,7 @@ export default function Index() {
       });
     });
   }, []);
-
+  */
 
   return (      
     <View className="flex-1 justify-center items-center">
