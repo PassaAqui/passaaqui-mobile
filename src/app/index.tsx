@@ -1,5 +1,6 @@
 import { Text, View, ImageBackground, Image, ScrollView } from "react-native";
 import { Redirect, Link } from "expo-router"
+import LogoIcon from "../components/common/logoIcon";
 
 export default function Index() {
 
@@ -15,7 +16,7 @@ export default function Index() {
       <ScrollView>
         <View className="justify-center items-center bg-black/40 h-screen p-10">
           <View className="mb-7">
-            <Image className="w-40 h-40" source={require("@/assets/logo/logo.png")} />
+            <LogoIcon />
           </View>
 
           <View className="justify-center mb-16 gap-3 w-full">
