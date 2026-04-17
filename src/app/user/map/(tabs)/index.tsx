@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text, Image } from "react-native";
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import { useEffect, useState, useRef } from "react";
@@ -44,6 +44,7 @@ export default function Index() {
     const currentPosition = await getCurrentPositionAsync({
       accuracy: LocationAccuracy.Balanced
     });
+    console.log(currentPosition);
     setLocation(currentPosition);
     // colocar um tratamento pra ver se o usuário está em Recife ou não. Se não tiver, aparecer um modal falando que o app só funciona em recife ou algo assim
 
@@ -102,7 +103,15 @@ export default function Index() {
   */
 
   return (      
-    <View className="flex-1 justify-center items-center">
+    <View className="flex-1 justify-center">
+      <View className="flex-row p-4 pt-12 items-center gap-3 bg-white">
+        <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
+        <View className="flex-col">
+          <Text className="font-itim text-xl">David Cleyton</Text>
+          <Text>1207 XP</Text>
+        </View>
+      </View>
+
       {location && (
         <MapView
           ref={mapRef}

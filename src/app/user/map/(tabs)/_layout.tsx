@@ -16,7 +16,7 @@ export default function TabLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: "black" }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: "black", headerShown: false }}>
         <Tabs.Screen name="index" options={{ title: "Explorar" }} />
         <Tabs.Screen
           name="redirect"
