@@ -2,6 +2,14 @@ import { StyleSheet, View, Text, Image } from "react-native";
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import { useEffect, useState, useRef } from "react";
+import AlertModal from "@/src/components/user/map/Alert";
+
+const PAULISTA_BOUNDS ={
+  latitudeMin: -7.9812503,
+  latitudeMax: -7.8379686,
+  longitudeMin: -35.0310089,
+  longitudeMax: -34.8192091
+}
 
 const mapStyle = [
   {
@@ -31,6 +39,7 @@ const mapStyle = [
 export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const mapRef = useRef<MapView>(null);
+  const [showAlertModal, setShowAlertModal] = useState<boolean>(false);
   
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
@@ -46,7 +55,6 @@ export default function Index() {
     });
     console.log(currentPosition);
     setLocation(currentPosition);
-    // colocar um tratamento pra ver se o usuário está em Recife ou não. Se não tiver, aparecer um modal falando que o app só funciona em recife ou algo assim
 
     return true;
   }
@@ -64,6 +72,7 @@ export default function Index() {
           distanceInterval: 1
         }, (response) => {
           setLocation(response);
+          checkLocation();
           mapRef.current?.animateCamera({
             center: {
               latitude: response.coords.latitude,
@@ -83,24 +92,38 @@ export default function Index() {
   }, []);
 
 
-  /*
+  const checkLocation = (): void => {
+    if (!location) {
+      return;
+    }
+
+    
+    const latitudeDentroDoLimite =
+    //location.coords.latitude >= PAULISTA_BOUNDS.latitudeMin &&
+    //location.coords.latitude <= PAULISTA_BOUNDS.latitudeMax;
+    -8.2832 >= PAULISTA_BOUNDS.latitudeMin &&
+    -8.2832 <= PAULISTA_BOUNDS.latitudeMax;
+
+    const longitudeDentroDoLimite =
+      location.coords.longitude >= PAULISTA_BOUNDS.longitudeMin &&
+      location.coords.longitude <= PAULISTA_BOUNDS.longitudeMax;
+
+    if (latitudeDentroDoLimite && longitudeDentroDoLimite) {
+      setShowAlertModal(false);
+      console.log("LOCATION ATUAL DENTRO DE PAULISTA: " + location)
+      console.log("DENTRO DE PAULISTA - mostrando modal");
+      return;
+    }
+    
+    console.log("LOCATION ATUAL FORA DE PAULISTA: " + location)
+    console.log("FORA DE PAULISTA - mostrando modal");
+    setShowAlertModal(true);
+  }
+
   useEffect(() => {
-    watchPositionAsync({
-      accuracy: LocationAccuracy.Highest,
-      timeInterval: 1000,
-      distanceInterval: 1
-    }, (response) => {
-      setLocation(response);
-      mapRef.current?.animateCamera({
-        center: {
-          latitude: response.coords.latitude,
-          longitude: response.coords.longitude
-        },
-        zoom: 19,
-      });
-    });
-  }, []);
-  */
+    checkLocation();
+  }, [location])
+
 
   return (      
     <View className="flex-1 justify-center">
@@ -117,25 +140,30 @@ export default function Index() {
           ref={mapRef}
           customMapStyle={mapStyle}
           initialRegion={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+            latitude: -7.94009, // Paulista (PE)
+            longitude: -34.8723,
             latitudeDelta: 0.005,
-            longitudeDelta: 0.005
+            longitudeDelta: 0.005,
           }}
           style={styles.map}
         >
           <Marker
             coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude
+              //latitude: -7.9158,
+              //longitude: -34.8587
+              latitude: -8.2832,
+              longitude: -35.9736
             }}
           />
         </MapView>
       )}
+
+      {showAlertModal && (
+        <AlertModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />
+      )}
     </View>
   )
 }
-
 
 const styles = StyleSheet.create({
   map: {
