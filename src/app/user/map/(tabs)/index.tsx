@@ -2,6 +2,8 @@ import { StyleSheet, View, Text, Image, ActivityIndicator } from "react-native";
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from "expo-location";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useEffect, useState, useRef } from "react";
+import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar"
 import AlertModal from "@/src/components/user/map/Alert";
 import POIModal from "@/src/components/user/map/POIModal";
 import { getRoute } from "@/src/services/routeService";
@@ -140,6 +142,10 @@ export default function Index() {
     checkLocation();
   }, [location])
 
+  useEffect(() => {
+    NavigationBar.setButtonStyleAsync("dark");
+  }, []);
+
 
   async function handleNavigation(destination: { latitude: number, longitude: number }) {
     if (!location) return;
@@ -175,6 +181,7 @@ export default function Index() {
 
   return (      
     <View className="flex-1 justify-center">
+      <StatusBar style="dark" hidden/>
       <View className="flex-row p-4 pt-12 items-center gap-3 bg-white">
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
         <View className="flex-col">
