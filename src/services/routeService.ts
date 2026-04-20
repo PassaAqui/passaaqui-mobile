@@ -1,5 +1,5 @@
-const ORS_API_KEY = "";
-const ORS_BASE_URL = "";
+const ORS_API_KEY = process.env.EXPO_PUBLIC_ORS_API_KEY;
+const ORS_BASE_URL = process.env.EXPO_PUBLIC_ORS_BASE_URL;
 
 interface Coordinate {
   latitude: number,
@@ -16,7 +16,7 @@ type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
 
 export async function getRoute(origin: Coordinate, destination: Coordinate, mode: RouteMode = "foot-walking"): Promise<RouteResult> {
   try {
-    const response = await fetch(`${ORS_BASE_URL}/directions/${mode}?api_key=${ORS_API_KEY}&start=${origin.longitude},${origin.latitude}&end=${destination.longitude}, ${destination.latitude}`);
+    const response = await fetch(`${ORS_BASE_URL}/directions/${mode}?api_key=${ORS_API_KEY}&start=${origin.longitude},${origin.latitude}&end=${destination.longitude},${destination.latitude}`);
     
     if (!response.ok) {
       throw new Error(`[OpenRoute ERROR]: Erro na API ${response.status}`);

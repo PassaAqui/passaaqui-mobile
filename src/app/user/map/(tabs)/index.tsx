@@ -1,9 +1,10 @@
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, ActivityIndicator } from "react-native";
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from "expo-location";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import { useEffect, useState, useRef } from "react";
 import AlertModal from "@/src/components/user/map/Alert";
 import POIModal from "@/src/components/user/map/POIModal";
+import { getRoute } from "@/src/services/routeService";
 
 const PAULISTA_BOUNDS ={
   latitudeMin: -7.9812503,
@@ -47,7 +48,9 @@ export default function Index() {
   const mapRef = useRef<MapView>(null);
   const [showAlertModal, setShowAlertModal] = useState<boolean>(false);
   const [openPOIMarker, setOpenPOIMarker] = useState<typeof POIS[0] | null>(null);
-  
+  const [routeCoords, setRouteCoords] = useState<{ latitude: number, longitude: number }[]>([]);
+  const [loadingRoute, setLoadingRoute] = useState(false);
+
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
 
@@ -138,6 +141,38 @@ export default function Index() {
   }, [location])
 
 
+  async function handleNavigation(destination: { latitude: number, longitude: number }) {
+    if (!location) return;
+
+    setLoadingRoute(true);
+
+    try {
+      const origin = {
+        //latitude: location.coords.latitude,
+        //longitude: location.coords.longitude
+        latitude: -7.94009,
+        longitude: -34.8723
+      }
+
+      const { coordinates } = await getRoute(origin, destination);
+      setRouteCoords(coordinates);
+
+      mapRef.current?.fitToCoordinates(coordinates, {
+        edgePadding: {
+          top: 80,
+          right: 40,
+          bottom: 80,
+          left: 40
+        },
+        animated: true
+      });
+    } catch (error) {
+      console.log(`[user/map ERROR]: Erro ao traçar a rota ${error}`);
+    } finally {
+      setLoadingRoute(false);
+    }
+  }
+
   return (      
     <View className="flex-1 justify-center">
       <View className="flex-row p-4 pt-12 items-center gap-3 bg-white">
@@ -147,6 +182,12 @@ export default function Index() {
           <Text>1207 XP</Text>
         </View>
       </View>
+
+      {loadingRoute && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#EAAA6A" />
+        </View>
+      )}
 
       {location && (
         <MapView
@@ -181,6 +222,14 @@ export default function Index() {
               pinColor="black"
             />
           ))}
+
+          {routeCoords.length > 0 && (
+            <Polyline
+              coordinates={routeCoords}
+              strokeColor="#EAAA6A"
+              strokeWidth={6}
+            />
+          )}
         </MapView>
       )}
 
@@ -197,6 +246,7 @@ export default function Index() {
           xpQuantity={openPOIMarker.xpQuantity}
           visible={!!openPOIMarker}
           onClose={() => setOpenPOIMarker(null)}
+          onNavigate={() => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude })}
         />
       )}
     </View>
@@ -207,5 +257,11 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
     width: "100%"
+  },
+  loadingOverlay: {
+    position: "absolute",
+    zIndex: 10,
+    top: "50%",
+    alignSelf: "center"
   }
 })
