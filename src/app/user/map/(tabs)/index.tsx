@@ -208,6 +208,7 @@ export default function Index() {
               //latitude: -8.2832,
               //longitude: -35.9736
             }}
+            icon={require("@/assets/user/map/user-pin.png")}
           />
 
           {POIS.map(poi => (
