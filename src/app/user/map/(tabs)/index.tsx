@@ -37,6 +37,21 @@ const mapStyle = [
   {
     "featureType": "water",
     "stylers": [{ "color": "#a0d2ff" }]
+  },
+
+  // Remove nome dos bairros, pontos de transporte e ícones de marcadores que já vem por padrão
+  {
+    "featureType": "transit",
+    "stylers": [{ "visibility": "off" }]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{ "visibility": "off" }]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "labels",
+    "stylers": [{ "visibility": "off" }]
   }
 ];
 
