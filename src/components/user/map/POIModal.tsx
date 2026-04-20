@@ -7,10 +7,11 @@ interface POIModalProps {
   distance: number,
   xpQuantity: number
   visible: boolean,
-  onClose: () => void;
+  onClose: () => void,
+  onNavigate: () => void;
 }
 
-export default function POIModal({ img, title, description, distance, xpQuantity, visible, onClose }: POIModalProps) {
+export default function POIModal({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: POIModalProps) {
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View className="flex-1 bg-black/50 items-center justify-center px-6">
@@ -33,7 +34,13 @@ export default function POIModal({ img, title, description, distance, xpQuantity
               </View>
             </View>
 
-            <Pressable onPress={onClose} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
+            <Pressable
+              onPress={() => {
+                onNavigate();
+                onClose();
+              }}
+              className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65"
+            >
               <Text className="font-itim text-xxl">Ir</Text>
             </Pressable>
           </View>
