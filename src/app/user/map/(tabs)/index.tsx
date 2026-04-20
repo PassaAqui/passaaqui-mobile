@@ -220,7 +220,7 @@ export default function Index() {
               }}
               title={poi.title}
               onPress={() => setOpenPOIMarker(poi)}
-              pinColor="black"
+              icon={require("@/assets/user/map/shopkeeper-pin.png")}
             />
           ))}
 
