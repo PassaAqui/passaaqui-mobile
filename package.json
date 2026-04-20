@@ -14,6 +14,7 @@
     "@expo-google-fonts/irish-grover": "^0.4.0",
     "@expo-google-fonts/itim": "^0.4.1",
     "@expo/vector-icons": "^15.0.3",
+    "@mapbox/polyline": "^1.2.1",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
