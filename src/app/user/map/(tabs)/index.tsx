@@ -304,7 +304,7 @@ export default function Index() {
       )}
 
       {stop && (
-        <StopButton />
+        <StopButton onStop={() => setStop(false)} />
       )}
     </View>
   )
