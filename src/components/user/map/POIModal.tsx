@@ -1,4 +1,6 @@
 import { Modal, View, Text, Image, Pressable, ImageSourcePropType } from "react-native";
+import { useState } from "react";
+import LocomotionModal from "./LocomotionModal";
 
 interface POIModalProps {
   img: ImageSourcePropType
@@ -12,6 +14,12 @@ interface POIModalProps {
 }
 
 export default function POIModal({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: POIModalProps) {
+  const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
+
+  if (openLocomotionModal) {
+    return <LocomotionModal />
+  }
+
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View className="flex-1 bg-black/50 items-center justify-center px-6">
@@ -34,13 +42,14 @@ export default function POIModal({ img, title, description, distance, xpQuantity
               </View>
             </View>
 
-            <Pressable
+            {/*<Pressable
               onPress={() => {
                 onNavigate();
                 onClose();
               }}
               className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65"
-            >
+            >*/}
+            <Pressable onPress={() => setOpenLocomotionModal(true)} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
               <Text className="font-itim text-xxl">Ir</Text>
             </Pressable>
           </View>

@@ -2,7 +2,7 @@ import { Modal, View, Image, Text, Pressable } from "react-native"
 
 export default function LocomotionModal() {
   return (
-    <Modal>
+    <Modal transparent animationType="fade">
       <View className="flex-1 bg-black/50 items-center justify-center px-6">
         <View className="w-full bg-white items-center justify-center gap-2 p-6 rounded-xl overflow-hidden">
           <Image className="w-24 h-24" source={require("@/assets/user/map/poi/destination.png")} />
