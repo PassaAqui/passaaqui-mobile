@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar"
 import AlertModal from "@/src/components/user/map/Alert";
 import POIModal from "@/src/components/user/map/POIModal";
+import LocomotionModal from "@/src/components/user/map/LocomotionModal";
 import { getRoute } from "@/src/services/routeService";
 
 const PAULISTA_BOUNDS ={
@@ -280,6 +281,8 @@ export default function Index() {
           onNavigate={() => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude })}
         />
       )}
+
+      <LocomotionModal />
     </View>
   )
 }
