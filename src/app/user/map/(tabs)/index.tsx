@@ -67,6 +67,7 @@ export default function Index() {
   const [openPOIMarker, setOpenPOIMarker] = useState<typeof POIS[0] | null>(null);
   const [routeCoords, setRouteCoords] = useState<{ latitude: number, longitude: number }[]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
+  const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
 
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
@@ -158,6 +159,12 @@ export default function Index() {
   }, [location])
 
   useEffect(() => {
+    if (!openPOIMarker) return;
+
+    handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude });
+  }, [openPOIMarker]);
+
+  useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
   }, []);
 
@@ -175,8 +182,9 @@ export default function Index() {
         longitude: -34.8723
       }
 
-      const { coordinates } = await getRoute(origin, destination);
+      const { coordinates, distance } = await getRoute(origin, destination);
       setRouteCoords(coordinates);
+      setRouteDistance(distance);
 
       mapRef.current?.fitToCoordinates(coordinates, {
         edgePadding: {
@@ -265,7 +273,7 @@ export default function Index() {
           img={require("@/assets/user/map/tmp/no-image.png")}
           title={openPOIMarker.title}
           description={openPOIMarker.description}
-          distance={openPOIMarker.distance}
+          distance={routeDistance}
           xpQuantity={openPOIMarker.xpQuantity}
           visible={!!openPOIMarker}
           onClose={() => setOpenPOIMarker(null)}

@@ -4,7 +4,7 @@ interface POIModalProps {
   img: ImageSourcePropType
   title: string,
   description: string,
-  distance: number,
+  distance: number | string | null,
   xpQuantity: number
   visible: boolean,
   onClose: () => void,
