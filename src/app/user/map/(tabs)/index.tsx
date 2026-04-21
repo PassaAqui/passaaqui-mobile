@@ -7,6 +7,8 @@ import * as NavigationBar from "expo-navigation-bar"
 import AlertModal from "@/src/components/user/map/Alert";
 import POIModal from "@/src/components/user/map/POIModal";
 import { getRoute } from "@/src/services/routeService";
+import StopButton from "@/src/components/user/map/StopButton";
+import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
 
 const PAULISTA_BOUNDS ={
   latitudeMin: -7.9812503,
@@ -68,6 +70,8 @@ export default function Index() {
   const [routeCoords, setRouteCoords] = useState<{ latitude: number, longitude: number }[]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
+  const [stop, setStop] = useState<boolean>(false);
+  const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
 
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
@@ -157,11 +161,30 @@ export default function Index() {
   useEffect(() => {
     checkLocation();
   }, [location])
-
+  
   useEffect(() => {
     if (!openPOIMarker) return;
 
-    handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude });
+    async function getDistance() {
+      try {
+        const origin = {
+          //latitude: location.coords.latitude,
+          //longitude: location.coords.longitude
+          latitude: -7.94009,
+          longitude: -34.8723
+        }
+
+        const destination = { latitude: openPOIMarker!.latitude, longitude: openPOIMarker!.longitude};
+        const { distance } = await getRoute(origin, destination, "foot-walking");
+        setRouteDistance(distance);
+
+      } catch (error) {
+        console.log(`[useEffect user/map ERROR]: Erro ao pegar a distância ${error}`);
+      }
+    }
+    
+    getDistance();
+
   }, [openPOIMarker]);
 
   useEffect(() => {
@@ -169,7 +192,7 @@ export default function Index() {
   }, []);
 
 
-  async function handleNavigation(destination: { latitude: number, longitude: number }) {
+  async function handleNavigation(destination: { latitude: number, longitude: number }, mode: "driving-car" | "foot-walking" | "cycling-regular" = "foot-walking") {
     if (!location) return;
 
     setLoadingRoute(true);
@@ -182,9 +205,8 @@ export default function Index() {
         longitude: -34.8723
       }
 
-      const { coordinates, distance } = await getRoute(origin, destination);
+      const { coordinates, distance } = await getRoute(origin, destination, mode);
       setRouteCoords(coordinates);
-      setRouteDistance(distance);
 
       mapRef.current?.fitToCoordinates(coordinates, {
         edgePadding: {
@@ -199,6 +221,7 @@ export default function Index() {
       console.log(`[user/map ERROR]: Erro ao traçar a rota ${error}`);
     } finally {
       setLoadingRoute(false);
+      setStop(true);
     }
   }
 
@@ -254,7 +277,7 @@ export default function Index() {
             />
           ))}
 
-          {routeCoords.length > 0 && (
+          {routeCoords.length > 0 && stop && (
             <Polyline
               coordinates={routeCoords}
               strokeColor="#EAAA6A"
@@ -277,7 +300,22 @@ export default function Index() {
           xpQuantity={openPOIMarker.xpQuantity}
           visible={!!openPOIMarker}
           onClose={() => setOpenPOIMarker(null)}
-          onNavigate={() => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude })}
+          onNavigate={(mode) => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude }, mode)}
+        />
+      )}
+
+      {stop && (
+        <StopButton onConfirmate={() => setShowStopConfirmation(true)} />
+      )}
+
+      {showStopConfirmation && (
+        <StopConfirmation
+          visible={!!showStopConfirmation}
+          onStop={() => {
+            setStop(false);
+            setRouteCoords([]);
+            setShowStopConfirmation(false);
+          }}
         />
       )}
     </View>
