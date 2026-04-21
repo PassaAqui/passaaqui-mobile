@@ -205,7 +205,6 @@ export default function Index() {
 
       const { coordinates, distance } = await getRoute(origin, destination, mode);
       setRouteCoords(coordinates);
-      setRouteDistance(distance);
 
       mapRef.current?.fitToCoordinates(coordinates, {
         edgePadding: {
