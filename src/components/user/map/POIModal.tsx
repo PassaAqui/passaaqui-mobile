@@ -2,6 +2,8 @@ import { Modal, View, Text, Image, Pressable, ImageSourcePropType } from "react-
 import { useState } from "react";
 import LocomotionModal from "./LocomotionModal";
 
+type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
+
 interface POIModalProps {
   img: ImageSourcePropType
   title: string,
@@ -10,14 +12,22 @@ interface POIModalProps {
   xpQuantity: number
   visible: boolean,
   onClose: () => void,
-  onNavigate: () => void;
+  onNavigate: (mode: RouteMode) => void;
 }
 
 export default function POIModal({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: POIModalProps) {
   const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
 
   if (openLocomotionModal) {
-    return <LocomotionModal />
+    return (
+      <LocomotionModal
+        onSelect={(mode) => {
+          onNavigate(mode);
+          setOpenLocomotionModal(false);
+          onClose();
+        }}
+      />
+    )
   }
 
   return (

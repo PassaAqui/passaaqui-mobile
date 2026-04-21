@@ -169,7 +169,7 @@ export default function Index() {
   }, []);
 
 
-  async function handleNavigation(destination: { latitude: number, longitude: number }) {
+  async function handleNavigation(destination: { latitude: number, longitude: number }, mode: "driving-car" | "foot-walking" | "cycling-regular" = "foot-walking") {
     if (!location) return;
 
     setLoadingRoute(true);
@@ -182,7 +182,7 @@ export default function Index() {
         longitude: -34.8723
       }
 
-      const { coordinates, distance } = await getRoute(origin, destination);
+      const { coordinates, distance } = await getRoute(origin, destination, mode);
       setRouteCoords(coordinates);
       setRouteDistance(distance);
 
@@ -277,7 +277,7 @@ export default function Index() {
           xpQuantity={openPOIMarker.xpQuantity}
           visible={!!openPOIMarker}
           onClose={() => setOpenPOIMarker(null)}
-          onNavigate={() => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude })}
+          onNavigate={(mode) => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude }, mode)}
         />
       )}
     </View>
