@@ -8,6 +8,7 @@ import AlertModal from "@/src/components/user/map/Alert";
 import POIModal from "@/src/components/user/map/POIModal";
 import { getRoute } from "@/src/services/routeService";
 import StopButton from "@/src/components/user/map/StopButton";
+import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
 
 const PAULISTA_BOUNDS ={
   latitudeMin: -7.9812503,
@@ -70,6 +71,7 @@ export default function Index() {
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
   const [stop, setStop] = useState<boolean>(false);
+  const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
 
   async function requestLocationPermission() {
     const { granted } = await requestForegroundPermissionsAsync();
@@ -303,7 +305,18 @@ export default function Index() {
       )}
 
       {stop && (
-        <StopButton onStop={() => setStop(false)} />
+        <StopButton onConfirmate={() => setShowStopConfirmation(true)} />
+      )}
+
+      {showStopConfirmation && (
+        <StopConfirmation
+          visible={!!showStopConfirmation}
+          onStop={() => {
+            setStop(false);
+            setRouteCoords([]);
+            setShowStopConfirmation(false);
+          }}
+        />
       )}
     </View>
   )
