@@ -322,6 +322,19 @@ export default function Index() {
         />
       )}
 
+      {openPOIMarker && (
+        <ShopPOIModal
+          img={require("@/assets/user/map/tmp/no-image.png")}
+          title={openPOIMarker.title}
+          description={openPOIMarker.description}
+          distance={routeDistance}
+          xpQuantity={openPOIMarker.xpQuantity}
+          visible={!!openPOIMarker}
+          onClose={() => setOpenPOIMarker(null)}
+          onNavigate={(mode) => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude }, mode)}
+        />
+      )}
+
       {stop && (
         <StopButton onConfirmate={() => setShowStopConfirmation(true)} />
       )}

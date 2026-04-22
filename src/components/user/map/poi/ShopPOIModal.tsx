@@ -51,9 +51,9 @@ export default function ShopPOIModal({ img, title, description, distance, xpQuan
               </View>
 
               <View className="border border-[#EAAA6A] p-4 w-2/5 rounded-lg items-center justify-center">
-                <Image className="w-10 h-10 opacity-70" source={require("@/assets/user/map/poi/xp.png")} />
-                <Text className="font-itim text-lg opacity-70">Recompensa</Text>
-                <Text className="font-itim text-3xl">{xpQuantity} <Text className="text-center text-xl font-itim">XP</Text></Text>
+                <Image className="w-10 h-10 opacity-70" source={require("@/assets/user/map/poi/shop/star.png")} />
+                <Text className="font-itim text-lg opacity-70">Avaliações</Text>
+                <Text className="font-itim text-3xl">4.6</Text>
               </View>
             </View>
 
