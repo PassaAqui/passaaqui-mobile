@@ -5,7 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar"
 import AlertModal from "@/src/components/user/map/Alert";
-import POIModal from "@/src/components/user/map/POIModal";
+//import POIModal from "@/src/components/user/map/POIModal";
+import TouristPOIModal from "@/src/components/user/map/poi/TouristPOIModal";
 import { getRoute } from "@/src/services/routeService";
 import StopButton from "@/src/components/user/map/StopButton";
 import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
@@ -57,16 +58,16 @@ const mapStyle = [
   }
 ];
 
-const POIS = [
+const touristPOIs = [
   {id: 1, latitude: -7.9450, longitude: -34.8750, title: "Primeiro POI", description: "Descrição 1 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 1200, xpQuantity: 45},
-  {id: 2, latitude: -7.9380, longitude: -34.8690, title: "Segundo POI", description: "Descrição 2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 700, xpQuantity: 12}
+  //{id: 2, latitude: -7.9380, longitude: -34.8690, title: "Segundo POI", description: "Descrição 2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 700, xpQuantity: 12}
 ]
 
 export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const mapRef = useRef<MapView>(null);
   const [showAlertModal, setShowAlertModal] = useState<boolean>(false);
-  const [openPOIMarker, setOpenPOIMarker] = useState<typeof POIS[0] | null>(null);
+  const [openPOIMarker, setOpenPOIMarker] = useState<typeof touristPOIs[0] | null>(null);
   const [routeCoords, setRouteCoords] = useState<{ latitude: number, longitude: number }[]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
@@ -264,15 +265,15 @@ export default function Index() {
             icon={require("@/assets/user/map/user-pin.png")}
           />
 
-          {POIS.map(poi => (
+          {touristPOIs.map(touristPoi => (
             <Marker
-              key={poi.id}
+              key={touristPoi.id}
               coordinate={{
-                latitude: poi.latitude,
-                longitude: poi.longitude
+                latitude: touristPoi.latitude,
+                longitude: touristPoi.longitude
               }}
-              title={poi.title}
-              onPress={() => setOpenPOIMarker(poi)}
+              title={touristPoi.title}
+              onPress={() => setOpenPOIMarker(touristPoi)}
               icon={require("@/assets/user/map/shopkeeper-pin.png")}
             />
           ))}
@@ -292,7 +293,7 @@ export default function Index() {
       )}
 
       {openPOIMarker && (
-        <POIModal
+        <TouristPOIModal
           img={require("@/assets/user/map/tmp/no-image.png")}
           title={openPOIMarker.title}
           description={openPOIMarker.description}
