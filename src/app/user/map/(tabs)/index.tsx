@@ -278,7 +278,7 @@ export default function Index() {
               }}
               title={touristPoi.title}
               onPress={() => setOpenPOIMarker(touristPoi)}
-              icon={require("@/assets/user/map/shopkeeper-pin.png")}
+              icon={require("@/assets/user/map/poi/touristPOI.png")}
             />
           ))}
 
