@@ -7,6 +7,7 @@ import * as NavigationBar from "expo-navigation-bar"
 import AlertModal from "@/src/components/user/map/Alert";
 //import POIModal from "@/src/components/user/map/POIModal";
 import TouristPOIModal from "@/src/components/user/map/poi/TouristPOIModal";
+import ShopPOIModal from "@/src/components/user/map/poi/ShopPOIModal";
 import { getRoute } from "@/src/services/routeService";
 import StopButton from "@/src/components/user/map/StopButton";
 import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
@@ -60,7 +61,10 @@ const mapStyle = [
 
 const touristPOIs = [
   {id: 1, latitude: -7.9450, longitude: -34.8750, title: "Primeiro POI", description: "Descrição 1 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 1200, xpQuantity: 45},
-  //{id: 2, latitude: -7.9380, longitude: -34.8690, title: "Segundo POI", description: "Descrição 2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 700, xpQuantity: 12}
+]
+
+const shopPOIs = [
+  {id: 2, latitude: -7.9380, longitude: -34.8690, title: "Segundo ShopPOI", description: "Descrição 2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 700, xpQuantity: 12}
 ]
 
 export default function Index() {
@@ -274,6 +278,19 @@ export default function Index() {
               }}
               title={touristPoi.title}
               onPress={() => setOpenPOIMarker(touristPoi)}
+              icon={require("@/assets/user/map/shopkeeper-pin.png")}
+            />
+          ))}
+
+          {shopPOIs.map(shopPoi => (
+            <Marker
+              key={shopPoi.id}
+              coordinate={{
+                latitude: shopPoi.latitude,
+                longitude: shopPoi.longitude
+              }}
+              title={shopPoi.title}
+              onPress={() => setOpenPOIMarker(shopPoi)}
               icon={require("@/assets/user/map/shopkeeper-pin.png")}
             />
           ))}
