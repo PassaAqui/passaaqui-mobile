@@ -71,7 +71,9 @@ export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const mapRef = useRef<MapView>(null);
   const [showAlertModal, setShowAlertModal] = useState<boolean>(false);
-  const [openPOIMarker, setOpenPOIMarker] = useState<typeof touristPOIs[0] | null>(null);
+  const [openTouristPOIMarker, setOpenTouristPOIMarker] = useState<typeof touristPOIs[0] | null>(null);
+  const [openShopPOIMarker, setOpenShopPOIMarker] = useState<typeof shopPOIs[0] | null>(null);
+  const [openPOIMarker, setOpenPOIMarker] = useState<typeof shopPOIs[0] | typeof touristPOIs[0] | null>(null);
   const [routeCoords, setRouteCoords] = useState<{ latitude: number, longitude: number }[]>([]);
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
@@ -277,7 +279,10 @@ export default function Index() {
                 longitude: touristPoi.longitude
               }}
               title={touristPoi.title}
-              onPress={() => setOpenPOIMarker(touristPoi)}
+              onPress={() => {
+                setOpenTouristPOIMarker(touristPoi);
+                setOpenPOIMarker(touristPoi);
+              }}
               icon={require("@/assets/user/map/poi/touristPOI.png")}
             />
           ))}
@@ -290,7 +295,10 @@ export default function Index() {
                 longitude: shopPoi.longitude
               }}
               title={shopPoi.title}
-              onPress={() => setOpenPOIMarker(shopPoi)}
+              onPress={() => {
+                setOpenShopPOIMarker(shopPoi);
+                setOpenPOIMarker(shopPoi);
+              }}
               icon={require("@/assets/user/map/shopkeeper-pin.png")}
             />
           ))}
@@ -309,29 +317,29 @@ export default function Index() {
         <AlertModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />
       )}
 
-      {openPOIMarker && (
+      {openTouristPOIMarker && (
         <TouristPOIModal
           img={require("@/assets/user/map/tmp/no-image.png")}
-          title={openPOIMarker.title}
-          description={openPOIMarker.description}
+          title={openTouristPOIMarker.title}
+          description={openTouristPOIMarker.description}
           distance={routeDistance}
-          xpQuantity={openPOIMarker.xpQuantity}
-          visible={!!openPOIMarker}
-          onClose={() => setOpenPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude }, mode)}
+          xpQuantity={openTouristPOIMarker.xpQuantity}
+          visible={!!openTouristPOIMarker}
+          onClose={() => setOpenTouristPOIMarker(null)}
+          onNavigate={(mode) => handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode)}
         />
       )}
 
-      {openPOIMarker && (
+      {openShopPOIMarker && (
         <ShopPOIModal
           img={require("@/assets/user/map/tmp/no-image.png")}
-          title={openPOIMarker.title}
-          description={openPOIMarker.description}
+          title={openShopPOIMarker.title}
+          description={openShopPOIMarker.description}
           distance={routeDistance}
-          xpQuantity={openPOIMarker.xpQuantity}
-          visible={!!openPOIMarker}
-          onClose={() => setOpenPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude }, mode)}
+          xpQuantity={openShopPOIMarker.xpQuantity}
+          visible={!!openShopPOIMarker}
+          onClose={() => setOpenShopPOIMarker(null)}
+          onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode)}
         />
       )}
 
