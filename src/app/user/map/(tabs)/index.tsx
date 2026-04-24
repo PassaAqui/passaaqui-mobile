@@ -3,7 +3,8 @@ import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObj
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useEffect, useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import * as NavigationBar from "expo-navigation-bar"
+import * as NavigationBar from "expo-navigation-bar";
+import { PAULISTA_BOUNDS, mapStyle } from "@/src/constants/user/map/map";
 import AlertModal from "@/src/components/user/map/Alert";
 //import POIModal from "@/src/components/user/map/POIModal";
 import TouristPOIModal from "@/src/components/user/map/poi/TouristPOIModal";
@@ -11,53 +12,6 @@ import ShopPOIModal from "@/src/components/user/map/poi/ShopPOIModal";
 import { getRoute } from "@/src/services/routeService";
 import StopButton from "@/src/components/user/map/StopButton";
 import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
-
-const PAULISTA_BOUNDS ={
-  latitudeMin: -7.9812503,
-  latitudeMax: -7.8379686,
-  longitudeMin: -35.0310089,
-  longitudeMax: -34.8192091
-}
-
-const mapStyle = [
-  {
-    "featureType": "poi",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "featureType": "poi.park",
-    "stylers": [{ "visibility": "on" }]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [{ "visibility": "on" }]
-  },
-  {
-    "featureType": "water",
-    "stylers": [{ "color": "#a0d2ff" }]
-  },
-
-  // Remove nome dos bairros, pontos de transporte e ícones de marcadores que já vem por padrão
-  {
-    "featureType": "transit",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [{ "visibility": "off" }]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "labels",
-    "stylers": [{ "visibility": "off" }]
-  }
-];
 
 const touristPOIs = [
   {id: 1, latitude: -7.9450, longitude: -34.8750, title: "Primeiro POI", description: "Descrição 1 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 1200, xpQuantity: 45},
