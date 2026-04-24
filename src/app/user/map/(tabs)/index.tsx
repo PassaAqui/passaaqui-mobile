@@ -5,21 +5,13 @@ import { useEffect, useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { PAULISTA_BOUNDS, mapStyle } from "@/src/constants/user/map/map";
+import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
 import AlertModal from "@/src/components/user/map/Alert";
-//import POIModal from "@/src/components/user/map/POIModal";
 import TouristPOIModal from "@/src/components/user/map/poi/TouristPOIModal";
 import ShopPOIModal from "@/src/components/user/map/poi/ShopPOIModal";
 import { getRoute } from "@/src/services/routeService";
 import StopButton from "@/src/components/user/map/StopButton";
 import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
-
-const touristPOIs = [
-  {id: 1, latitude: -7.9450, longitude: -34.8750, title: "Primeiro POI", description: "Descrição 1 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 1200, xpQuantity: 45},
-]
-
-const shopPOIs = [
-  {id: 2, latitude: -7.9380, longitude: -34.8690, title: "Segundo ShopPOI", description: "Descrição 2 Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis dolore, laborum dicta quidem ratione, rerum eveniet reiciendis laboriosam quas odit modi, hic voluptatem excepturi explicabo sit ea voluptate iusto reprehenderit?", distance: 700, xpQuantity: 12}
-]
 
 export default function Index() {
   const [location, setLocation] = useState<LocationObject | null>(null);
