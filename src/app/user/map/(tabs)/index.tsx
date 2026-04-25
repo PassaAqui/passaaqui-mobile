@@ -136,7 +136,7 @@ export default function Index() {
           title={openShopPOIMarker.title}
           description={openShopPOIMarker.description}
           distance={routeDistance}
-          xpQuantity={openShopPOIMarker.xpQuantity}
+          starQuantity={openShopPOIMarker.xpQuantity}
           visible={!!openShopPOIMarker}
           onClose={() => setOpenShopPOIMarker(null)}
           onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode)}

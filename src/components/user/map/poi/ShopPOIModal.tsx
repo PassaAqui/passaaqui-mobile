@@ -1,6 +1,7 @@
 import { Modal, View, Text, Image, Pressable, ImageSourcePropType } from "react-native";
 import { useState } from "react";
 import LocomotionModal from "../LocomotionModal";
+import { Link } from "expo-router";
 
 type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
 
@@ -9,13 +10,13 @@ interface ShopPOIModalProps {
   title: string,
   description: string,
   distance: number | string | null,
-  xpQuantity: number
+  starQuantity: number
   visible: boolean,
   onClose: () => void,
   onNavigate: (mode: RouteMode) => void;
 }
 
-export default function ShopPOIModal({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
+export default function ShopPOIModal({ img, title, description, distance, starQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
   const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
 
   if (openLocomotionModal) {
@@ -57,7 +58,11 @@ export default function ShopPOIModal({ img, title, description, distance, xpQuan
               </View>
             </View>
 
-            <Pressable onPress={() => setOpenLocomotionModal(true)} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
+            <Link href={"/user/map/poi/shop"} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
+              <Text className="font-itim text-xl text-center">Ver produtos</Text>
+            </Link>
+
+            <Pressable onPress={() => setOpenLocomotionModal(true)} className="border border-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
               <Text className="font-itim text-xl text-center">Ir agora</Text>
             </Pressable>
           </View>
