@@ -5,7 +5,7 @@ import LogoIcon from "../components/common/logoIcon";
 export default function Index() {
 
   // Apenas em desenvolvimento para testar novas telas
-  return <Redirect href={"/user/map/(tabs)"} />
+  return <Redirect href={"/user/map/poi/shop"} />
 
   return (
     <ImageBackground
