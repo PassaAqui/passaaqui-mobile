@@ -33,6 +33,20 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
+          name="shop"
+          options={{
+            title: "Loja",
+            tabBarIcon: ({ focused }: { focused: boolean }) => (
+              <Image
+                source={require("@/assets/user/map/poi/shop/shop-icon.png")}
+                className="w-8 h-8"
+                style={{ resizeMode: "contain", opacity: focused ? 1 : 0.5 }}
+              />
+            )
+          }}
+        />
+
+        <Tabs.Screen
           name="achievements"
           options={{
             title: "Conquistas",
