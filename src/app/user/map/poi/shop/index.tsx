@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
+import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import { useEffect } from "react";
 
 const products = [
@@ -56,9 +57,9 @@ export default function Shop() {
 
                   <View>
                     <XpBar currentXp={currentXp} xpRequired={product.xpRequired} />
-                    <View>
+                    <View className="flex-row gap-2 items-center">
                       <Text className="font-itim">{currentXp}/{product.xpRequired} XP</Text>
-                      {/*<Image />*/}
+                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} />
                     </View>
                   </View>
                 </View>
