@@ -79,10 +79,10 @@ export default function Shop() {
                   </View>
 
                   <View>
-                    <XpBar currentXp={currentXp} xpRequired={product.xpRequired} />
+                    <XpBar currentXp={currentXp} xpRequired={product.xpRequired} thickness={1} />
                     <View className="flex-row gap-2 items-center">
                       <Text className="font-itim">{currentXp}/{product.xpRequired} XP</Text>
-                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} />
+                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} showText={false} />
                     </View>
                   </View>
                 </View>
