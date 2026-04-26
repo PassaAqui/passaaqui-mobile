@@ -2,6 +2,7 @@ import { ScrollView, View, Text, Image, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as NavigationBar from "expo-navigation-bar";
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
+import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import { useEffect, useState } from "react";
 
 const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
@@ -67,9 +68,9 @@ export default function Shop() {
 
                   <View>
                     <XpBar currentXp={currentXp} xpRequired={product.xpRequired} />
-                    <View>
+                    <View className="flex-row gap-2 items-center">
                       <Text className="font-itim">{currentXp}/{product.xpRequired} XP</Text>
-                      {/*<Image />*/}
+                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} />
                     </View>
                   </View>
                 </View>
