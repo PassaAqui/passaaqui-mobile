@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, Image, Pressable } from "react-native";
+import { ScrollView, View, Text, Image, Pressable, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
@@ -18,6 +18,15 @@ const products = [
 const currentXp = 500;
 
 export default function Shop() {
+  const { width } = useWindowDimensions();
+
+  const PADDING = 16;
+  const GAP = 24;
+  const MIN_CARD_WIDTH = 150;
+
+  const columns = width - PADDING * 2 >= MIN_CARD_WIDTH * 2 + GAP ? 2 : 1;
+  const cardWidth = (width - PADDING * 2 - GAP * (columns - 1)) / columns;
+
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
   }, [])
@@ -33,7 +42,7 @@ export default function Shop() {
       </View>
 
       <ScrollView>
-        <View className="flex-1 justify-center items-center w-full p-4 gap-6">
+        <View className="flex-1 w-full p-4 gap-6">
           <View className="bg-[#C4843A] w-full p-7 rounded-lg flex-row gap-3 items-center">
             <Image className="w-16 h-16" source={require("@/assets/user/map/poi/shop/coin.png")}/>
             <View>
@@ -42,9 +51,13 @@ export default function Shop() {
             </View>
           </View>
 
-          <View className="gap-6 flex-row flex-wrap items-center justify-center">
+          <View className="flex-row flex-wrap gap-6 items-center justify-center">
             {products.map((product) => (
-              <View key={product.id} className="border-2 border-[#EAAA6A] w-[47%] rounded-lg overflow-hidden">
+              <View
+                key={product.id}
+                className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
+                style={{ width: cardWidth }}
+              >
                 <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
                 <View className="p-5 gap-3">
                   <Text className="text-lg">{product.title}</Text>
@@ -64,7 +77,7 @@ export default function Shop() {
                   </View>
                 </View>
               </View>
-            ))}          
+            ))}
           </View>
         </View>
       </ScrollView>
