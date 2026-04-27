@@ -14,7 +14,7 @@ export default function CompleteRequiredXp({ currentXp, requiredXp, showText }: 
       )}
 
       {showText && (
-        <Text className="text-green-600 text-base">XP suficiente para resgatar!</Text>
+        <Text className="text-green-600 text-base flex-1">XP suficiente para resgatar!</Text>
       )}
     </View>
   )
