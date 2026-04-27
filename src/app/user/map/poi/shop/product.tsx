@@ -21,7 +21,7 @@ interface ProductProps {
   description: string
 }
 
-export default function Product({ img, requiredXp, title, location, description }: ProductProps) {
+export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -43,13 +43,13 @@ export default function Product({ img, requiredXp, title, location, description 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
           <View className="w-full items-center justify-center gap-4 overflow-hidden">
-            <Image className="bg-gray-400 w-full h-56" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+            <Image className="bg-gray-400 w-full h-56" source={img} resizeMode="cover" />
           </View>
 
           <View className="flex-row justify-between w-full px-3">
             <View className="flex-1">
-              <Text className="text-2xl">{title}Title</Text>
-              <Text className="opacity-55">{location}location</Text>
+              <Text className="text-2xl">{title}</Text>
+              <Text className="opacity-55">{location}</Text>
 
               <View className="flex-row gap-1 items-center">
                 <StarRating rating={4} />
@@ -65,7 +65,7 @@ export default function Product({ img, requiredXp, title, location, description 
           <View className="gap-5 w-full">
             <View className="border-2 border-[#EAAA6A] rounded-2xl px-4 py-5 gap-2">
               <Text className="text-lg" adjustsFontSizeToFit>SOBRE O PRODUTO</Text>
-              <Text className="text-justify opacity-70" adjustsFontSizeToFit>{description}Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum officiis id obcaecati, nesciunt suscipit aut doloribus reiciendis nobis ea illum quo? Maiores amet quia quas dolorum aut velit voluptas officiis.</Text>
+              <Text className="text-justify opacity-70" adjustsFontSizeToFit>{description}</Text>
             </View>
 
             <View className="border border-[#EAAA6A] rounded-2xl px-4 py-5 gap-2">
@@ -91,7 +91,7 @@ export default function Product({ img, requiredXp, title, location, description 
                 <Text className="text-lg flex-1" adjustsFontSizeToFit>SEU PROGRESSO</Text>
                 <View className="flex-row gap-1 items-center justify-center shrink-0">
                   <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                  <Text  adjustsFontSizeToFit>250 / {requiredXp}250 XP</Text>
+                  <Text  adjustsFontSizeToFit>250 / {requiredXp} XP</Text>
                 </View>
               </View>
 
@@ -108,7 +108,7 @@ export default function Product({ img, requiredXp, title, location, description 
               <Text className="text-white text-lg">Resgatar</Text>
             </Pressable>
 
-            <Text className="text-sm opacity-55 text-center">Ao resgatar, {requiredXp}250 XP serão debitados do seu saldo</Text>
+            <Text className="text-sm opacity-55 text-center">Ao resgatar, {requiredXp} XP serão debitados do seu saldo</Text>
           </View>
         </View>
       </ScrollView>

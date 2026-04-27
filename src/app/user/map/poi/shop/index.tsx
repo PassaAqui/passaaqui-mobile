@@ -5,15 +5,8 @@ import * as NavigationBar from "expo-navigation-bar";
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
 import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import { useEffect } from "react";
-
-const products = [
-  {id: 1, title: "Produto 1", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "10,00", xpRequired: 250},
-  {id: 2, title: "Produto 2", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "35,00", xpRequired: 750},
-  {id: 3, title: "Produto 3", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "10,00", xpRequired: 250},
-  {id: 4, title: "Produto 4", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "35,00", xpRequired: 750},
-  {id: 5, title: "Produto 5", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "10,00", xpRequired: 250},
-  {id: 6, title: "Produto 6", description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit.", price: "35,00", xpRequired: 750},
-]
+import { products } from "@/src/constants/user/map/poi/shop/products";
+import { router } from "expo-router";
 
 const currentXp = 500;
 
@@ -53,8 +46,9 @@ export default function Shop() {
 
           <View className="flex-row flex-wrap gap-6 items-center justify-center">
             {products.map((product) => (
-              <View
+              <Pressable
                 key={product.id}
+                onPress={() => router.push(`/user/map/poi/shop/${product.id}`)}
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
@@ -76,7 +70,7 @@ export default function Shop() {
                     </View>
                   </View>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </View>
         </View>
