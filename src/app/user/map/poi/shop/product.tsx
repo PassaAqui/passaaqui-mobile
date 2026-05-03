@@ -35,10 +35,10 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
   }, [])
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <StatusBar style="dark"/>
 
-      <View className="flex-row items-center justify-between p-2 px-6">
+      <View className="bg-white flex-row items-center justify-between p-2 px-6">
         <Pressable className="active:opacity-35">
           <Image source={require("@/assets/user/settings/back.png")} />
         </Pressable>
@@ -53,7 +53,7 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
 
             <View className="absolute bottom-3 right-3 bg-[#3D2408] px-3 p-1 flex-row rounded-full gap-1 items-center justify-center">
               <Image className={`${canRescue ? 'w-5 h-5' : 'w-6 h-6'}`} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
-              <Text className="text-white text-sm text-center">{currentXP} XP</Text>
+              <Text className="text-white text-sm text-center">{requiredXp} XP</Text>
             </View>
           </View>
 
@@ -68,8 +68,8 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
               </View>
             </View>
 
-            <View className="bg-[#EAAA6A] items-center justify-center p-2 px-4 rounded-3xl self-start shrink-0">
-              <Text className="text-white">GASTRONOMIA</Text>
+            <View className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#F0EEEA] border border-gray-300'} items-center justify-center p-2 px-4 rounded-3xl self-start shrink-0`}>
+              <Text className={`${canRescue ? 'text-white' : 'text-black'}`}>GASTRONOMIA</Text>
             </View>
           </View>
 

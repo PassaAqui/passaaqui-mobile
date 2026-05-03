@@ -26,7 +26,7 @@ export default function Shop() {
   }, [])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-white">
       <View className="flex-row items-center justify-center p-2">
         <Text className="font-itim text-black text-3xl" adjustsFontSizeToFit>Loja global</Text>
       </View>

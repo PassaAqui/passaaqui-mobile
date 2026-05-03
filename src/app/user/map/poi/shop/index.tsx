@@ -25,7 +25,7 @@ export default function Shop() {
   }, [])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-white">
       <StatusBar style="dark" />
       <View className="flex-row items-center justify-center p-2">
         <Pressable className="absolute left-7 active:opacity-35">
