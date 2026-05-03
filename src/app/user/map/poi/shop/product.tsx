@@ -22,13 +22,17 @@ interface ProductProps {
   description: string
 }
 
+const currentXP = 250;
+
 export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
   const { hasRedeemed, setRedeemed } = useRedemptionCheck();
 
+  const canRescue = currentXP >= requiredXp;
+
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
-  })
+  }, [])
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1">
@@ -88,29 +92,34 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
               </View>
             </View>
 
-            <View className="bg-[#E0DBD5] border border-gray-300 rounded-2xl px-4 py-5 flex-col gap-2">
+            <View className={`${canRescue ? 'bg-[#E0DBD5]' : 'bg-[#FFF3F3]'} border ${canRescue ? 'border-gray-300' : 'border-[#F5C0C0]'} rounded-2xl px-4 py-5 flex-col gap-2`}>
               <View className="flex-row justify-between flex-wrap">
                 <Text className="text-lg flex-1" adjustsFontSizeToFit>SEU PROGRESSO</Text>
                 <View className="flex-row gap-1 items-center justify-center shrink-0">
                   <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                  <Text  adjustsFontSizeToFit>250 / {requiredXp} XP</Text>
+                  <Text className="text-[#A86830]" adjustsFontSizeToFit>{currentXP} / {requiredXp} XP</Text>
                 </View>
               </View>
 
-              <XpBar currentXp={250} xpRequired={250} thickness={3}/>
+              <XpBar currentXp={currentXP} xpRequired={requiredXp} thickness={3}/>
 
               <View className="flex-row gap-2 items-center">
-                <CompleteRequiredXp currentXp={250} requiredXp={250} showText={true} />
+                <CompleteRequiredXp currentXp={currentXP} requiredXp={requiredXp} showText={true} />
               </View>
             </View>
           </View>
 
           <View className="w-full items-center justify-center gap-2 shrink-0">
-            <Pressable onPress={() => setRedeemed(true)} className="bg-[#EAAA6A] w-full p-4 items-center rounded-xl active:opacity-55">
+            <Pressable onPress={canRescue ? () => setRedeemed(true) : undefined} disabled={!canRescue} className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#888888]'} w-full p-4 items-center rounded-xl active:opacity-55`}>
               <Text className="text-white text-lg">Resgatar</Text>
             </Pressable>
 
-            <Text className="text-sm opacity-55 text-center">Ao resgatar, {requiredXp} XP serão debitados do seu saldo</Text>
+            <Text className={`text-sm text-center ${canRescue ? 'opacity-55' : 'text-red-500'}`}>
+              {canRescue 
+                ? `Ao resgatar, ${requiredXp} XP serão debitados do seu saldo`
+                : `Você precisa de mais ${requiredXp - currentXP} XP para resgatar esse item`
+              }
+            </Text>
           </View>
         </View>
       </ScrollView>
