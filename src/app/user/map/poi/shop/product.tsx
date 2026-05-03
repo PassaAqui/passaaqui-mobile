@@ -115,7 +115,9 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
         </View>
       </ScrollView>
 
-      <RedemptionAlertModal visible={hasRedeemed} />
+      {hasRedeemed && (
+        <RedemptionAlertModal visible={hasRedeemed} onClose={() => setRedeemed(false)} />
+      )}
     </SafeAreaView>
   )
 }
