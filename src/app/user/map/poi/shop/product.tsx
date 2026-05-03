@@ -1,7 +1,6 @@
 // currentXP - colocar na posta constants
 // pegar a quantidade de avaliações do backend
 // pegar 'category' do backend
-// ver como eu vou fazer a representação das estrelinhas
 
 import { ScrollView, View, Image, Text, Pressable, ImageSourcePropType } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +11,8 @@ import * as NavigationBar from "expo-navigation-bar"
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
 import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import StarRating from "@/src/components/user/map/poi/shop/StarRating";
+import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
+import RedemptionAlertModal from "@/src/components/user/map/poi/shop/RedemptionAlertModal";
 
 interface ProductProps {
   img: ImageSourcePropType,
@@ -23,6 +24,7 @@ interface ProductProps {
 
 export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
+  const { hasRedeemed, setRedeemed } = useRedemptionCheck();
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
@@ -104,7 +106,7 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
           </View>
 
           <View className="w-full items-center justify-center gap-2 shrink-0">
-            <Pressable className="bg-[#EAAA6A] w-full p-4 items-center rounded-xl active:opacity-55">
+            <Pressable onPress={() => setRedeemed(true)} className="bg-[#EAAA6A] w-full p-4 items-center rounded-xl active:opacity-55">
               <Text className="text-white text-lg">Resgatar</Text>
             </Pressable>
 
@@ -112,6 +114,8 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
           </View>
         </View>
       </ScrollView>
+
+      <RedemptionAlertModal visible={hasRedeemed} />
     </SafeAreaView>
   )
 }
