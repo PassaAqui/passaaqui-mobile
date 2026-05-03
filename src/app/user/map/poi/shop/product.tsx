@@ -48,8 +48,13 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
-          <View className="w-full items-center justify-center gap-4 overflow-hidden">
+          <View className="w-full relative overflow-hidden">
             <Image className="bg-gray-400 w-full h-56" source={img} resizeMode="cover" />
+
+            <View className="absolute bottom-3 right-3 bg-[#3D2408] px-3 p-1 flex-row rounded-full gap-1 items-center justify-center">
+              <Image className={`${canRescue ? 'w-5 h-5' : 'w-6 h-6'}`} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
+              <Text className="text-white text-sm text-center">{currentXP} XP</Text>
+            </View>
           </View>
 
           <View className="flex-row justify-between w-full px-3">
