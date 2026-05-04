@@ -13,6 +13,7 @@ import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequi
 import StarRating from "@/src/components/user/map/poi/shop/StarRating";
 import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
 import RedemptionAlertModal from "@/src/components/user/map/poi/shop/RedemptionAlertModal";
+import Header from "@/src/components/user/map/poi/shop/Header";
 
 interface ProductProps {
   img: ImageSourcePropType,
@@ -23,6 +24,7 @@ interface ProductProps {
 }
 
 const currentXP = 250;
+const discount = 5.00;
 
 export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
@@ -38,13 +40,7 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <StatusBar style="dark"/>
 
-      <View className="bg-white flex-row items-center justify-between p-2 px-6">
-        <Pressable className="active:opacity-35">
-          <Image source={require("@/assets/user/settings/back.png")} />
-        </Pressable>
-
-        <Image className="w-10 h-10" source={require("@/assets/logo/logoOFC.png")} />
-      </View>
+      <Header />
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
@@ -80,10 +76,10 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
             </View>
 
             <View className="border border-[#EAAA6A] rounded-2xl px-4 py-5 gap-2">
-              <Text className="text-lg  adjustsFontSizeToFit">DETALHES DO DESCONTO</Text>
+              <Text className="text-lg" adjustsFontSizeToFit>DETALHES DO DESCONTO</Text>
               <View className="justify-between flex-row flex-wrap">
                 <Text className="opacity-70" adjustsFontSizeToFit>Valor do desconto</Text>
-                <Text className="text-green-700"  adjustsFontSizeToFit>- R$ 5,00</Text>
+                <Text className="text-green-700"  adjustsFontSizeToFit>- R$ {discount.toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
               </View>
 
               <View className="justify-between flex-row flex-wrap">
@@ -130,7 +126,7 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
       </ScrollView>
 
       {hasRedeemed && (
-        <RedemptionAlertModal visible={hasRedeemed} onClose={() => setRedeemed(false)} />
+        <RedemptionAlertModal title={title} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
       )}
     </SafeAreaView>
   )
