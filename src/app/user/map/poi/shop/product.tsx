@@ -1,7 +1,6 @@
 // currentXP - colocar na posta constants
 // pegar a quantidade de avaliações do backend
 // pegar 'category' do backend
-// ver como eu vou fazer a representação das estrelinhas
 
 import { ScrollView, View, Image, Text, Pressable, ImageSourcePropType } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +11,9 @@ import * as NavigationBar from "expo-navigation-bar"
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
 import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import StarRating from "@/src/components/user/map/poi/shop/StarRating";
+import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
+import RedemptionAlertModal from "@/src/components/user/map/poi/shop/RedemptionAlertModal";
+import Header from "@/src/components/user/map/poi/shop/Header";
 
 interface ProductProps {
   img: ImageSourcePropType,
@@ -21,97 +23,111 @@ interface ProductProps {
   description: string
 }
 
+const currentXP = 250;
+const discount = 5.00;
+
 export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
+  const { hasRedeemed, setRedeemed } = useRedemptionCheck();
+
+  const canRescue = currentXP >= requiredXp;
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
-  })
+  }, [])
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <StatusBar style="dark"/>
 
-      <View className="flex-row items-center justify-between p-2 px-6">
-        <Pressable className="active:opacity-35">
-          <Image source={require("@/assets/user/settings/back.png")} />
-        </Pressable>
-
-        <Image className="w-10 h-10" source={require("@/assets/logo/logoOFC.png")} />
-      </View>
+      <Header />
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
-          <View className="w-full items-center justify-center gap-4 overflow-hidden">
+          <View className="w-full relative overflow-hidden">
             <Image className="bg-gray-400 w-full h-56" source={img} resizeMode="cover" />
+
+            <View className="absolute bottom-3 right-3 bg-[#3D2408] px-3 p-1 flex-row rounded-full gap-1 items-center justify-center">
+              <Image className={`${canRescue ? 'w-5 h-5' : 'w-6 h-6'}`} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
+              <Text className="text-white text-sm text-center font-interBold">{requiredXp} XP</Text>
+            </View>
           </View>
 
           <View className="flex-row justify-between w-full px-3">
             <View className="flex-1">
-              <Text className="text-2xl">{title}</Text>
-              <Text className="opacity-55">{location}</Text>
+              <Text className="text-2xl font-interBold">{title}</Text>
+              <Text className="opacity-55 font-inter">{location}</Text>
 
               <View className="flex-row gap-1 items-center">
                 <StarRating rating={4} />
-                <Text className="opacity-55">4.0 (128 avaliações)</Text>
+                <Text className="opacity-55 font-inter">4.0 (128 avaliações)</Text>
               </View>
             </View>
 
-            <View className="bg-[#EAAA6A] items-center justify-center p-2 px-4 rounded-3xl self-start shrink-0">
-              <Text className="text-white">GASTRONOMIA</Text>
+            <View className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#F0EEEA] border border-gray-300'} items-center justify-center p-2 px-4 rounded-3xl self-start shrink-0`}>
+              <Text className={`${canRescue ? 'text-white' : 'text-black'} font-inter`}>GASTRONOMIA</Text>
             </View>
           </View>
 
           <View className="gap-5 w-full">
             <View className="border-2 border-[#EAAA6A] rounded-2xl px-4 py-5 gap-2">
-              <Text className="text-lg" adjustsFontSizeToFit>SOBRE O PRODUTO</Text>
-              <Text className="text-justify opacity-70" adjustsFontSizeToFit>{description}</Text>
+              <Text className="text-lg font-interBold" adjustsFontSizeToFit>SOBRE O PRODUTO</Text>
+              <Text className="text-justify opacity-70 font-inter" adjustsFontSizeToFit>{description}</Text>
             </View>
 
             <View className="border border-[#EAAA6A] rounded-2xl px-4 py-5 gap-2">
-              <Text className="text-lg  adjustsFontSizeToFit">DETALHES DO DESCONTO</Text>
+              <Text className="text-lg font-interBold" adjustsFontSizeToFit>DETALHES DO DESCONTO</Text>
               <View className="justify-between flex-row flex-wrap">
-                <Text className="opacity-70" adjustsFontSizeToFit>Valor do desconto</Text>
-                <Text className="text-green-700"  adjustsFontSizeToFit>- R$ 5,00</Text>
+                <Text className="opacity-70 font-inter" adjustsFontSizeToFit>Valor do desconto</Text>
+                <Text className="text-green-700 font-interBold"  adjustsFontSizeToFit>- R$ {discount.toLocaleString("pt-br", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Text>
               </View>
 
               <View className="justify-between flex-row flex-wrap">
-                <Text className="opacity-70" adjustsFontSizeToFit>Validade</Text>
-                <Text adjustsFontSizeToFit>30 dias após o resgate</Text>
+                <Text className="opacity-70 font-inter" adjustsFontSizeToFit>Validade</Text>
+                <Text className="font-inter" adjustsFontSizeToFit>30 dias após o resgate</Text>
               </View>
 
               <View className="justify-between flex-row flex-wrap">
-                <Text className="opacity-70" adjustsFontSizeToFit>Uso</Text>
-                <Text adjustsFontSizeToFit>1 vez por resgate</Text>
+                <Text className="opacity-70 font-inter" adjustsFontSizeToFit>Uso</Text>
+                <Text className="font-inter" adjustsFontSizeToFit>1 vez por resgate</Text>
               </View>
             </View>
 
-            <View className="bg-[#E0DBD5] border border-gray-300 rounded-2xl px-4 py-5 flex-col gap-2">
+            <View className={`${canRescue ? 'bg-[#E0DBD5]' : 'bg-[#FFF3F3]'} border ${canRescue ? 'border-gray-300' : 'border-[#F5C0C0]'} rounded-2xl px-4 py-5 flex-col gap-2`}>
               <View className="flex-row justify-between flex-wrap">
-                <Text className="text-lg flex-1" adjustsFontSizeToFit>SEU PROGRESSO</Text>
+                <Text className="text-lg flex-1 font-interBold" adjustsFontSizeToFit>SEU PROGRESSO</Text>
                 <View className="flex-row gap-1 items-center justify-center shrink-0">
                   <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                  <Text  adjustsFontSizeToFit>250 / {requiredXp} XP</Text>
+                  <Text className="text-[#A86830] font-interBold" adjustsFontSizeToFit>{currentXP} / {requiredXp} XP</Text>
                 </View>
               </View>
 
-              <XpBar currentXp={250} xpRequired={250} thickness={3}/>
+              <XpBar currentXp={currentXP} xpRequired={requiredXp} thickness={3}/>
 
               <View className="flex-row gap-2 items-center">
-                <CompleteRequiredXp currentXp={250} requiredXp={250} showText={true} />
+                <CompleteRequiredXp currentXp={currentXP} requiredXp={requiredXp} showText={true} />
               </View>
             </View>
           </View>
 
           <View className="w-full items-center justify-center gap-2 shrink-0">
-            <Pressable className="bg-[#EAAA6A] w-full p-4 items-center rounded-xl active:opacity-55">
-              <Text className="text-white text-lg">Resgatar</Text>
+            <Pressable onPress={canRescue ? () => setRedeemed(true) : undefined} disabled={!canRescue} className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#888888]'} w-full p-4 items-center rounded-xl active:opacity-55`}>
+              <Text className="text-white text-lg font-interBold">Resgatar</Text>
             </Pressable>
 
-            <Text className="text-sm opacity-55 text-center">Ao resgatar, {requiredXp} XP serão debitados do seu saldo</Text>
+            <Text className={`text-sm text-center ${canRescue ? 'opacity-55' : 'text-red-500'} font-inter`}>
+              {canRescue 
+                ? `Ao resgatar, ${requiredXp} XP serão debitados do seu saldo`
+                : `Você precisa de mais ${requiredXp - currentXP} XP para resgatar esse item`
+              }
+            </Text>
           </View>
         </View>
       </ScrollView>
+
+      {hasRedeemed && (
+        <RedemptionAlertModal title={title} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
+      )}
     </SafeAreaView>
   )
 }

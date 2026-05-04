@@ -6,7 +6,9 @@ module.exports = {
     extend: {
       fontFamily: {
         irishGrover: ["IrishGrover_400Regular"],
-        itim: ["Itim_400Regular"]
+        itim: ["Itim_400Regular"],
+        inter: ["Inter_400Regular"],
+        interBold: ["Inter_700Bold"]
       }
     },
   },
