@@ -9,7 +9,7 @@ import Header from "@/src/components/user/map/poi/shop/Header";
 
 export default function ProductCode() {
   const insets = useSafeAreaInsets();
-  const { title, discount } = useLocalSearchParams<{ title: string, discount: string }>();
+  const { img, title, discount } = useLocalSearchParams<{ img: string, title: string, discount: string }>();
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
@@ -26,7 +26,7 @@ export default function ProductCode() {
 
           <View className="w-full border border-gray-400 flex-col rounded-xl pt-4">
             <View className="w-full flex-row items-center pb-3">
-              <Image className="w-20 h-20" source={require("@/assets/user/map/tmp/no-image.png")} />
+              <Image className="w-20 h-20" source={{ uri: img }} />
               <View className="flex-col flex-1">
                 <Text className="text-lg font-interBold" adjustsFontSizeToFit>{title}</Text>
                 <Text className="opacity-75 font-inter" adjustsFontSizeToFit>Pedido</Text>

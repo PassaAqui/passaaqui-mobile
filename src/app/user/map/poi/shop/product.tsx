@@ -2,7 +2,7 @@
 // pegar a quantidade de avaliações do backend
 // pegar 'category' do backend
 
-import { ScrollView, View, Image, Text, Pressable, ImageSourcePropType } from "react-native";
+import { ScrollView, View, Image, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,9 +14,11 @@ import StarRating from "@/src/components/user/map/poi/shop/StarRating";
 import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
 import RedemptionAlertModal from "@/src/components/user/map/poi/shop/RedemptionAlertModal";
 import Header from "@/src/components/user/map/poi/shop/Header";
+import { useRouter } from "expo-router";
 
 interface ProductProps {
-  img: ImageSourcePropType,
+  img?: string,
+  price: number,
   requiredXp: number,
   title: string,
   location: string,
@@ -26,8 +28,9 @@ interface ProductProps {
 const currentXP = 250;
 const discount = 5.00;
 
-export default function ProductScreen({ img, requiredXp, title, location, description }: ProductProps) {
+export default function ProductScreen({ img = "https://static.thenounproject.com/png/3674270-200.png", price, requiredXp, title, location, description }: ProductProps) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { hasRedeemed, setRedeemed } = useRedemptionCheck();
 
   const canRescue = currentXP >= requiredXp;
@@ -45,11 +48,11 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
           <View className="w-full relative overflow-hidden">
-            <Image className="bg-gray-400 w-full h-56" source={img} resizeMode="cover" />
+            <Image className="bg-gray-400 w-full h-56" source={{ uri: img }} resizeMode="cover" />
 
             <View className="absolute bottom-3 right-3 bg-[#3D2408] px-3 p-1 flex-row rounded-full gap-1 items-center justify-center">
               <Image className={`${canRescue ? 'w-5 h-5' : 'w-6 h-6'}`} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
-              <Text className="text-white text-sm text-center font-interBold">{requiredXp} XP</Text>
+              <Text className="text-white text-sm text-center font-interBold">R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
             </View>
           </View>
 
@@ -111,7 +114,16 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
           </View>
 
           <View className="w-full items-center justify-center gap-2 shrink-0">
-            <Pressable onPress={canRescue ? () => setRedeemed(true) : undefined} disabled={!canRescue} className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#888888]'} w-full p-4 items-center rounded-xl active:opacity-55`}>
+            <Pressable
+              onPress={!canRescue
+                ? () => setRedeemed(true)
+                : () => router.push({
+                  pathname: "/user/map/poi/shop/payment",
+                  params: { img, title, location, price, requiredXp, discount }
+                })}
+              disabled={!canRescue}
+              className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#888888]'} w-full p-4 items-center rounded-xl active:opacity-55`}
+            >
               <Text className="text-white text-lg font-interBold">Resgatar</Text>
             </Pressable>
 
@@ -126,7 +138,7 @@ export default function ProductScreen({ img, requiredXp, title, location, descri
       </ScrollView>
 
       {hasRedeemed && (
-        <RedemptionAlertModal title={title} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
+        <RedemptionAlertModal img={img} title={title} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
       )}
     </SafeAreaView>
   )

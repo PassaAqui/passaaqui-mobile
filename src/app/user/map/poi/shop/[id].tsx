@@ -11,6 +11,7 @@ export default function Product() {
   return (
     <ProductScreen
       img={product.img}
+      price={product.price}
       title={product.title}
       requiredXp={product.xpRequired}
       location={product.location}

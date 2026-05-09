@@ -53,7 +53,7 @@ export default function Shop() {
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
-                <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+                <Image className="w-full h-28 bg-gray-400" source={{ uri: product.img }} resizeMode="cover" />
                 <View className="p-5 gap-3">
                   <Text className="font-interBold text-lg">{product.title}</Text>
                   <Text className="font-inter">{product.description}</Text>
