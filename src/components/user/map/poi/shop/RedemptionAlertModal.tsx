@@ -2,13 +2,14 @@ import { Modal, View, Text, Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 interface RedemptionAlertModalProps {
+  img: string,
   title: string,
   discount: number,
   visible: boolean,
   onClose: () => void
 }
 
-export default function RedemptionAlertModal({ title, discount, visible, onClose }: RedemptionAlertModalProps) {
+export default function RedemptionAlertModal({ img, title, discount, visible, onClose }: RedemptionAlertModalProps) {
   const router = useRouter();
   
   return (
@@ -25,7 +26,7 @@ export default function RedemptionAlertModal({ title, discount, visible, onClose
             <Pressable
               onPress={() => router.push({
                 pathname: "/user/map/poi/shop/code",
-                params: { title, discount }
+                params: { img, title, discount }
               })}
               className="bg-[#3D2408] px-10 p-1 items-center justify-center rounded-2xl active:opacity-65"
             >
