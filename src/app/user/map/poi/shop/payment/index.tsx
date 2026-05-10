@@ -5,10 +5,13 @@ import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect } from "react";
+import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 
 export default function Index() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
+
   const { img, title, location, price, requiredXp, discount } = useLocalSearchParams<{ img: string, title: string, location: string, price: string, requiredXp: string, discount: string }>();
 
   useEffect(() => {
@@ -107,7 +110,10 @@ export default function Index() {
           </View>
 
           <View className="w-full gap-2 pt-6">
-            <Pressable className="bg-[#311e08] p-4 items-center justify-center rounded-xl active:opacity-70">
+            <Pressable
+              onPress={() => router.push("/user/map/poi/shop/payment/pix-payment")}
+              className="bg-[#311e08] p-4 items-center justify-center rounded-xl active:opacity-70"
+            >
               <Text className="text-white font-interBold text-lg">Pagar com PIX</Text>
             </Pressable>
             <Text className="opacity-55 text-sm text-center font-inter">Você será redirecionado para o QR Code do PIX</Text>
