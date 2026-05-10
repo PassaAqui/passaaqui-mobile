@@ -4,13 +4,15 @@ import * as NavigationBar from "expo-navigation-bar";
 import XpBar from "@/src/components/user/map/poi/shop/XpBar";
 import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
 import { useEffect, useState } from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { products } from "@/src/constants/user/map/poi/shop/products";
 
 const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
 const currentXp = 500;
 
 export default function Shop() {
+  const router = useRouter();
+
   const insets = useSafeAreaInsets();
   const [selectFilter, setSelectFilter] = useState<string>("TODOS");
   const { width } = useWindowDimensions();
@@ -58,7 +60,10 @@ export default function Shop() {
             {products.map((product) => (
               <Pressable
                 key={product.id}
-                onPress={() => router.push(`/user/map/poi/shop/${product.id}`)}
+                onPress={() => router.push({
+                  pathname: "/user/map/poi/shop/product",
+                  params: { id: product.id }
+                })}
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
