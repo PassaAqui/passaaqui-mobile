@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { products } from "@/src/constants/user/map/poi/shop/products";
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
@@ -12,7 +13,11 @@ export default function Index() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const { img, title, location, price, requiredXp, discount } = useLocalSearchParams<{ img: string, title: string, location: string, price: string, requiredXp: string, discount: string }>();
+  //const { img, title, location, price, requiredXp, discount } = useLocalSearchParams<{ img: string, title: string, location: string, price: string, requiredXp: string, discount: string }>();
+  const { id, discount } = useLocalSearchParams<{ id: string, discount: string }>();
+  const product = products.find(p => p.id === Number(id));
+
+  if (!product) return null;
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
@@ -29,12 +34,12 @@ export default function Index() {
           <View className="w-full border border-gray-400 flex-col rounded-xl px-4 pt-4">
             <Text className="font-interBold" adjustsFontSizeToFit>RESUMO DO PEDIDO</Text>
             <View className="w-full flex-row items-center py-3 gap-3">
-              <Image className="w-20 h-20 rounded-lg" source={{ uri: img }} />
+              <Image className="w-20 h-20 rounded-lg" source={{ uri: product.img }} />
               <View className="flex-col flex-1">
-                <Text className="text-lg font-interBold" adjustsFontSizeToFit>{title}</Text>
-                <Text className="opacity-75 font-inter" adjustsFontSizeToFit>{location}</Text>
+                <Text className="text-lg font-interBold" adjustsFontSizeToFit>{product.title}</Text>
+                <Text className="opacity-75 font-inter" adjustsFontSizeToFit>{product.location}</Text>
               </View>
-              <Text className="font-interBold text-lg">R$ {parseFloat(price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
+              <Text className="font-interBold text-lg">R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
             </View>
           </View>
 
@@ -59,7 +64,7 @@ export default function Index() {
             <View className="w-full flex-row bg-[#FEF3E2] border border-[#F0D49A] p-3 justify-between rounded-xl">
               <View className="flex-1 flex-row gap-2 items-center">
                 <Image className="w-4 h-4" source={require("@/assets/user/map/poi/shop/check.png")} />
-                <Text className="font-interBold text-[#7A5C1E] flex-1" adjustsFontSizeToFit>{requiredXp} XP aplicados</Text>
+                <Text className="font-interBold text-[#7A5C1E] flex-1" adjustsFontSizeToFit>{product.xpRequired} XP aplicados</Text>
               </View>
               <Text className="text-green-600 font-interBold" adjustsFontSizeToFit>- R$ {parseFloat(discount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
             </View>
@@ -88,7 +93,7 @@ export default function Index() {
 
                 <View className="flex-row justify-between">
                     <Text className="opacity-75 font-inter flex-1" adjustsFontSizeToFit>Subtotal</Text>
-                  <Text className="font-inter" adjustsFontSizeToFit>R$ {parseFloat(price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
+                  <Text className="font-inter" adjustsFontSizeToFit>R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
                 </View>
 
                 <View className="flex-row justify-between">
@@ -103,7 +108,7 @@ export default function Index() {
 
                 <View className="flex-row justify-between items-center flex-1">
                   <Text className="font-interBold text-lg">Total</Text>
-                  <Text className="font-interBold text-xl">R$ {(Number(price) - Number(discount)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
+                  <Text className="font-interBold text-xl">R$ {(Number(product.price) - Number(discount)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
                 </View>
               </View>
             </View>
@@ -111,7 +116,10 @@ export default function Index() {
 
           <View className="w-full gap-2 pt-6">
             <Pressable
-              onPress={() => router.push("/user/map/poi/shop/payment/pix-payment")}
+              onPress={() => router.push({
+                pathname: "/user/map/poi/shop/payment/pix-payment",
+                params: { id: product.id, discount }
+              })}
               className="bg-[#311e08] p-4 items-center justify-center rounded-xl active:opacity-70"
             >
               <Text className="text-white font-interBold text-lg">Pagar com PIX</Text>

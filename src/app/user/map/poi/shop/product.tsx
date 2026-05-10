@@ -118,7 +118,7 @@ export default function ProductScreen() {
                 ? () => setRedeemed(true)
                 : () => router.push({
                   pathname: "/user/map/poi/shop/payment",
-                  params: { img: product.img, title: product.title, location: product.location, price: product.price, xpRequired: product.xpRequired, discount }
+                  params: { id: product.id, discount }
                 })}
               disabled={!canRescue}
               className={`${canRescue ? 'bg-[#EAAA6A]' : 'bg-[#888888]'} w-full p-4 items-center rounded-xl active:opacity-55`}

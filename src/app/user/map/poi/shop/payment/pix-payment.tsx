@@ -6,8 +6,17 @@ import * as NavigationBar from "expo-navigation-bar";
 import { useEffect, useState, useRef } from "react";
 import QRCode from "react-native-qrcode-svg";
 import * as ClipBoard from "expo-clipboard";
+import { useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
+import { products } from "@/src/constants/user/map/poi/shop/products";
 
 export default function PixPayment() {
+  const { id, discount } = useLocalSearchParams<{ id: string, discount: string }>();
+  const product = products.find(p => p.id === Number(id));
+  
+  if (!product) return null;
+
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const TIMER_DURATION = 5 * 60;
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
@@ -128,7 +137,13 @@ export default function PixPayment() {
             </Text>
             </Pressable>
 
-            <Pressable className="bg-transparent p-4 items-center justify-center rounded-xl active:opacity-50 border border-gray-400">
+            <Pressable
+              onPress={() => router.push({
+                pathname: "/user/map/poi/shop/product",
+                params: { id: product.id, discount }
+              })}
+              className="bg-transparent p-4 items-center justify-center rounded-xl active:opacity-50 border border-gray-400"
+            >
               <Text className="text-black font-interBold text-lg text-center">Voltar à loja</Text>
             </Pressable>
           </View>
