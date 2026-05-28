@@ -6,7 +6,7 @@ interface LocomotionModalProp {
   onSelect: (mode: RouteMode) => void;
 }
 
-export default function LocomotionModal({ onSelect }: LocomotionModalProp ) {
+export default function LocomotionMode({ onSelect }: LocomotionModalProp ) {
   return (
     <Modal transparent animationType="fade">
       <View className="flex-1 bg-black/50 items-center justify-center px-6">

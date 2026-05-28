@@ -1,6 +1,6 @@
 import { Modal, View, Text, Image, Pressable, ImageSourcePropType } from "react-native";
 import { useState } from "react";
-import LocomotionModal from "../LocomotionModal";
+import LocomotionModal from "@/src/features/user/map/poi/components/LocomotionMode";
 
 type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
 
@@ -15,7 +15,7 @@ interface TouristPOIModalProps {
   onNavigate: (mode: RouteMode) => void;
 }
 
-export default function TouristPOIModal({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: TouristPOIModalProps) {
+export default function TouristSpotPOI({ img, title, description, distance, xpQuantity, visible, onClose, onNavigate }: TouristPOIModalProps) {
   const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
 
   if (openLocomotionModal) {

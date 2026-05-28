@@ -1,6 +1,6 @@
 import { Modal, View, Text, Image, Pressable, ImageSourcePropType } from "react-native";
 import { useState } from "react";
-import LocomotionModal from "../LocomotionModal";
+import LocomotionModal from "@/src/features/user/map/poi/components/LocomotionMode";
 import { Link } from "expo-router";
 
 type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
@@ -16,7 +16,7 @@ interface ShopPOIModalProps {
   onNavigate: (mode: RouteMode) => void;
 }
 
-export default function ShopPOIModal({ img, title, description, distance, starQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
+export default function ShopkeeperPOI({ img, title, description, distance, starQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
   const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
 
   if (openLocomotionModal) {

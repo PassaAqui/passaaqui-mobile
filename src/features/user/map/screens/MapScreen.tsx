@@ -4,10 +4,10 @@ import { StatusBar } from "expo-status-bar";
 import { mapStyle } from "@/src/constants/user/map/map";
 import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
 import OutsideRegionModal from "@/src/features/user/map/components/OutsideRegionModal";
-import TouristPOIModal from "@/src/components/user/map/poi/TouristPOIModal";
-import ShopPOIModal from "@/src/components/user/map/poi/ShopPOIModal";
+import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPOI";
+import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
 import StopButton from "@/src/features/user/map/components/StopButton";
-import StopConfirmation from "@/src/components/user/map/poi/StopConfirmation";
+import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
 import { useMapScreen } from "@/src/hooks/user/map/useMapScreen";
 
 export default function MapScreen() {
@@ -118,7 +118,7 @@ export default function MapScreen() {
       )}
 
       {openTouristPOIMarker && (
-        <TouristPOIModal
+        <TouristSpotPOI
           img={require("@/assets/user/map/tmp/no-image.png")}
           title={openTouristPOIMarker.title}
           description={openTouristPOIMarker.description}
@@ -131,7 +131,7 @@ export default function MapScreen() {
       )}
 
       {openShopPOIMarker && (
-        <ShopPOIModal
+        <ShopkeeperPOI
           img={require("@/assets/user/map/tmp/no-image.png")}
           title={openShopPOIMarker.title}
           description={openShopPOIMarker.description}
