@@ -2,7 +2,7 @@ import { ScrollView, View, Text, Image, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import Header from "@/src/components/user/map/poi/shop/Header";
+import Header from "@/src/features/user/shop/components/Header";
 
 export default function CodeToRedeemScreen() {
   const insets = useSafeAreaInsets();

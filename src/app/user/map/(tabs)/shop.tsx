@@ -1,5 +1,5 @@
-import GlobalStoreScreen from "@/src/features/user/shop/screens/GlobalStoreScreen";
+import GlobalShopScreen from "@/src/features/user/shop/screens/GlobalShopScreen";
 
 export default function GlobalStore() {
-  return <GlobalStoreScreen />
+  return <GlobalShopScreen />
 }

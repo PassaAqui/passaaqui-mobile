@@ -1,16 +1,20 @@
 import { ScrollView, View, Text, Image, Pressable, useWindowDimensions } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import XpBar from "@/src/components/user/map/poi/shop/XpBar";
-import CompleteRequiredXp from "@/src/components/user/map/poi/shop/CompleteRequiredXp";
-import { products } from "@/src/constants/user/map/poi/shop/products";
+import * as NavigationBar from "expo-navigation-bar";
+import XpBar from "@/src/features/user/shop/components/XpBar";
+import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+import { products } from "@/src/constants/user/map/poi/shop/products";
 
+const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
 const currentXp = 500;
 
-export default function ShopkeeperStoreScreen() {
+export default function GlobalShopScreen() {
   const router = useRouter();
 
   const insets = useSafeAreaInsets();
+  const [selectFilter, setSelectFilter] = useState<string>("TODOS");
   const { width } = useWindowDimensions();
 
   const PADDING = 16;
@@ -20,13 +24,14 @@ export default function ShopkeeperStoreScreen() {
   const columns = width - PADDING * 2 >= MIN_CARD_WIDTH * 2 + GAP ? 2 : 1;
   const cardWidth = (width - PADDING * 2 - GAP * (columns - 1)) / columns;
 
+  useEffect(() => {
+    NavigationBar.setButtonStyleAsync("dark");
+  }, [])
+
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <View className="flex-row items-center justify-center p-2">
-        <Pressable className="absolute left-7 active:opacity-35">
-          <Image source={require("@/assets/user/settings/back.png")} />
-        </Pressable>
-        <Text className="font-itim text-black text-3xl" adjustsFontSizeToFit>Loja de fulano</Text>
+        <Text className="font-interBold text-black text-2xl" adjustsFontSizeToFit>Loja global</Text>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
@@ -38,6 +43,18 @@ export default function ShopkeeperStoreScreen() {
               <Text className="font-interBold text-white text-2xl" adjustsFontSizeToFit>1207 XP</Text>
             </View>
           </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row" contentContainerClassName="flex-row gap-2">
+            {filters.map((filter) => (
+              <Pressable
+                key={filter}
+                onPress={() => setSelectFilter(filter)}
+                className={`${selectFilter === filter ? 'bg-[#EAAA6A]' : 'bg-white border border-gray-400'} p-2 px-5 rounded-3xl min-w-1/4 items-center justify-center`}
+              >
+                <Text className={`${selectFilter === filter ? 'text-white' : 'text-black'} font-inter`}>{filter}</Text>  
+              </Pressable>
+            ))}
+          </ScrollView>
 
           <View className="flex-row flex-wrap gap-6 items-center justify-center">
             {products.map((product) => (
@@ -52,7 +69,7 @@ export default function ShopkeeperStoreScreen() {
               >
                 <Image className="w-full h-28 bg-gray-400" source={{ uri: product.img }} resizeMode="cover" />
                 <View className="p-5 gap-3">
-                  <Text className="font-interBold text-lg">{product.title}</Text>
+                  <Text className="text-lg font-interBold">{product.title}</Text>
                   <Text className="font-inter">{product.description}</Text>
 
                   <View className="flex-row gap-1 items-center">
@@ -69,7 +86,7 @@ export default function ShopkeeperStoreScreen() {
                   </View>
                 </View>
               </Pressable>
-            ))}
+            ))}          
           </View>
         </View>
       </ScrollView>
