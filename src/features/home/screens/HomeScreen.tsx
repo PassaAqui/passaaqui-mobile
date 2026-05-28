@@ -1,6 +1,5 @@
-import { Text, View, ImageBackground, ScrollView } from "react-native";
+import { Text, View, ImageBackground, Image, ScrollView } from "react-native";
 import { Link } from "expo-router"
-import LogoIcon from "@/src/components/common/logoIcon";
 
 export default function HomeScreen() {
   return (
@@ -12,7 +11,7 @@ export default function HomeScreen() {
       <ScrollView>
         <View className="justify-center items-center bg-black/40 h-screen p-10">
           <View className="mb-7">
-            <LogoIcon />
+            <Image className="w-40 h-40 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
           </View>
 
           <View className="justify-center mb-16 gap-3 w-full">
