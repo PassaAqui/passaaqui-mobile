@@ -1,4 +1,4 @@
-import { Text, View, ImageBackground, Image, ScrollView } from "react-native";
+import { Text, View, ImageBackground, ScrollView } from "react-native";
 import { Link } from "expo-router"
 import LogoIcon from "@/src/components/common/logoIcon";
 
@@ -16,7 +16,7 @@ export default function HomeScreen() {
           </View>
 
           <View className="justify-center mb-16 gap-3 w-full">
-            <Text className="text-white text-6xl text-center font-irishGrover">Recife GO</Text>
+            <Text className="text-white text-6xl text-center font-irishGrover">PassaAqui</Text>
             <Text className="text-white text-center font-irishGrover self-center max-w-56">Transforme a cidade em uma aventura</Text>
           </View>
 
