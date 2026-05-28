@@ -1,7 +1,7 @@
 import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
 import { Link } from "expo-router";
 import { useState } from "react";
-import ShopkeeperIcon from "@/src/components/shopkeeper/ShopkeeperIcon";
+import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 
 export default function ShopkeeperLoginScreen() {
 const [email, setEmail] = useState("");

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { shopkeeperSignUpSchema } from "@/src/schemas/shopkeeper/signUpSchema";
 import { Link } from "expo-router";
 import Checkbox from "expo-checkbox";
-import ShopkeeperIcon from "@/src/components/shopkeeper/ShopkeeperIcon";
+import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 
 const formatCpfOrCnpj = (text: string) => {
   const digits = text.replace(/\D/g, "").slice(0, 14);
