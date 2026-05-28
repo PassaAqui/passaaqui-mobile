@@ -5,7 +5,7 @@ import LogoIcon from "../components/common/logoIcon";
 export default function Index() {
 
   // Apenas em desenvolvimento para testar novas telas
-  return <Redirect href={"/user/auth/login"} />
+  //return <Redirect href={"/shopkeeper/auth/signup"} />
 
   return (
     <ImageBackground
@@ -36,7 +36,7 @@ export default function Index() {
                 <View className="w-1/3 h-px bg-white" />
               </View>
 
-              <Link href={"/shopkeeper/signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
+              <Link href={"/shopkeeper/auth/shopkeeper-signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
                 <Text className="font-itim text-lg text-center">Contiuar como comerciante</Text>
               </Link>
             </View>

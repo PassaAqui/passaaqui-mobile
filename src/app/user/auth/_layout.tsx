@@ -15,14 +15,14 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    NavigationBar.setButtonStyleAsync("dark");
+    NavigationBar.setButtonStyleAsync("light");
   }, []);
 
   if (!fontsLoaded) return null;
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }} />
     </>
   )

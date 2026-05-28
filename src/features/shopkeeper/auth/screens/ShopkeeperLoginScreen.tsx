@@ -3,13 +3,13 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import ShopkeeperIcon from "@/src/components/shopkeeper/ShopkeeperIcon";
 
-export default function Login() {
+export default function ShopkeeperLoginScreen() {
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const [error, setError] = useState({
   email: "",
   password: ""
-});
+})
 
 const handleSubmit = () => {
   const errors = {
@@ -91,7 +91,7 @@ const handleSubmit = () => {
                 <Text className="font-itim text-lg">Entrar</Text>
               </Pressable>
 
-              <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/signup"} className="text-cyan-500">Cadastre-se</Link></Text>
+              <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/auth/shopkeeper-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
             </View>
           </View>
         </ScrollView>

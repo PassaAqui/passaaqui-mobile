@@ -2,8 +2,6 @@ import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, Keyboard
 import { useState, useEffect } from "react";
 import { shopkeeperSignUpSchema } from "@/src/schemas/shopkeeper/signUpSchema";
 import { Link } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as NavigationBar from "expo-navigation-bar"
 import Checkbox from "expo-checkbox";
 import ShopkeeperIcon from "@/src/components/shopkeeper/ShopkeeperIcon";
 
@@ -24,7 +22,7 @@ const formatCpfOrCnpj = (text: string) => {
     .replace(/(\d{4})(\d{1,2})$/, "$1/$2");
 };
 
-export default function SignUp() {
+export default function ShopkeeperSignupScreen() {
   const [storeName, setStoreName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,10 +39,6 @@ export default function SignUp() {
       confirmPassword: "",
       terms: ""
   });
-
-  useEffect(() => {
-    NavigationBar.setVisibilityAsync("hidden");
-  }, []);
 
   const handleSubmit = () => {
     const result = shopkeeperSignUpSchema.safeParse({
@@ -82,7 +76,6 @@ export default function SignUp() {
       className="flex-1"
       resizeMode="cover"
     >
-      <StatusBar hidden />
       <View className="bg-black/40 inset-0 absolute" />
 
       <KeyboardAvoidingView
@@ -101,10 +94,10 @@ export default function SignUp() {
                 <TextInput
                 value={storeName}
                 onChangeText={(text) => {
-                    setStoreName(text);
-                    if (error.storeName) {
-                        setError(prev => ({ ...prev, storeName: "" }));
-                    }
+                  setStoreName(text);
+                  if (error.storeName) {
+                    setError(prev => ({ ...prev, storeName: "" }));
+                  }
                 }}
                 className="bg-white rounded-lg p-4"
                 placeholder={"Digite o nome do estabelecimento"}
@@ -117,10 +110,10 @@ export default function SignUp() {
               <TextInput
                 value={ownerName}
                 onChangeText={(text) => {
-                    setOwnerName(text);
-                    if (error.ownerName) {
-                        setError(prev => ({ ...prev, ownerName: "" }));
-                    }
+                  setOwnerName(text);
+                  if (error.ownerName) {
+                    setError(prev => ({ ...prev, ownerName: "" }));
+                  }
                 }}
                 className="bg-white rounded-lg p-4"
                 placeholder={"Digite o nome do proprietário"}
@@ -136,10 +129,10 @@ export default function SignUp() {
                 autoCorrect={false}
                 value={email}
                 onChangeText={(text) => {
-                    setEmail(text);
-                    if (error.email) {
-                        setError(prev => ({ ...prev, email: "" }));
-                    }
+                  setEmail(text);
+                  if (error.email) {
+                    setError(prev => ({ ...prev, email: "" }));
+                  }
                 }}
                 className="bg-white rounded-lg p-4"
                 placeholder={"Digite o email do estabelecimento"}
@@ -168,10 +161,10 @@ export default function SignUp() {
                 secureTextEntry
                 value={password}
                 onChangeText={(text) => {
-                    setPassword(text);
-                    if (error.password) {
-                        setError(prev => ({ ...prev, password: "" }));
-                    }
+                  setPassword(text);
+                  if (error.password) {
+                    setError(prev => ({ ...prev, password: "" }));
+                  }
                 }}
                 className="bg-white rounded-lg p-4"
                 placeholder={"Digite sua senha"}
@@ -185,10 +178,10 @@ export default function SignUp() {
                 secureTextEntry
                 value={confirmPassword}
                 onChangeText={(text) => {
-                    setConfirmPassword(text);
-                    if (error.confirmPassword) {
-                        setError(prev => ({ ...prev, confirmPassword: "" }));
-                    }
+                  setConfirmPassword(text);
+                  if (error.confirmPassword) {
+                    setError(prev => ({ ...prev, confirmPassword: "" }));
+                  }
                 }}
                 className="bg-white rounded-lg p-4"
                 placeholder={"Confirme sua senha"}
@@ -199,24 +192,24 @@ export default function SignUp() {
 
               <View className="flex-row items-center gap-2">
                 <Checkbox
-                        value={isChecked}
-                        onValueChange={(state) => {
-                            setChecked(state);
-                            if (error.terms) {
-                                setError(prev => ({ ...prev, terms: "" }))
-                            }
-                        }}
-                        color={isChecked? "#2463EB" : undefined}
-                        className="border-red-500"
-                    />
-                    <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.</Text>
+                  value={isChecked}
+                  onValueChange={(state) => {
+                    setChecked(state);
+                    if (error.terms) {
+                      setError(prev => ({ ...prev, terms: "" }))
+                    }
+                  }}
+                  color={isChecked? "#2463EB" : undefined}
+                  className="border-red-500"
+              />
+              <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.</Text>
               </View>
 
               <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
                 <Text>Cadastrar</Text>
               </Pressable>
 
-              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/login"} className="text-cyan-500">Login</Link></Text>
+              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/auth/shopkeeper-login"} className="text-cyan-500">Login</Link></Text>
             </View>
           </View>
         </ScrollView>

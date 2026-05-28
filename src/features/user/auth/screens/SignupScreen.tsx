@@ -2,8 +2,6 @@ import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, Keyboard
 import { useEffect, useState } from "react";
 import { signUpSchema } from "@/src/schemas/user/signUpSchema";
 import { Link } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import * as NavigationBar from "expo-navigation-bar";
 import Checkbox from "expo-checkbox";
 import UserIcon from "@/src/components/user/UserIcon";
 
@@ -30,10 +28,6 @@ export default function SignupScreen() {
       confirmPassword: "",
       terms: ""
   });
-
-  useEffect(() => {
-    NavigationBar.setVisibilityAsync("hidden");
-  }, []);
 
   const handleSubmit = () => {
     const result = signUpSchema.safeParse({
@@ -69,7 +63,6 @@ export default function SignupScreen() {
       className="flex-1"
       resizeMode="cover"
     >
-      <StatusBar hidden />
       <View className="bg-black/40 inset-0 absolute" />
 
       <KeyboardAvoidingView
