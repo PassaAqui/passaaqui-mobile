@@ -74,7 +74,7 @@ export default function TabLayout() {
           />
 
           <Tabs.Screen
-            name="redirect"
+            name="settings"
             options={{
               title: "Configurações",
               tabBarIcon: ({ focused }: { focused: boolean }) => (

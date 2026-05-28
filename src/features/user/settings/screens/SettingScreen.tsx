@@ -5,7 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import LogoIcon from "@/src/components/common/logoIcon";
 
-export default function Index() {
+export default function SettingScreen() {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
