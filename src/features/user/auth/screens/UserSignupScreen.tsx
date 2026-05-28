@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { signUpSchema } from "@/src/schemas/user/signUpSchema";
 import { Link } from "expo-router";
 import Checkbox from "expo-checkbox";
-import UserIcon from "@/src/components/user/UserIcon";
+import UserIcon from "@/src/features/user/auth/components/UserIcon";
 
 const formatCpf = (text: string) => {
   const digits = text.replace(/\D/g, "").slice(0, 11);

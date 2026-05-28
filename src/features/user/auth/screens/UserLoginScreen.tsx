@@ -1,7 +1,7 @@
 import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
 import { Link } from "expo-router";
 import { useState } from "react";
-import UserIcon from "@/src/components/user/UserIcon";
+import UserIcon from "@/src/features/user/auth/components/UserIcon";
 
 export default function UserLoginScreen() {
 const [email, setEmail] = useState("");
