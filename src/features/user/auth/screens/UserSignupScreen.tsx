@@ -13,7 +13,7 @@ const formatCpf = (text: string) => {
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 };
 
-export default function SignupScreen() {
+export default function UserSignupScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
@@ -180,7 +180,7 @@ export default function SignupScreen() {
                 <Text>Cadastrar</Text>
               </Pressable>
 
-              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/auth/login"} className="text-cyan-500">Login</Link></Text>
+              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/user/auth/user-login"} className="text-cyan-500">Login</Link></Text>
             </View>
           </View>
         </ScrollView>

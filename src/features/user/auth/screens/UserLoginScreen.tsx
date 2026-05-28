@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import UserIcon from "@/src/components/user/UserIcon";
 
-export default function LoginScreen() {
+export default function UserLoginScreen() {
 const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 const [error, setError] = useState({
@@ -91,7 +91,7 @@ const handleSubmit = () => {
                 <Text className="font-itim text-lg">Entrar</Text>
               </Pressable>
 
-              <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/auth/signup"} className="text-cyan-500">Cadastre-se</Link></Text>
+              <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/auth/user-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
             </View>
           </View>
         </ScrollView>
