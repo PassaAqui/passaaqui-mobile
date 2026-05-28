@@ -5,7 +5,7 @@ interface AlertModalProps {
   onClose: () => void;
 }
 
-export default function AlertModal({ visible,  onClose}: AlertModalProps) {
+export default function OutsideRegionModal({ visible,  onClose}: AlertModalProps) {
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <View className="flex-1 bg-black/50 items-center justify-center px-6">
