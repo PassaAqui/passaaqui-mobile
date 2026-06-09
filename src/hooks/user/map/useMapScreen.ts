@@ -20,7 +20,7 @@ async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): 
       return true;
     } catch {
       console.log(`[waitForLocation WARN] Falhou na tentativa ${attempt}. Tentando novamente...`)
-      if (attempt < maxRetries) {
+      if (attempt <= maxRetries) {
         await new Promise(resolve => setTimeout(resolve, delayMs));
       }
     }
@@ -126,6 +126,7 @@ export function useMapScreen() {
   
   useEffect(() => {
     if (!openPOIMarker) return;
+    let cancelled: boolean = false;
 
     async function getDistance() {
       try {
@@ -138,7 +139,7 @@ export function useMapScreen() {
 
         const destination = { latitude: openPOIMarker!.latitude, longitude: openPOIMarker!.longitude};
         const { distance } = await getRoute(origin, destination, "foot-walking");
-        setRouteDistance(distance);
+        if (!cancelled) setRouteDistance(distance);
 
       } catch (error) {
         console.log(`[useEffect user/map ERROR]: Erro ao pegar a distância ${error}`);
