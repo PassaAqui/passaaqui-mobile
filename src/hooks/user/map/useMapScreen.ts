@@ -1,10 +1,33 @@
 import MapView from "react-native-maps";
 import { useState, useEffect, useRef } from "react";
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync, LocationObject, watchPositionAsync, LocationAccuracy } from "expo-location";
+import { 
+  requestForegroundPermissionsAsync,
+  getCurrentPositionAsync,
+  LocationObject,
+  watchPositionAsync,
+  LocationAccuracy,
+} from "expo-location";
 import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
 import { PAULISTA_BOUNDS } from "@/src/constants/user/map/map";
 import { getRoute } from "@/src//services/routeService";
 import * as NavigationBar from "expo-navigation-bar";
+
+
+async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
+  for (let attempt = 1; attempt < maxRetries; attempt++) {
+    try {
+      await getCurrentPositionAsync({ accuracy: LocationAccuracy.Balanced });
+      return true;
+    } catch {
+      console.log(`[waitForLocation WARN] Falhou na tentativa ${attempt}. Tentando novamente...`)
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  return false;
+}
 
 export function useMapScreen() {
   const [location, setLocation] = useState<LocationObject | null>(null);
@@ -19,49 +42,42 @@ export function useMapScreen() {
   const [stop, setStop] = useState<boolean>(false);
   const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
 
-  async function requestLocationPermission() {
-    const { granted } = await requestForegroundPermissionsAsync();
-
-    if (!granted) {
-      // Colocar um modal aqui falando que recomendamos ativar a localização para uma melhor experiência com o aplicativo...
-      console.log("[WARN LOCATION]: Permissão negada");
-      return;
-    }
-
-    const currentPosition = await getCurrentPositionAsync({
-      accuracy: LocationAccuracy.Balanced
-    });
-    console.log(currentPosition);
-    setLocation(currentPosition);
-
-    return true;
-  }
-
   useEffect(() => {
     let subscription: {remove: () => void } | null = null;
 
     async function getLocation() {
-      const isLocationPermission = await requestLocationPermission();
+      const { granted } = await requestForegroundPermissionsAsync();
 
-      if (isLocationPermission) {
-        subscription = await watchPositionAsync({
-          accuracy: LocationAccuracy.Highest,
-          timeInterval: 1000,
-          distanceInterval: 1
-        }, (response) => {
-          setLocation(response);
-          checkLocation();
-          mapRef.current?.animateCamera({
-            center: {
-              //latitude: response.coords.latitude,
-              //longitude: response.coords.longitude
-              latitude: -7.94009,
-              longitude: -34.8723
-            },
-            zoom: 19
-          });
-        });
+      if (!granted) {
+        // Colocar um modal aqui falando que recomendamos ativar a localização para uma melhor experiência com o aplicativo...
+        console.log("[WARN LOCATION]: Permissão negada");
+        return;
       }
+
+      const locationReady = await waitForLocation();
+
+      if (!locationReady) {
+        // Colocar um modal aqui falando que não foi possivel obter a localização do usuário e que é necessário tentar novamente...
+        console.log("[ERROR LOCATION]: Não foi possivel obter a localização do usuário")
+        return;
+      }
+
+      subscription = await watchPositionAsync({
+        accuracy: LocationAccuracy.Highest,
+        timeInterval: 1000,
+        distanceInterval: 1
+      }, (response) => {
+        setLocation(response);
+        mapRef.current?.animateCamera({
+          center: {
+            //latitude: response.coords.latitude,
+            //longitude: response.coords.longitude
+            latitude: -7.94009, // só pra dev pq eu não vou sair na rua testando a localização
+            longitude: -34.8723 // só pra dev pq eu não vou sair na rua testando a localização
+          },
+          zoom: 19
+        });
+      });  
     }
 
     getLocation();
