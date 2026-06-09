@@ -8,7 +8,7 @@ import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPO
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
 import StopButton from "@/src/features/user/map/components/StopButton";
 import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
-import { useMapScreen } from "@/src/hooks/user/map/useMapScreen";
+import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
