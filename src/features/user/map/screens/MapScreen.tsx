@@ -39,7 +39,8 @@ export default function MapScreen() {
   return (      
     <SafeAreaView edges={["top"]} className="bg-white flex-1 justify-center">
       <StatusBar style="dark" hidden/>
-      <View className="flex-row p-4 pt-12 items-center gap-3 bg-white">
+
+      <View style={{ paddingTop: insets.top }} className="flex-row px-4 pb-4 items-center gap-3 bg-white">
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
         <View className="flex-col">
           <Text className="font-itim text-xl">David Cleyton</Text>
