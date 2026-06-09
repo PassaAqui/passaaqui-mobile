@@ -85,12 +85,14 @@ export default function TabLayout() {
                 />
               )
             }}
+            /*
             listeners={{
               tabPress: (e) => {
                 e.preventDefault();
                 router.push("/user/settings");
               }
             }}
+            */ /* Esse listeners tava aqui porque antes eu redirecionava para uma outra tela quando eu ainda estava usando a pasta app para tudo (criação de telas, componetens próprios) */
           />
       </Tabs>
     </>
