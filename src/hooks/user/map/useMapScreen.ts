@@ -14,7 +14,7 @@ import * as NavigationBar from "expo-navigation-bar";
 
 
 async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
-  for (let attempt = 1; attempt < maxRetries; attempt++) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       await getCurrentPositionAsync({ accuracy: LocationAccuracy.Balanced });
       return true;
@@ -147,6 +147,7 @@ export function useMapScreen() {
     }
     
     getDistance();
+    return () => { cancelled = true };
 
   }, [openPOIMarker]);
 
