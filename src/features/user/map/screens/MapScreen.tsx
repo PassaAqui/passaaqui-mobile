@@ -9,8 +9,12 @@ import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI"
 import StopButton from "@/src/features/user/map/components/StopButton";
 import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
 import { useMapScreen } from "@/src/hooks/user/map/useMapScreen";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MapScreen() {
+  const insets = useSafeAreaInsets();
+
   const {
     location,
     loadingRoute,
@@ -33,7 +37,7 @@ export default function MapScreen() {
   } = useMapScreen();
 
   return (      
-    <View className="flex-1 justify-center">
+    <SafeAreaView edges={["top"]} className="bg-white flex-1 justify-center">
       <StatusBar style="dark" hidden/>
       <View className="flex-row p-4 pt-12 items-center gap-3 bg-white">
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
@@ -157,7 +161,7 @@ export default function MapScreen() {
           }}
         />
       )}
-    </View>
+    </SafeAreaView>
   )
 }
 
