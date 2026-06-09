@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
-import LogoIcon from "@/src/components/common/logoIcon";
 
 export default function SettingScreen() {
   const insets = useSafeAreaInsets();
@@ -30,7 +29,10 @@ export default function SettingScreen() {
         
 
         <View className="items-center justify-center mb-14 gap-4">
-          <LogoIcon />
+          <View className="mb-7">
+            <Image className="w-40 h-40 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
+          </View>
+
           <View>
             <Text className="font-itim text-center text-2xl">David Cleyton</Text>
             <Text className="font-itim text-center text-lg opacity-65">davidcleyton101@gmail.com</Text>
