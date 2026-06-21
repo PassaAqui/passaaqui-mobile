@@ -27,6 +27,18 @@ async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): 
 export function useLocation() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const mapRef = useRef<MapView>(null);
+  const [mapReady, setMapReady] = useState(false);
+
+  useEffect(() => {
+    if (mapReady && mapRef.current) {
+      mapRef.current.animateToRegion({
+        latitude: -8.0675, /* Centro de recife (Marco Zero) */
+        longitude: -34.9167,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+    }
+  }, [mapReady]);
 
   useEffect(() => {
       let subscription: {remove: () => void } | null = null;
@@ -73,5 +85,9 @@ export function useLocation() {
       }
     }, []);
   
-    return { location, mapRef }
+    return {
+      location,
+      mapRef,
+      mapReady, setMapReady
+    }
 }

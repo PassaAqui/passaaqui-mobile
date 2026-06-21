@@ -11,7 +11,8 @@ import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirm
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+/* latitude: -8.0675
+longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
 
@@ -19,6 +20,8 @@ export default function MapScreen() {
     location,
     loadingRoute,
     mapRef,
+    mapReady,
+    setMapReady,
     setOpenTouristPOIMarker,
     openTouristPOIMarker,
     setOpenShopPOIMarker,
@@ -54,69 +57,72 @@ export default function MapScreen() {
         </View>
       )}
 
-      {location && (
-        <MapView
-          ref={mapRef}
-          customMapStyle={mapStyle}
-          initialRegion={{
-            latitude: -7.94009, // Paulista (PE)
-            longitude: -34.8723,
-            latitudeDelta: 0.005,
-            longitudeDelta: 0.005,
-          }}
-          style={styles.map}
-        >
-          <Marker
-            coordinate={{
-              latitude: -7.94009,
-              longitude: -34.8723
-              //latitude: -8.2832,
-              //longitude: -35.9736
-            }}
-            icon={require("@/assets/user/map/user-pin.png")}
-          />
-
-          {touristPOIs.map(touristPoi => (
+      <MapView
+        ref={mapRef}
+        customMapStyle={mapStyle}
+        initialRegion={{
+          latitude: -8.0675, /* Centro de recife (Marco Zero) */
+          longitude: -34.9167,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }}
+        style={styles.map}
+        onMapReady={() => setMapReady(true)}
+      >
+        {location && (
+          <>
             <Marker
-              key={touristPoi.id}
               coordinate={{
-                latitude: touristPoi.latitude,
-                longitude: touristPoi.longitude
+                latitude: -7.94009,
+                longitude: -34.8723
+                //latitude: -8.2832, Caruaru
+                //longitude: -35.9736
               }}
-              title={touristPoi.title}
-              onPress={() => {
-                setOpenTouristPOIMarker(touristPoi);
-                setOpenPOIMarker(touristPoi);
-              }}
-              icon={require("@/assets/user/map/poi/touristPOI.png")}
+              icon={require("@/assets/user/map/user-pin.png")}
             />
-          ))}
 
-          {shopPOIs.map(shopPoi => (
-            <Marker
-              key={shopPoi.id}
-              coordinate={{
-                latitude: shopPoi.latitude,
-                longitude: shopPoi.longitude
-              }}
-              title={shopPoi.title}
-              onPress={() => {
-                setOpenShopPOIMarker(shopPoi);
-                setOpenPOIMarker(shopPoi);
-              }}
-              icon={require("@/assets/user/map/shopkeeper-pin.png")}
-            />
-          ))}
+            {touristPOIs.map(touristPoi => (
+              <Marker
+                key={touristPoi.id}
+                coordinate={{
+                  latitude: touristPoi.latitude,
+                  longitude: touristPoi.longitude
+                }}
+                title={touristPoi.title}
+                onPress={() => {
+                  setOpenTouristPOIMarker(touristPoi);
+                  setOpenPOIMarker(touristPoi);
+                }}
+                icon={require("@/assets/user/map/poi/touristPOI.png")}
+              />
+            ))}
 
-          {routeCoords.length > 0 && stop && (
-            <Polyline
-              coordinates={routeCoords}
-              strokeColor="#EAAA6A"
-              strokeWidth={6}
-            />
-          )}
-        </MapView>
-      )}
+            {shopPOIs.map(shopPoi => (
+              <Marker
+                key={shopPoi.id}
+                coordinate={{
+                  latitude: shopPoi.latitude,
+                  longitude: shopPoi.longitude
+                }}
+                title={shopPoi.title}
+                onPress={() => {
+                  setOpenShopPOIMarker(shopPoi);
+                  setOpenPOIMarker(shopPoi);
+                }}
+                icon={require("@/assets/user/map/shopkeeper-pin.png")}
+              />
+            ))}
+
+            {routeCoords.length > 0 && stop && (
+              <Polyline
+                coordinates={routeCoords}
+                strokeColor="#EAAA6A"
+                strokeWidth={6}
+              />
+            )}
+          </>
+        )}
+      </MapView>
 
       {showAlertModal && (
         <OutsideRegionModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />
