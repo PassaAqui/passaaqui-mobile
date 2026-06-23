@@ -27,7 +27,10 @@ async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): 
 export function useLocation() {
   const [location, setLocation] = useState<LocationObject | null>(null);
   const mapRef = useRef<MapView>(null);
-  const [mapReady, setMapReady] = useState(false);
+  const [mapReady, setMapReady] = useState<boolean>(false);
+  const [lastUpdate, setLastUpdate] = useState<number>(Date.now);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [initialPosition, setInitialPosition] = useState<boolean>(false);
 
   useEffect(() => {
     if (mapReady && mapRef.current) {
@@ -39,6 +42,24 @@ export function useLocation() {
       });
     }
   }, [mapReady]);
+
+  useEffect(() => {
+    if (location && mapReady && !initialPosition && !isFollowing && mapRef.current) {
+      mapRef.current.animateToRegion({
+        //latitude: response.coords.latitude,
+        //longitude: response.coords.longitude
+
+        /*
+          Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+        */
+        latitude: -7.94009,
+        longitude: -34.8723,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+      setInitialPosition(true);
+    }
+  }, [location, mapReady, initialPosition, isFollowing]);
 
   useEffect(() => {
       let subscription: {remove: () => void } | null = null;
@@ -61,33 +82,43 @@ export function useLocation() {
         }
   
         subscription = await watchPositionAsync({
-          accuracy: LocationAccuracy.Highest,
+          accuracy: LocationAccuracy.High,
           timeInterval: 1000,
-          distanceInterval: 1
+          distanceInterval: 2
         }, (response) => {
           setLocation(response);
-          mapRef.current?.animateCamera({
-            center: {
-              //latitude: response.coords.latitude,
-              //longitude: response.coords.longitude
-              latitude: -7.94009, // só pra dev pq eu não vou sair na rua testando a localização
-              longitude: -34.8723 // só pra dev pq eu não vou sair na rua testando a localização
-            },
-            zoom: 19
-          });
+          setLastUpdate(Date.now());
+
+          if (isFollowing) {
+            mapRef.current?.animateCamera({
+              center: {
+                //latitude: response.coords.latitude,
+                //longitude: response.coords.longitude
+
+                /*
+                  Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+                */
+                latitude: -7.94009,
+                longitude: -34.8723
+              },
+              //zoom: 19
+            });
+          }
         });  
       }
   
       getLocation();
   
       return () => {
-        subscription?.remove()
+        subscription?.remove();
       }
     }, []);
   
     return {
       location,
       mapRef,
-      mapReady, setMapReady
+      mapReady, setMapReady,
+      lastUpdate,
+      isFollowing, setIsFollowing
     }
 }

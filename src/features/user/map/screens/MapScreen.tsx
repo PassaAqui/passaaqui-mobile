@@ -7,10 +7,12 @@ import OutsideRegionModal from "@/src/features/user/map/components/OutsideRegion
 import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPOI";
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
 import StopButton from "@/src/features/user/map/components/StopButton";
+import FollowUserButton from "@/src/features/user/map/components/FollowUserButton";
 import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -22,6 +24,8 @@ export default function MapScreen() {
     mapRef,
     mapReady,
     setMapReady,
+    gpsActive,
+    isFollowing, setIsFollowing,
     setOpenTouristPOIMarker,
     openTouristPOIMarker,
     setOpenShopPOIMarker,
@@ -38,6 +42,25 @@ export default function MapScreen() {
     setRouteCoords,
     routeDistance
   } = useMapScreen();
+
+  const handleFollow = () => {
+    setIsFollowing(true);
+
+    if (location) {
+      mapRef.current?.animateToRegion({
+          //latitude: response.coords.latitude,
+          //longitude: response.coords.longitude
+
+          /*
+            Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+          */
+          latitude: -7.94009,
+          longitude: -34.8723,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+      });
+    }
+  };
 
   return (      
     <SafeAreaView edges={["top"]} className="bg-white flex-1 justify-center">
@@ -68,6 +91,11 @@ export default function MapScreen() {
         }}
         style={styles.map}
         onMapReady={() => setMapReady(true)}
+        onRegionChange={(region, details) => {
+          if (details.isGesture) {
+            setIsFollowing(false);
+          }
+        }}
       >
         {location && (
           <>
@@ -154,8 +182,13 @@ export default function MapScreen() {
         />
       )}
 
-      {stop && (
-        <StopButton onConfirmate={() => setShowStopConfirmation(true)} />
+      {(stop || !isFollowing) && (
+        <View className="absolute bottom-5 left-0 right-0 px-4">
+          <View className={`flex-row justify-center gap-3 ${stop && !isFollowing ? '' : 'justify-center'}`}>
+            {stop && <StopButton onConfirmate={() => setShowStopConfirmation(true)} />}
+            {!isFollowing && <FollowUserButton onFollow={handleFollow} />}
+          </View>
+        </View>
       )}
 
       {showStopConfirmation && (
@@ -167,6 +200,10 @@ export default function MapScreen() {
             setShowStopConfirmation(false);
           }}
         />
+      )}
+
+      {!gpsActive && (
+        <GpsDisabledModal />
       )}
     </SafeAreaView>
   )
