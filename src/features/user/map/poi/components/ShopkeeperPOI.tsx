@@ -33,8 +33,11 @@ export default function ShopkeeperPOI({ img, title, description, distance, starQ
 
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <View className="flex-1 bg-black/50 items-center justify-center px-6">
-        <View className="w-full bg-white items-center justify-center gap-4 rounded-xl overflow-hidden">
+      <Pressable onPress={onClose} className="flex-1 bg-black/50 items-center justify-center px-6">
+        <Pressable onPress={() => {}} className="w-full bg-white items-center justify-center gap-4 rounded-xl overflow-hidden">
+          <Pressable onPress={onClose} className="absolute z-10 top-4 right-4 bg-white/50 p-3 rounded-full w-12 h-12 items-center justify-center active:opacity-30">
+            <Text className="font-interBold text-xl text-center" numberOfLines={1}>X</Text>
+          </Pressable>
           <Image className="bg-gray-200 w-full h-56" resizeMode="cover" source={img} />
 
           <View className="w-full px-6 pb-6 gap-4 items-center">
@@ -66,8 +69,8 @@ export default function ShopkeeperPOI({ img, title, description, distance, starQ
               <Text className="font-itim text-xl text-center">Ir agora</Text>
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   )
 }
