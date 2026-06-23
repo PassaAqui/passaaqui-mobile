@@ -33,7 +33,7 @@ export function useLocation() {
   const [initialPosition, setInitialPosition] = useState<boolean>(false);
 
   useEffect(() => {
-    if (mapReady && mapRef.current) {
+    if (mapReady && mapRef.current && !location) {
       mapRef.current.animateToRegion({
         latitude: -8.0675, /* Centro de recife (Marco Zero) */
         longitude: -34.9167,
@@ -41,7 +41,7 @@ export function useLocation() {
         longitudeDelta: 0.005,
       });
     }
-  }, [mapReady]);
+  }, [mapReady, location]);
 
   useEffect(() => {
     if (location && mapReady && !initialPosition && !isFollowing && mapRef.current) {
