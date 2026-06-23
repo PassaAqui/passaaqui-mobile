@@ -11,6 +11,7 @@ import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirm
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -22,6 +23,7 @@ export default function MapScreen() {
     mapRef,
     mapReady,
     setMapReady,
+    gpsActive,
     setOpenTouristPOIMarker,
     openTouristPOIMarker,
     setOpenShopPOIMarker,
@@ -167,6 +169,10 @@ export default function MapScreen() {
             setShowStopConfirmation(false);
           }}
         />
+      )}
+
+      {!gpsActive && (
+        <GpsDisabledModal />
       )}
     </SafeAreaView>
   )
