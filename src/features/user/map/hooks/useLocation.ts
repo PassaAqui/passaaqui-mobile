@@ -29,6 +29,8 @@ export function useLocation() {
   const mapRef = useRef<MapView>(null);
   const [mapReady, setMapReady] = useState<boolean>(false);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [initialPosition, setInitialPosition] = useState<boolean>(false);
 
   useEffect(() => {
     if (mapReady && mapRef.current) {
@@ -40,6 +42,24 @@ export function useLocation() {
       });
     }
   }, [mapReady]);
+
+  useEffect(() => {
+    if (location && mapReady && !initialPosition && !isFollowing && mapRef.current) {
+      mapRef.current.animateToRegion({
+        //latitude: response.coords.latitude,
+        //longitude: response.coords.longitude
+
+        /*
+          Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+        */
+        latitude: -7.94009,
+        longitude: -34.8723,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
+      setInitialPosition(true);
+    }
+  }, [location, mapReady, initialPosition, isFollowing]);
 
   useEffect(() => {
       let subscription: {remove: () => void } | null = null;
@@ -68,17 +88,22 @@ export function useLocation() {
         }, (response) => {
           setLocation(response);
           setLastUpdate(Date.now());
-          mapRef.current?.animateCamera({
-            center: {
-              // coloca um if aqui, se for true vai redirecionar a camera pro lugar q o user está
-              
-              //latitude: response.coords.latitude,
-              //longitude: response.coords.longitude
-              latitude: -7.94009, // só pra dev pq eu não vou sair na rua testando a localização
-              longitude: -34.8723 // só pra dev pq eu não vou sair na rua testando a localização
-            },
-            //zoom: 19
-          });
+
+          if (isFollowing) {
+            mapRef.current?.animateCamera({
+              center: {
+                //latitude: response.coords.latitude,
+                //longitude: response.coords.longitude
+
+                /*
+                  Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+                */
+                latitude: -7.94009,
+                longitude: -34.8723
+              },
+              //zoom: 19
+            });
+          }
         });  
       }
   
@@ -93,6 +118,7 @@ export function useLocation() {
       location,
       mapRef,
       mapReady, setMapReady,
-      lastUpdate
+      lastUpdate,
+      isFollowing, setIsFollowing
     }
 }

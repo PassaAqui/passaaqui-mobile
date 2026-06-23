@@ -5,14 +5,14 @@ import { useNavigation } from "@/src/features/user/map/hooks/useNavigation";
 import { useGpsStatus } from "@/src/features/user/map/hooks/useGpsStatus";
 
 export function useMapScreen() {
-  const { location, mapRef, mapReady, setMapReady, lastUpdate } = useLocation();
+  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing } = useLocation();
   const { gpsActive } = useGpsStatus(lastUpdate);
   const poi = usePOI(location);
   const navigation = useNavigation(mapRef);
   const bounds = useBoundsCheck(location);
 
   return {
-    location, mapRef, mapReady, setMapReady,
+    location, mapRef, mapReady, setMapReady, isFollowing, setIsFollowing,
     gpsActive,
     ...poi,
     ...navigation,
