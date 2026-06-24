@@ -1,10 +1,16 @@
-import { Pressable, Image, Text } from "react-native"
+import { Pressable, Image, Text,  } from "react-native"
 
-export default function CompleteSticker() {
+interface CompleteStickerProps {
+  image: string,
+  title: string,
+  invertRotate: boolean
+}
+
+export default function CompleteSticker({ image, title, invertRotate }: CompleteStickerProps) {
   return (
-    <Pressable className="gap-2 border border-gray-400 rounded-xl items-center justify-center overflow-hidden min-h-52 w-[47%] pb-6 active:opacity-55">
-      <Image className="bg-gray-400 w-full h-40" source={{ uri: "https://www.gov.br/turismo/pt-br/assuntos/noticias/historia-e-natureza-no-passeio-pelo-rio-timbo-em-paulista-pe/29.08.22_PaulistsPECarlosQueiroz.jpg/@@images/812978df-6147-41ad-98fa-533fc4145042.jpeg" }} />
-      <Text className="font-interBold text-lg text-center">Rio Timbó</Text>
+    <Pressable className={`gap-2 border border-gray-400 rounded-xl items-center justify-center overflow-hidden h-48 w-[47%] pb-6 active:opacity-55 ${invertRotate ? '-rotate-2' : 'rotate-2'}`}>
+      <Image className="bg-gray-400 w-full h-40" source={{ uri: image }} />
+      <Text className="font-interBold text-lg text-center">{title}</Text>
     </Pressable>
   )
 }
