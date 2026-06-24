@@ -3,7 +3,7 @@ import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
 import { IrishGrover_400Regular } from "@expo-google-fonts/irish-grover";
 import { Itim_400Regular } from "@expo-google-fonts/itim";
-import { Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter"
+import { Inter_400Regular, Inter_700Bold, Inter_400Regular_Italic } from "@expo-google-fonts/inter"
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { Image } from "react-native";
@@ -17,7 +17,8 @@ export default function TabLayout() {
     IrishGrover_400Regular,
     Itim_400Regular,
     Inter_400Regular,
-    Inter_700Bold
+    Inter_700Bold,
+    Inter_400Regular_Italic
   });
 
   useEffect(() => {

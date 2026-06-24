@@ -8,7 +8,8 @@ module.exports = {
         irishGrover: ["IrishGrover_400Regular"],
         itim: ["Itim_400Regular"],
         inter: ["Inter_400Regular"],
-        interBold: ["Inter_700Bold"]
+        interBold: ["Inter_700Bold"],
+        interItalic: ["Inter_400Regular_Italic"]
       }
     },
   },

@@ -71,10 +71,11 @@ export default function AchievementScreen() {
                   if (!sticker.img || !sticker.title) {
                     return <WithoutSticker key={sticker.id} />
                   }
-                  
+
                   return (
                     <CompleteSticker 
                       key={sticker.id} 
+                      id={sticker.id}
                       image={sticker.img} 
                       title={sticker.title} 
                       invertRotate={sticker.id % 2 != 0 && sticker.complete} 
