@@ -75,6 +75,20 @@ export default function TabLayout() {
           />
 
           <Tabs.Screen
+            name="purchased"
+            options={{
+              title: "Comprados",
+              tabBarIcon: ({ focused }: { focused: boolean }) => (
+                <Image
+                  source={require("@/assets/user/map/tabs/purchased.png")}
+                  className="w-8 h-8"
+                  style={{ resizeMode: "contain", opacity: focused ? 1 : 0.5 }}
+                />
+              )
+            }}
+          />
+
+          <Tabs.Screen
             name="settings"
             options={{
               title: "Configurações",
