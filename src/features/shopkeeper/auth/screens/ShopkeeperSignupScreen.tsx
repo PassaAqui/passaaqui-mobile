@@ -211,7 +211,7 @@ export default function ShopkeeperSignupScreen() {
                 <Text>Cadastrar</Text>
               </Pressable>
 
-              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/auth/shopkeeper-login"} className="text-cyan-500">Login</Link></Text>
+              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/(public)/auth/shopkeeper-login"} className="text-cyan-500">Login</Link></Text>
             </View>
           </View>
         </KeyboardAwareScrollView>
