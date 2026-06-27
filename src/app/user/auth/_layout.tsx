@@ -5,7 +5,7 @@ import { Itim_400Regular } from "@expo-google-fonts/itim";
 import { useEffect } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-//import { KeyboardProvider } from "react-native-keyboard-controller"
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import "@/global.css";
 
 export default function RootLayout() {
@@ -21,9 +21,9 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <>
+    <KeyboardProvider>
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }} />
-    </>
+    </KeyboardProvider>
   )
 }

@@ -1,7 +1,10 @@
-import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
-import { useState, useEffect } from "react";
+import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
 import { shopkeeperSignUpSchema } from "@/src/schemas/shopkeeper/signUpSchema";
 import { Link } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 
@@ -23,6 +26,8 @@ const formatCpfOrCnpj = (text: string) => {
 };
 
 export default function ShopkeeperSignupScreen() {
+  const insets = useSafeAreaInsets();
+
   const [storeName, setStoreName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
@@ -76,13 +81,10 @@ export default function ShopkeeperSignupScreen() {
       className="flex-1"
       resizeMode="cover"
     >
-      <View className="bg-black/40 inset-0 absolute" />
+      <SafeAreaView edges={["top", "bottom"]} className="flex-1">
+        <View className="bg-black/40 inset-0 absolute" />
 
-      <KeyboardAvoidingView
-        behavior="padding"
-        className="flex-1"
-      >
-        <ScrollView>
+        <KeyboardAwareScrollView bottomOffset={16} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
           <View className="justify-center items-center min-h-screen p-9 w-full">
             <View className="flex-col justify-center items-center gap-3">
               <ShopkeeperIcon />
@@ -212,8 +214,8 @@ export default function ShopkeeperSignupScreen() {
               <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/auth/shopkeeper-login"} className="text-cyan-500">Login</Link></Text>
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
     </ImageBackground>
   )
 }

@@ -1,34 +1,38 @@
-import { ImageBackground, ScrollView, View, Text, TextInput, Pressable, KeyboardAvoidingView } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useState } from "react";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 
 export default function ShopkeeperLoginScreen() {
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const [error, setError] = useState({
-  email: "",
-  password: ""
-})
+  const insets = useSafeAreaInsets();
 
-const handleSubmit = () => {
-  const errors = {
-      email: "",
-      password: ""
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState({
+    email: "",
+    password: ""
+  })
+
+  const handleSubmit = () => {
+    const errors = {
+        email: "",
+        password: ""
+    }
+
+    if (email.trim() === "") {
+        errors.email = "Preencha o campo com seu email";
+    }
+    if (password.trim() === "") {
+        errors.password = "Preencha o campo com sua senha";
+    }
+
+    setError(errors)
+
+    const hasError = Object.values(errors).some(Boolean);
+    if (hasError) return;
   }
-
-  if (email.trim() === "") {
-      errors.email = "Preencha o campo com seu email";
-  }
-  if (password.trim() === "") {
-      errors.password = "Preencha o campo com sua senha";
-  }
-
-  setError(errors)
-
-  const hasError = Object.values(errors).some(Boolean);
-  if (hasError) return;
-}
 
   return (
     <ImageBackground
@@ -37,16 +41,8 @@ const handleSubmit = () => {
       resizeMode="cover"
     >
       <View className="bg-black/40 inset-0 absolute"/>
-
-      <KeyboardAvoidingView
-        behavior="padding"
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 justify-center items-center p-9 w-full">
+        <KeyboardAwareScrollView bottomOffset={16} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
+          <View className="min-h-screen justify-center items-center p-9 w-full">
             <View className="flex-col justify-center items-center mb-12 gap-3">
               <ShopkeeperIcon />
               <Text className="text-white text-3xl font-irishGrover text-center">Entrar na conta do seu estabelecimento</Text>
@@ -94,8 +90,7 @@ const handleSubmit = () => {
               <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/auth/shopkeeper-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
             </View>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
     </ImageBackground>
   )
 }
