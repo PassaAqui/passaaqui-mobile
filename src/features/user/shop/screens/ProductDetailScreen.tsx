@@ -108,7 +108,7 @@ export default function ProductDetailScreen() {
               onPress={!canRescue
                 ? () => setRedeemed(true)
                 : () => router.push({
-                  pathname: "/user/map/poi/shop/payment",
+                  pathname: "/user/(private)/payment",
                   params: { id: product.id, discount }
                 })}
               disabled={!canRescue}

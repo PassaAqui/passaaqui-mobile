@@ -131,7 +131,7 @@ export default function PixPaymentScreen() {
 
             <Pressable
               onPress={() => router.push({
-                pathname: "/user/map/poi/shop/product",
+                pathname: "/user/(private)/shop/product",
                 params: { id: product.id, discount }
               })}
               className="bg-transparent p-4 items-center justify-center rounded-xl active:opacity-50 border border-gray-400"
