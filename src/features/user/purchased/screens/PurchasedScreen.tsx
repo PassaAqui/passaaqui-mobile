@@ -51,14 +51,21 @@ export default function PurchasedScreen() {
           <View className="gap-3 mb-5">
             <Text className="font-interBold text-lg text-black mb-2">Produtos não resgatados</Text>
             {unredeemeds.map((item) => (
-              <View key={item.id} className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white  active:opacity-50">
+              <Pressable
+                key={item.id}
+                className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white  active:opacity-50"
+                onPress={() => router.push({
+                  pathname: "/user/purchased/review-product",
+                  params: { id: item.id.toString() }
+                })}
+              >
                 <Image className="w-14 h-14 rounded-xl" source={{ uri: item.img }} />
                 <View className="flex-1">
                   <Text className="font-interBold text-base text-black">{item.title}</Text>
                   <Text className="font-inter text-sm text-gray-500">Pedido {item.pedido}</Text>
                   <Text className="font-interBold text-sm text-[#E07B00]">Válido até {item.validade}</Text>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </View>
 
