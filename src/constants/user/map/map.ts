@@ -1,8 +1,8 @@
-export const PAULISTA_BOUNDS ={
-  latitudeMin: -7.9812503,
-  latitudeMax: -7.8379686,
-  longitudeMin: -35.0310089,
-  longitudeMax: -34.8192091
+export const RECIFE_BOUNDS ={
+  latitudeMin: -8.1500,
+  latitudeMax: -7.9500,
+  longitudeMin: -34.9500,
+  longitudeMax: -34.8000
 }
 
 export const mapStyle = [
