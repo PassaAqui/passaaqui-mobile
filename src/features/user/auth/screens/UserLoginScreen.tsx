@@ -88,7 +88,7 @@ export default function UserLoginScreen() {
               <Text className="font-itim text-lg">Entrar</Text>
             </Pressable>
 
-            <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/auth/user-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
+            <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/(public)/auth/user-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
           </View>
         </View>
       </KeyboardAwareScrollView>

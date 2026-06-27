@@ -108,7 +108,7 @@ export default function SummaryOrderScreen() {
           <View className="w-full gap-2 pt-6">
             <Pressable
               onPress={() => router.push({
-                pathname: "/user/map/poi/shop/payment/pix-payment",
+                pathname: "/user/(private)/payment/pix-payment",
                 params: { id: product.id, discount }
               })}
               className="bg-[#311e08] p-4 items-center justify-center rounded-xl active:opacity-70"

@@ -134,7 +134,7 @@ export default function UserSignupScreen() {
               </Pressable>
 
               <Text className="font-itim text-lg text-white text-center">
-                Já possui uma conta? Faça o <Link href={"/user/auth/user-login"} className="text-cyan-500">Login</Link>
+                Já possui uma conta? Faça o <Link href={"/user/(public)/auth/user-login"} className="text-cyan-500">Login</Link>
               </Text>
             </View>
           </View>

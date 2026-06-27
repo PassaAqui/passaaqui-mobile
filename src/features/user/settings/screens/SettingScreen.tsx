@@ -70,10 +70,14 @@ export default function SettingScreen() {
           </View>
         </View>
 
-        <View style={{ bottom: insets.bottom - 8 }}  className="absolute bottom-0 left-0 flex-row items-center gap-1 p-10">
+        {/* <View style={{ bottom: insets.bottom - 8 }}  className="absolute bottom-0 left-0 flex-row items-center gap-1 p-10">
           <Image className="w-7 h-7" source={require("@/assets/user/settings/trash.png")} />
           <Text className="text-red-800 font-itim text-lg">Excluir conta</Text>
-        </View>
+        </View> */}
+        <Pressable style={{ bottom: insets.bottom - 8 }}  className="absolute bottom-0 left-0 flex-row items-center gap-2 p-10 active:opacity-50">
+          <Image className="w-6 h-6" source={require("@/assets/user/settings/logout2.png")} />
+          <Text className="text-red-600 font-itim text-lg">Sair da conta</Text>
+        </Pressable>
       </View>
     </ScrollView>
   )

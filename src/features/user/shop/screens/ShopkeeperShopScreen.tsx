@@ -44,7 +44,7 @@ export default function ShopkeeperShopScreen() {
               <Pressable
                 key={product.id}
                 onPress={() => router.push({
-                  pathname: "/user/map/poi/shop/product",
+                  pathname: "/user/(private)/shop/product",
                   params: { id: product.id }
                 })}
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"

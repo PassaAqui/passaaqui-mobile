@@ -61,7 +61,7 @@ export default function ShopkeeperPOI({ img, title, description, distance, starQ
               </View>
             </View>
 
-            <Link href={"/user/map/poi/shop"} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
+            <Link href={"/user/(private)/shop"} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
               <Text className="font-itim text-xl text-center">Ver produtos</Text>
             </Link>
 

@@ -55,7 +55,7 @@ export default function PurchasedScreen() {
                 key={item.id}
                 className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white  active:opacity-50"
                 onPress={() => router.push({
-                  pathname: "/user/purchased/review-product",
+                  pathname: "/user/(private)/purchased/review-product",
                   params: { id: item.id.toString() }
                 })}
               >
