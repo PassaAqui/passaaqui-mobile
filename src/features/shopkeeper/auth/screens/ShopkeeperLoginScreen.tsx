@@ -87,7 +87,7 @@ export default function ShopkeeperLoginScreen() {
                 <Text className="font-itim text-lg">Entrar</Text>
               </Pressable>
 
-              <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/auth/shopkeeper-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
+              <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/(public)/auth/shopkeeper-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
             </View>
           </View>
         </KeyboardAwareScrollView>

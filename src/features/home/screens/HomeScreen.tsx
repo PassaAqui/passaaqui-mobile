@@ -21,7 +21,7 @@ export default function HomeScreen() {
 
           <View className="w-full gap-6">
             <View className="gap-6">
-              <Link href={"/user/auth/user-login"} className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
+              <Link href={"/user/(public)/auth/user-login"} className="border-[#EAAA6A] border-2 p-3 rounded-3xl items-center active:opacity-50">
                 <Text className="font-itim text-lg text-center text-white">Continuar como aventureiro</Text>
               </Link>
       
@@ -31,7 +31,7 @@ export default function HomeScreen() {
                 <View className="w-1/3 h-px bg-white" />
               </View>
 
-              <Link href={"/shopkeeper/auth/shopkeeper-signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
+              <Link href={"/shopkeeper/(public)/auth/shopkeeper-signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
                 <Text className="font-itim text-lg text-center">Contiuar como comerciante</Text>
               </Link>
             </View>
