@@ -1,37 +1,48 @@
-import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
+import { login } from "@/src/features/user/auth/services/authService";
 
 export default function UserLoginScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState({
     email: "",
-    password: ""
+    password: "",
+    general: ""
   });
 
-  const handleSubmit = () => {
-    const errors = {
-        email: "",
-        password: ""
-    }
+  const handleSubmit = async () => {
+    const errors = { email: "", password: "", general: ""}
 
     if (email.trim() === "") {
-        errors.email = "Preencha o campo com seu email";
+      errors.email = "Preencha o campo com seu email";
     }
     if (password.trim() === "") {
-        errors.password = "Preencha o campo com sua senha";
+      errors.password = "Preencha o campo com sua senha";
     }
 
     setError(errors)
-
     const hasError = Object.values(errors).some(Boolean);
     if (hasError) return;
+
+    setLoading(true);
+
+    try {
+      await login({ email, password });
+      router.replace("/user/(private)/map/(tabs)");
+    } catch {
+      setError(prev => ({ ...prev, general: "Email ou senha incorretos" }));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -84,8 +95,13 @@ export default function UserLoginScreen() {
               <Text className="font-itim text-base text-red-300">{error.password}</Text>
             )}
 
+            {error.general && <Text className="font-itim text-base text-red-300 text-center">{error.general}</Text>}
+
             <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
-              <Text className="font-itim text-lg">Entrar</Text>
+              {loading
+                ? <ActivityIndicator color="#fff" />
+                : <Text className="font-itim text-lg">Entrar</Text>
+              }
             </Pressable>
 
             <Text className="text-white font-itim text-lg text-center">Não possui uma conta? <Link href={"/user/(public)/auth/user-signup"} className="text-cyan-500">Cadastre-se</Link></Text>

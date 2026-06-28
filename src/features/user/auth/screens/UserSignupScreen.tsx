@@ -1,12 +1,13 @@
-import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import { signUpSchema } from "@/src/schemas/user/signUpSchema";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
+import { singUp } from "@/src/features/user/auth/services/authService";
 
 const formatCpf = (text: string) => {
   const digits = text.replace(/\D/g, "").slice(0, 11);
@@ -18,6 +19,10 @@ const formatCpf = (text: string) => {
 
 export default function UserSignupScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generalError, setGeneralError] = useState<string>("");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,7 +34,7 @@ export default function UserSignupScreen() {
     name: "", email: "", cpf: "", password: "", confirmPassword: "", terms: ""
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const result = signUpSchema.safeParse({ name, email, cpf, password, confirmPassword, terms: isChecked });
 
     if (!result.success) {
@@ -45,7 +50,25 @@ export default function UserSignupScreen() {
       return;
     }
 
-    console.log(result.data);
+    setLoading(true);
+    setGeneralError("");
+
+    try {
+      await singUp({
+        name: result.data.name,
+        email: result.data.email,
+        cpf: result.data.cpf,
+        password: result.data.password,
+        confirm_password: result.data.confirmPassword
+      })
+
+      router.replace("/user/(private)/map/(tabs)");
+    } catch(err) {
+      setGeneralError("Erro ao criar conta. Tente novamente");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -129,8 +152,15 @@ export default function UserSignupScreen() {
                 </Text>
               </View>
 
+              {generalError && (
+                <Text className="font-itim text-base text-red-300 text-center">{generalError}</Text>
+              )}
+
               <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
-                <Text>Cadastrar</Text>
+                {loading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text>Cadastrar</Text>
+                }
               </Pressable>
 
               <Text className="font-itim text-lg text-white text-center">

@@ -1,15 +1,42 @@
-import { ScrollView, View, Text, Pressable, Image } from "react-native"
-import { useEffect } from "react";
+import { ScrollView, View, Text, Pressable, Image, Alert } from "react-native"
+import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
+import { logout } from "@/src/features/user/auth/services/authService";
+import { useRouter } from "expo-router";
 
 export default function SettingScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark")
   })
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair da conta",
+      "Tem certeza que deseja sair?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Sair",
+          style: "destructive",
+          onPress: async () => {
+            setLoggingOut(true);
+            try {
+              await logout();
+              router.replace("/user/(public)/auth/user-login");
+            } finally {
+              setLoggingOut(false);
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <ScrollView>
@@ -74,9 +101,14 @@ export default function SettingScreen() {
           <Image className="w-7 h-7" source={require("@/assets/user/settings/trash.png")} />
           <Text className="text-red-800 font-itim text-lg">Excluir conta</Text>
         </View> */}
-        <Pressable style={{ bottom: insets.bottom - 8 }}  className="absolute bottom-0 left-0 flex-row items-center gap-2 p-10 active:opacity-50">
+        <Pressable
+          onPress={handleLogout}
+          disabled={loggingOut}
+          style={{ bottom: insets.bottom - 8 }}
+          className="absolute bottom-0 left-0 flex-row items-center gap-2 p-10 active:opacity-50"
+        >
           <Image className="w-6 h-6" source={require("@/assets/user/settings/logout2.png")} />
-          <Text className="text-red-600 font-itim text-lg">Sair da conta</Text>
+          <Text className="text-red-600 font-itim text-lg">{loggingOut ? "Saindo..." : "Sair da conta"}</Text>
         </Pressable>
       </View>
     </ScrollView>
