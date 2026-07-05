@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { api } from "@/src/services/api/api";
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
+import axios from "axios";
 
 const REFRESH_TOKEN = "refresh_token";
 
@@ -56,22 +57,37 @@ export async function logout() {
 export async function  tryRestoreSession(): Promise<boolean> {
   try {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN);
+    console.log("[restore] refresh token no SecureStore:", refreshToken ? "existe" : "não existe");
     if (!refreshToken) return false;
 
+    console.log("[restore] enviando refresh token:", `refresh_token=${refreshToken}`);
     const { data } = await api.get("/auth/refresh", {
       headers: {
+        withCredentials: true,
         Cookie: `refresh_token=${refreshToken}`
       }
     });
+
+    console.log("[restore] resposta do backend:", data);
     useAuthStore.getState().setAccessToken(data.access_token);
 
     if (data.refresh_token) {
-      await SecureStore.getItemAsync(REFRESH_TOKEN, data.refresh_token)
+      await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh_token);
     }
 
     return true;
-  } catch {
-    await logout();
+  } catch (error) {
+    console.log("[restore] erro:", error);
+
+    if (axios.isAxiosError(error)) {
+      console.log("[restore] status:", error.response?.status);
+      console.log("[restore] body:", error.response?.data);
+    }
+
+    if (axios.isAxiosError(error) && (error.response?.status === 400 || error.response?.status === 401)) {
+      await logout();
+    }
+    
     return false;
   }
 }

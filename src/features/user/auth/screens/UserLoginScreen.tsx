@@ -65,6 +65,8 @@ export default function UserLoginScreen() {
             <TextInput
               keyboardType="email-address"
               value={email}
+              autoCapitalize="none"
+              autoCorrect={false}
               onChangeText={(text) => {
                 setEmail(text);
                 if (error.email) {
