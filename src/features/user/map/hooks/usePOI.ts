@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import { LocationObject } from "expo-location";
 import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
-import { getRoute } from "@/src/services/routeService";
+
+function haversineDistanceKm(pointA: { latitude: number; longitude: number }, pointB: { latitude: number; longitude: number }) {
+  const toRad = (v: number) => (v * Math.PI) / 180;
+  const R = 6371;
+  const distanceLat = toRad(pointB.latitude - pointA.latitude);
+  const distanceLon = toRad(pointB.longitude - pointA.longitude);
+  const lat1 = toRad(pointA.latitude);
+  const lat2 = toRad(pointB.latitude);
+
+  const h = Math.sin(distanceLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(distanceLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  return R * c;
+}
 
 export function usePOI(location: LocationObject | null) {
   const [openTouristPOIMarker, setOpenTouristPOIMarker] = useState<typeof touristPOIs[0] | null>(null);
@@ -9,36 +21,21 @@ export function usePOI(location: LocationObject | null) {
   const [openPOIMarker, setOpenPOIMarker] = useState<typeof shopPOIs[0] | typeof touristPOIs[0] | null>(null);
   const [routeDistance, setRouteDistance] = useState<number | string | null>(null);
 
-  useEffect(() => {
+   useEffect(() => {
     if (!openPOIMarker) return;
-    let cancelled: boolean = false;
 
-    async function getDistance() {
-      try {
-        const origin = {
-          //latitude: location.coords.latitude,
-          //longitude: location.coords.longitude
-          latitude: -7.94009,
-          longitude: -34.8723
-        }
-
-        const destination = { latitude: openPOIMarker!.latitude, longitude: openPOIMarker!.longitude};
-        const { distance } = await getRoute(origin, destination, "foot-walking");
-        if (!cancelled) setRouteDistance(distance);
-
-      } catch (error) {
-        console.log(`[useEffect user/map ERROR]: Erro ao pegar a distância ${error}`);
-      }
-    }
+    const origin = { latitude: -7.94009, longitude: -34.8723 };
+    const destination = { latitude: openPOIMarker.latitude, longitude: openPOIMarker.longitude };
     
-    getDistance();
-    return () => { cancelled = true };
-
+    setRouteDistance(haversineDistanceKm(origin, destination).toFixed(1));
   }, [openPOIMarker]);
 
   return {
-    openTouristPOIMarker, setOpenTouristPOIMarker,
-    openShopPOIMarker, setOpenShopPOIMarker,
-    setOpenPOIMarker, routeDistance
-  }
+    openTouristPOIMarker,
+    setOpenTouristPOIMarker,
+    openShopPOIMarker,
+    setOpenShopPOIMarker,
+    setOpenPOIMarker,
+    routeDistance,
+  };
 }

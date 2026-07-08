@@ -99,7 +99,7 @@ export default function UserLoginScreen() {
 
             {error.general && <Text className="font-itim text-base text-red-300 text-center">{error.general}</Text>}
 
-            <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
+            <Pressable onPress={handleSubmit} disabled={loading} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
               {loading
                 ? <ActivityIndicator color="#fff" />
                 : <Text className="font-itim text-lg">Entrar</Text>

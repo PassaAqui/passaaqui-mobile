@@ -4,6 +4,7 @@ import { useAuthStore } from "@/src/stores/user/auth/authStore";
 import axios from "axios";
 
 const REFRESH_TOKEN = "refresh_token";
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 interface SingUpData {
   email: string,
@@ -42,9 +43,9 @@ export async function logout() {
   try {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN);
     if (refreshToken) {
-      await api.get("/auth/logout", {
+      await axios.get(`${BASE_URL}/auth/logout`, {
         headers: {
-          Cookie: `refresh_token=${refreshToken}`
+          Authorization: `Bearer ${refreshToken}`
         }
       })
     }
@@ -61,19 +62,15 @@ export async function  tryRestoreSession(): Promise<boolean> {
     if (!refreshToken) return false;
 
     console.log("[restore] enviando refresh token:", `refresh_token=${refreshToken}`);
-    const { data } = await api.get("/auth/refresh", {
+    const { data } = await axios.get(`${BASE_URL}/auth/refresh`, {
       headers: {
-        withCredentials: true,
-        Cookie: `refresh_token=${refreshToken}`
+        Authorization: `Bearer ${refreshToken}`
       }
     });
 
     console.log("[restore] resposta do backend:", data);
     useAuthStore.getState().setAccessToken(data.access_token);
-
-    if (data.refresh_token) {
-      await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh_token);
-    }
+    await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh_token);
 
     return true;
   } catch (error) {

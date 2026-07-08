@@ -38,8 +38,7 @@ export default function MapScreen() {
     handleNavigation,
     setShowStopConfirmation,
     showStopConfirmation,
-    setStop,
-    setRouteCoords,
+    handleStopNavigation,
     routeDistance
   } = useMapScreen();
 
@@ -165,7 +164,7 @@ export default function MapScreen() {
           xpQuantity={openTouristPOIMarker.xpQuantity}
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode)}
+          onNavigate={(mode) => handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode, openTouristPOIMarker.id)}
         />
       )}
 
@@ -178,7 +177,7 @@ export default function MapScreen() {
           starQuantity={openShopPOIMarker.xpQuantity}
           visible={!!openShopPOIMarker}
           onClose={() => setOpenShopPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode)}
+          onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode, openShopPOIMarker.id)}
         />
       )}
 
@@ -194,11 +193,7 @@ export default function MapScreen() {
       {showStopConfirmation && (
         <StopConfirmation
           visible={!!showStopConfirmation}
-          onStop={() => {
-            setStop(false);
-            setRouteCoords([]);
-            setShowStopConfirmation(false);
-          }}
+          onStop={handleStopNavigation}
         />
       )}
 
