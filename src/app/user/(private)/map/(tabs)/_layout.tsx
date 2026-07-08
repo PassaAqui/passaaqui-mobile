@@ -9,6 +9,8 @@ import * as NavigationBar from "expo-navigation-bar";
 import { Image } from "react-native";
 import "@/global.css";
 import { useEffect } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/src/services/queryClient";
 
 export default function TabLayout() {
   const router = useRouter();
@@ -28,7 +30,7 @@ export default function TabLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
 
       <Tabs screenOptions={{ tabBarActiveTintColor: "black", headerShown: false }}>
@@ -110,7 +112,7 @@ export default function TabLayout() {
             */ /* Esse listeners tava aqui porque antes eu redirecionava para uma outra tela quando eu ainda estava usando a pasta app para tudo (criação de telas, componetens próprios) */
           />
       </Tabs>
-    </>
+    </QueryClientProvider>
   );
 }
 

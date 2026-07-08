@@ -9,11 +9,35 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken;
-  if (token) config.headers.Authorization = `Bearer ${token}`;;
+  if (!config.headers.Authorization) {
+    const token = useAuthStore.getState().accessToken;
+    console.log("[api.ts] accessToken:", token);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
 
+  console.log("[api.ts] request →", config.method?.toUpperCase(), config.url);
   return config;
 })
+
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshAccessToken(): Promise<string> {
+  const refreshToken = await SecureStore.getItemAsync("refresh_token");
+  if (!refreshToken) throw new Error("[api.ts AUTH ERROR]: refresh token nao existe");
+
+  const { data } = await axios.get(`${BASE_URL}/auth/refresh`, {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`
+    }
+  });
+
+  useAuthStore.getState().setAccessToken(data.access_token);
+  await SecureStore.setItemAsync("refresh_token", data.refresh_token);
+
+  return data.access_token;
+}
 
 api.interceptors.response.use(
   (res) => res,
@@ -24,25 +48,18 @@ api.interceptors.response.use(
       original._retry = true;
 
       try {
-        const refreshToken = await SecureStore.getItemAsync("refresh_token");
-        if (!refreshToken) throw new Error("[AUTH ERROR] - refresh token nao existe");
-
-        const { data } = await axios.get(`${BASE_URL}/auth/refresh`, {
-          headers: {
-            Cookie: `refresh_token=${refreshToken}`
-          }
-        });
-
-        useAuthStore.getState().setAccessToken(data.access_token);
-
-        if (data.refresh_token) {
-          await (SecureStore.setItemAsync("refresh_token", data.refresh_token));
+        if (!refreshPromise) {
+          refreshPromise = refreshAccessToken().finally(() => {
+            refreshPromise = null;
+          })
         }
-        
-        original.headers.Authorization = `Bearer ${data.access_token}`;
+
+        const newAccessToken = await refreshPromise;
+        original.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(original);
-      } catch {
+      } catch(refreshError) {
+        console.log("[api.ts] refresh falhou, fazendo logout:", refreshError);
         await useAuthStore.getState().logout();
         return Promise.reject(error);
       }
