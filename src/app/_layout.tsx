@@ -6,10 +6,12 @@ import { IrishGrover_400Regular } from "@expo-google-fonts/irish-grover";
 import { Itim_400Regular } from "@expo-google-fonts/itim";
 import "@/global.css";
 
+let sessionChecked = false;
+
 export default function RootLayout() {
   const [checking, setChecking] = useState<boolean>(true);
+  const [restored, setRestored] = useState<boolean>(true);
   const router = useRouter();
-  const hasCheckedSession = useRef(false);
   
   let [fontsLoaded] = useFonts({
     IrishGrover_400Regular,
@@ -17,16 +19,24 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (hasCheckedSession.current) return;
-    hasCheckedSession.current = true;
+    if (sessionChecked) return;
+    sessionChecked = true;
 
-    tryRestoreSession().then((restored) => {
+    tryRestoreSession().then((result) => {
+      console.log("[RootLayout] renderizou");
+
       setChecking(false);
-      if (restored) {
-        router.replace("/user/(private)/map/(tabs)")
-      }
+      setRestored(result)
     });
   }, []);
+
+  useEffect(() => {
+    if (checking || !fontsLoaded) return;
+
+    if (restored) {
+      router.replace("/user/(private)/map/(tabs)");
+    }
+  }, [checking, fontsLoaded, restored]);
 
   if (!fontsLoaded || checking) return null;
 
