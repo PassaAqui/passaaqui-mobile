@@ -2,11 +2,21 @@ import { useState, useEffect } from "react";
 import MapView from "react-native-maps";
 import { useStartRouteSession, useDirection, useEndRouteSession, useCurrentRouteSession } from "@/src/features/user/map/hooks/useRouteSession";
 import { RouteMode, getDirection } from "@/src/services/routeService";
+import { LocationObject } from "expo-location";
 
-export function useNavigation(mapRef: React.RefObject<MapView | null>) {
+interface PendingNavigation {
+  destination: { latitude: number; longitude: number };
+  mode: RouteMode;
+  poiId?: number;
+}
+
+export function useNavigation(location: LocationObject | null, mapRef: React.RefObject<MapView | null>) {
   const [routeCoords, setRouteCoords] = useState<{ latitude: number; longitude: number }[]>([]);
   const [stop, setStop] = useState<boolean>(false);
   const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
+  const [showSwitchDestinationModal, setShowSwitchDestinationModal] = useState<boolean>(false);
+  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null);
+
   const startRouteSession = useStartRouteSession();
   const direction = useDirection();
   const endRouteSessionMutation = useEndRouteSession();
@@ -33,8 +43,11 @@ export function useNavigation(mapRef: React.RefObject<MapView | null>) {
     restoreSession();
   }, []);
 
-  async function handleNavigation(destination: { latitude: number; longitude: number }, mode: RouteMode = "foot-walking", poiId?: number) {
+  async function executeNavigation(destination: { latitude: number; longitude: number }, mode: RouteMode, poiId?: number) {
     const origin = {
+      //latitude: location?.coords.latitude,
+      //longitude: location?.coords.longitude
+
       latitude: -7.94009,
       longitude: -34.8723,
     };
@@ -68,6 +81,40 @@ export function useNavigation(mapRef: React.RefObject<MapView | null>) {
     }
   }
 
+  async function handleNavigation(destination: { latitude: number; longitude: number }, mode: RouteMode = "foot-walking", poiId?: number) {
+    if (stop) {
+      setPendingNavigation({ destination, mode, poiId });
+      setShowSwitchDestinationModal(true);
+      return;
+    }
+
+    executeNavigation(destination, mode, poiId);
+  }
+
+  async function confirmSwitchDestination() {
+    if (!pendingNavigation) return;
+
+    try {
+      await endRouteSessionMutation.mutateAsync();
+    } catch (error) {
+      console.log(`[useNavigation ERROR]: Erro ao cancelar rota anterior ${error}`);
+    }
+
+    setStop(false);
+    setRouteCoords([]);
+
+    const { destination, mode, poiId } = pendingNavigation;
+    setPendingNavigation(null);
+    setShowSwitchDestinationModal(false);
+
+    await executeNavigation(destination, mode, poiId);
+  }
+
+  function cancelSwitchDestination() {
+    setPendingNavigation(null);
+    setShowSwitchDestinationModal(false);
+  }
+
   async function handleStopNavigation() {
     try {
       await endRouteSessionMutation.mutateAsync();
@@ -85,7 +132,10 @@ export function useNavigation(mapRef: React.RefObject<MapView | null>) {
     routeCoords, setRouteCoords,
     stop, setStop,
     showStopConfirmation, setShowStopConfirmation,
+    showSwitchDestinationModal,
+    confirmSwitchDestination,
+    cancelSwitchDestination,
     handleNavigation,
-    handleStopNavigation,
+    handleStopNavigation
   };
 }
