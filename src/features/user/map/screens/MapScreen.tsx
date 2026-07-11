@@ -14,6 +14,7 @@ import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
+import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -154,6 +155,14 @@ export default function MapScreen() {
           </>
         )}
       </MapView>
+
+      <AnimatedPostcardModal
+        visible={true}
+        onClose={() => {}}
+        cityImage={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtw1VcVbFpdwzwS_EnyK5YHMkTqcyLZwmBZ_f8Pj70vw&s=10"}
+        cityName="Recife"
+        chronicle="Recife nasceu entre rios, pontes e o mar, aprendendo desde cedo a conviver com diferentes povos e culturas. Suas ruas guardam lembranças da ocupação holandesa, das lutas pela liberdade e do crescimento de uma cidade que nunca deixou de se reinventar"
+      />
 
       {showAlertModal && (
         <OutsideRegionModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />

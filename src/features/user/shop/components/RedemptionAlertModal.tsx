@@ -25,7 +25,7 @@ export default function RedemptionAlertModal({ img, title, discount, visible, on
           <View>
             <Pressable
               onPress={() => router.push({
-                pathname: "/user/map/poi/shop/code",
+                pathname: "/user/(private)/shop/code",
                 params: { img, title, discount }
               })}
               className="bg-[#3D2408] px-10 p-1 items-center justify-center rounded-2xl active:opacity-65"
