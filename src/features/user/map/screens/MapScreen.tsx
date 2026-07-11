@@ -8,6 +8,7 @@ import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPO
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
 import StopButton from "@/src/features/user/map/components/StopButton";
 import FollowUserButton from "@/src/features/user/map/components/FollowUserButton";
+import SwitchDestinationModal from "@/src/features/user/map/components/SwitchDestinationModal";
 import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,7 +40,10 @@ export default function MapScreen() {
     setShowStopConfirmation,
     showStopConfirmation,
     handleStopNavigation,
-    routeDistance
+    routeDistance,
+    showSwitchDestinationModal,
+    confirmSwitchDestination,
+    cancelSwitchDestination
   } = useMapScreen();
 
   const handleFollow = () => {
@@ -194,6 +198,15 @@ export default function MapScreen() {
         <StopConfirmation
           visible={!!showStopConfirmation}
           onStop={handleStopNavigation}
+        />
+      )}
+
+      {showSwitchDestinationModal && (
+        <SwitchDestinationModal
+          visible={showSwitchDestinationModal}
+          onConfirm={confirmSwitchDestination}
+          onCancel={cancelSwitchDestination}
+          onClose={cancelSwitchDestination}
         />
       )}
 

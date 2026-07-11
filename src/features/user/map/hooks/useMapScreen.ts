@@ -9,7 +9,7 @@ export function useMapScreen() {
   const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing } = useLocation();
   const { gpsActive } = useGpsStatus(lastUpdate);
   const poi = usePOI(location);
-  const navigation = useNavigation(mapRef);
+  const navigation = useNavigation(location, mapRef);
   const bounds = useBoundsCheck(location);
 
   useLocationTracking(location, navigation.stop);

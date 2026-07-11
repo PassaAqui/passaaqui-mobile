@@ -21,9 +21,16 @@ api.interceptors.request.use((config) => {
   return config;
 })
 
-let refreshPromise: Promise<string> | null = null;
+let lastRefreshTime = 0;
 
 async function refreshAccessToken(): Promise<string> {
+  const now = Date.now();
+
+  if (now - lastRefreshTime < 5000) {
+    throw new Error("Refresh too frequent");
+  }
+  lastRefreshTime = now;
+
   const refreshToken = await SecureStore.getItemAsync("refresh_token");
   if (!refreshToken) throw new Error("[api.ts AUTH ERROR]: refresh token nao existe");
 
@@ -39,6 +46,33 @@ async function refreshAccessToken(): Promise<string> {
   return data.access_token;
 }
 
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config;
+
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      try {
+        const newToken = await refreshAccessToken();
+        original.headers.Authorization = `Bearer ${newToken}`;
+        return api(original);
+      } catch (refreshError) {
+        await useAuthStore.getState().logout();
+        return Promise.reject(error);
+      }
+    }
+
+    if (error.response?.status === 401 && original._retry) {
+      await useAuthStore.getState().logout();
+      return Promise.reject(new Error("Sessão expirada, faça login novamente"));
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+/*
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -68,5 +102,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 )
+*/
 
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
