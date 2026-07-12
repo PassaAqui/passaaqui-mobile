@@ -4,6 +4,7 @@ import { usePOI } from "@/src/features/user/map/hooks/usePOI";
 import { useNavigation } from "@/src/features/user/map/hooks/useNavigation";
 import { useGpsStatus } from "@/src/features/user/map/hooks/useGpsStatus";
 import { useLocationTracking } from "@/src/features/user/map/hooks/useLocationTracking";
+import { useCityEntry } from "@/src/features/user/map/hooks/useCityEntry";
 
 export function useMapScreen() {
   const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing } = useLocation();
@@ -11,6 +12,7 @@ export function useMapScreen() {
   const poi = usePOI(location);
   const navigation = useNavigation(location, mapRef);
   const bounds = useBoundsCheck(location);
+  const cityEntry = useCityEntry(location);
 
   useLocationTracking(location, navigation.stop);
 
@@ -20,5 +22,6 @@ export function useMapScreen() {
     ...poi,
     ...navigation,
     ...bounds,
+    ...cityEntry
   };
 }

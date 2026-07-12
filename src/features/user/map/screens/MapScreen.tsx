@@ -15,6 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
+import { useEffect } from "react";
+import { useVisitedCitiesStore } from "@/src/stores/user/map/visitedCitiesStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -28,23 +31,20 @@ export default function MapScreen() {
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
-    setOpenTouristPOIMarker,
-    openTouristPOIMarker,
-    setOpenShopPOIMarker,
-    openShopPOIMarker,
+    setOpenTouristPOIMarker, openTouristPOIMarker,
+    setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
     routeCoords,
     stop,
-    showAlertModal,
-    setShowAlertModal,
+    showAlertModal, setShowAlertModal,
     handleNavigation,
-    setShowStopConfirmation,
-    showStopConfirmation,
+    setShowStopConfirmation, showStopConfirmation,
     handleStopNavigation,
     routeDistance,
     showSwitchDestinationModal,
     confirmSwitchDestination,
-    cancelSwitchDestination
+    cancelSwitchDestination,
+    cityToShow, dismissCity, loadingCity
   } = useMapScreen();
 
   const handleFollow = () => {
@@ -157,11 +157,11 @@ export default function MapScreen() {
       </MapView>
 
       <AnimatedPostcardModal
-        visible={true}
-        onClose={() => {}}
-        cityImage={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtw1VcVbFpdwzwS_EnyK5YHMkTqcyLZwmBZ_f8Pj70vw&s=10"}
-        cityName="Recife"
-        chronicle="Recife nasceu entre rios, pontes e o mar, aprendendo desde cedo a conviver com diferentes povos e culturas. Suas ruas guardam lembranças da ocupação holandesa, das lutas pela liberdade e do crescimento de uma cidade que nunca deixou de se reinventar"
+        visible={!!cityToShow}
+        onClose={dismissCity}
+        cityImage={cityToShow?.cityImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtw1VcVbFpdwzwS_EnyK5YHMkTqcyLZwmBZ_f8Pj70vw&s=10"}
+        cityName={cityToShow?.cityName ?? ""}
+        chronicle={cityToShow?.chronicle ?? "Recife nasceu entre rios, pontes e o mar, aprendendo desde cedo a conviver com diferentes povos e culturas. Suas ruas guardam lembranças da ocupação holandesa, das lutas pela liberdade e do crescimento de uma cidade que nunca deixou de se reinventar"}
       />
 
       {showAlertModal && (
