@@ -10,8 +10,8 @@ interface StopRouteModalProps {
 export default function SwitchDestinationModal({ visible, onConfirm, onCancel, onClose }: StopRouteModalProps) {
   return (
     <Modal transparent animationType="slide" visible={visible} onRequestClose={onClose}>
-      <View className="flex-1 bg-black/50 items-center justify-center px-6">
-        <View className="w-full bg-white p-6 items-center justify-center gap-3 rounded-xl">
+      <Pressable onPress={onClose} className="flex-1 bg-black/50 items-center justify-center px-6">
+        <Pressable onPress={() => {}} className="w-full bg-white p-6 items-center justify-center gap-3 rounded-xl">
           <Image className="w-24 h-24" source={require("@/assets/user/map/alert.png")} />
           <Text className="font-itim text-3xl text-red-500">ATENÇÂO!</Text>
             
@@ -25,8 +25,8 @@ export default function SwitchDestinationModal({ visible, onConfirm, onCancel, o
               <Text className="text-xl font-itim text-center text-black">Cancelar</Text>
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   )
 }

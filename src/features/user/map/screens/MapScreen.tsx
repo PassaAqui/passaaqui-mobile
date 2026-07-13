@@ -14,6 +14,8 @@ import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
+import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -27,24 +29,23 @@ export default function MapScreen() {
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
-    setOpenTouristPOIMarker,
-    openTouristPOIMarker,
-    setOpenShopPOIMarker,
-    openShopPOIMarker,
+    setOpenTouristPOIMarker, openTouristPOIMarker,
+    setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
     routeCoords,
     stop,
-    showAlertModal,
-    setShowAlertModal,
+    showAlertModal, setShowAlertModal,
     handleNavigation,
-    setShowStopConfirmation,
-    showStopConfirmation,
+    setShowStopConfirmation, showStopConfirmation,
     handleStopNavigation,
     routeDistance,
     showSwitchDestinationModal,
     confirmSwitchDestination,
-    cancelSwitchDestination
+    cancelSwitchDestination,
+    cityToShow, dismissCity, loadingCity
   } = useMapScreen();
+
+  const { data: user } = useTouristMe();
 
   const handleFollow = () => {
     setIsFollowing(true);
@@ -72,8 +73,8 @@ export default function MapScreen() {
       <View style={{ paddingTop: insets.top }} className="flex-row px-4 pb-4 items-center gap-3 bg-white">
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
         <View className="flex-col">
-          <Text className="font-itim text-xl">David Cleyton</Text>
-          <Text>1207 XP</Text>
+          <Text className="font-itim text-xl">{user?.name ?? "..."}</Text>
+          <Text>{user?.currentXP ?? 0} XP</Text>
         </View>
       </View>
 
@@ -155,6 +156,14 @@ export default function MapScreen() {
         )}
       </MapView>
 
+      <AnimatedPostcardModal
+        visible={!!cityToShow}
+        onClose={dismissCity}
+        cityImage={cityToShow?.cityImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtw1VcVbFpdwzwS_EnyK5YHMkTqcyLZwmBZ_f8Pj70vw&s=10"}
+        cityName={cityToShow?.cityName ?? ""}
+        chronicle={cityToShow?.chronicle ?? "Recife nasceu entre rios, pontes e o mar, aprendendo desde cedo a conviver com diferentes povos e culturas. Suas ruas guardam lembranças da ocupação holandesa, das lutas pela liberdade e do crescimento de uma cidade que nunca deixou de se reinventar"}
+      />
+
       {showAlertModal && (
         <OutsideRegionModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />
       )}
@@ -198,6 +207,9 @@ export default function MapScreen() {
         <StopConfirmation
           visible={!!showStopConfirmation}
           onStop={handleStopNavigation}
+          onClose={() => {
+            setShowStopConfirmation(false)
+          }}
         />
       )}
 
