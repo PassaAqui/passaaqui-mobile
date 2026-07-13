@@ -6,12 +6,13 @@ import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequ
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { products } from "@/src/constants/user/map/poi/shop/products";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
 const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
-const currentXp = 500;
 
 export default function GlobalShopScreen() {
   const router = useRouter();
+  const { data: user } = useTouristMe();
 
   const insets = useSafeAreaInsets();
   const [selectFilter, setSelectFilter] = useState<string>("TODOS");
@@ -78,10 +79,10 @@ export default function GlobalShopScreen() {
                   </View>
 
                   <View>
-                    <XpBar currentXp={currentXp} xpRequired={product.xpRequired} thickness={1} />
+                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.xpRequired} thickness={1} />
                     <View className="flex-row gap-2 items-center">
-                      <Text className="font-inter text-sm">{currentXp}/{product.xpRequired} XP</Text>
-                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} showText={false} />
+                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.xpRequired} XP</Text>
+                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.xpRequired} showText={false} />
                     </View>
                   </View>
                 </View>
