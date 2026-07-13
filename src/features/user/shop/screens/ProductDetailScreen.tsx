@@ -14,8 +14,8 @@ import Header from "@/src/features/user/shop/components/Header";
 import { products } from "@/src/constants/user/map/poi/shop/products";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
-const currentXP = 250;
 const discount = 5.00;
 
 export default function ProductDetailScreen() {
@@ -23,13 +23,15 @@ export default function ProductDetailScreen() {
   const router = useRouter();
   const { hasRedeemed, setRedeemed } = useRedemptionCheck();
 
+  const { data: user } = useTouristMe();
+
   //const { img, price, title, xpRequired, location, description } = useLocalSearchParams<{ img: string, price: string, title: string, xpRequired: string, location: string, description: string }>();
   const { id } = useLocalSearchParams<{ id: string }>();
   const product = products.find(p => p.id === Number(id));
 
   if (!product) return null;
 
-  const canRescue = currentXP >= Number(product.xpRequired);
+  const canRescue = user?.currentXP ?? 0 >= Number(product.xpRequired);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
@@ -91,14 +93,14 @@ export default function ProductDetailScreen() {
                 <Text className="text-lg flex-1 font-interBold" adjustsFontSizeToFit>SEU PROGRESSO</Text>
                 <View className="flex-row gap-1 items-center justify-center shrink-0">
                   <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                  <Text className="text-[#A86830] font-interBold" adjustsFontSizeToFit>{currentXP} / {product.xpRequired} XP</Text>
+                  <Text className="text-[#A86830] font-interBold" adjustsFontSizeToFit>{user?.currentXP ?? 0} / {product.xpRequired} XP</Text>
                 </View>
               </View>
 
-              <XpBar currentXp={currentXP} xpRequired={Number(product.xpRequired)} thickness={3}/>
+              <XpBar currentXp={user?.currentXP ?? 0} xpRequired={Number(product.xpRequired)} thickness={3}/>
 
               <View className="flex-row gap-2 items-center">
-                <CompleteRequiredXp currentXp={currentXP} requiredXp={Number(product.xpRequired)} showText={true} />
+                <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={Number(product.xpRequired)} showText={true} />
               </View>
             </View>
           </View>
@@ -120,7 +122,7 @@ export default function ProductDetailScreen() {
             <Text className={`text-sm text-center ${canRescue ? 'opacity-55' : 'text-red-500'} font-inter`}>
               {canRescue 
                 ? `Ao resgatar, ${product.xpRequired} XP serão debitados do seu saldo`
-                : `Você precisa de mais ${Number(product.xpRequired) - currentXP} XP para resgatar esse item`
+                : `Você precisa de mais ${Number(product.xpRequired) - (user?.currentXP ?? 0)} XP para resgatar esse item`
               }
             </Text>
           </View>

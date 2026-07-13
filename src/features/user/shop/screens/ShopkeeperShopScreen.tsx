@@ -4,11 +4,11 @@ import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
 import { products } from "@/src/constants/user/map/poi/shop/products";
 import { useRouter } from "expo-router";
-
-const currentXp = 500;
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
 export default function ShopkeeperShopScreen() {
   const router = useRouter();
+  const { data: user } = useTouristMe();
 
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -61,10 +61,10 @@ export default function ShopkeeperShopScreen() {
                   </View>
 
                   <View>
-                    <XpBar currentXp={currentXp} xpRequired={product.xpRequired} thickness={1} />
+                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.xpRequired} thickness={1} />
                     <View className="flex-row gap-2 items-center">
-                      <Text className="font-inter text-sm">{currentXp}/{product.xpRequired} XP</Text>
-                      <CompleteRequiredXp currentXp={currentXp} requiredXp={product.xpRequired} showText={false} />
+                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.xpRequired} XP</Text>
+                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.xpRequired} showText={false} />
                     </View>
                   </View>
                 </View>
