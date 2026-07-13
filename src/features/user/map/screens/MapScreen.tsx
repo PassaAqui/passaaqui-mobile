@@ -207,6 +207,9 @@ export default function MapScreen() {
         <StopConfirmation
           visible={!!showStopConfirmation}
           onStop={handleStopNavigation}
+          onClose={() => {
+            setShowStopConfirmation(false)
+          }}
         />
       )}
 
