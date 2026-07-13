@@ -15,9 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
-import { useEffect } from "react";
-import { useVisitedCitiesStore } from "@/src/stores/user/map/visitedCitiesStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
 export default function MapScreen() {
@@ -47,6 +45,8 @@ export default function MapScreen() {
     cityToShow, dismissCity, loadingCity
   } = useMapScreen();
 
+  const { data: user } = useTouristMe();
+
   const handleFollow = () => {
     setIsFollowing(true);
 
@@ -73,8 +73,8 @@ export default function MapScreen() {
       <View style={{ paddingTop: insets.top }} className="flex-row px-4 pb-4 items-center gap-3 bg-white">
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
         <View className="flex-col">
-          <Text className="font-itim text-xl">David Cleyton</Text>
-          <Text>1207 XP</Text>
+          <Text className="font-itim text-xl">{user?.name ?? "..."}</Text>
+          <Text>{user?.currentXP ?? 0} XP</Text>
         </View>
       </View>
 
