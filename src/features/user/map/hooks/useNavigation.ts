@@ -48,8 +48,8 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
       //latitude: location?.coords.latitude,
       //longitude: location?.coords.longitude
 
-      latitude: -7.94009,
-      longitude: -34.8723,
+      latitude: -8.0675,
+      longitude: -34.9167,
     };
 
     try {

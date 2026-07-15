@@ -21,9 +21,9 @@ export function useLocationTracking(location: LocationObject | null ,active: boo
         //latitude: location.coords.latitude,
         //longitude: location.coords.longitude
 
-        latitude: -7.94009,
-        longitude: -34.8723,
-      };
+        latitude: -8.0675,
+        longitude: -34.9167
+      }
 
       try {
         await updateLocation.mutateAsync(coords);
