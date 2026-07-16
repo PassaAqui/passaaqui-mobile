@@ -187,7 +187,8 @@ export default function MapScreen() {
 
       {openShopPOIMarker && (
         <ShopkeeperPOI
-          img={require("@/assets/user/map/tmp/no-image.png")}
+          poiId={openShopPOIMarker.id}
+          img={ (!!openShopPOIMarker.image) ? openShopPOIMarker.image : require("@/assets/user/map/tmp/no-image.png")}
           title={openShopPOIMarker.name}
           description={openShopPOIMarker.description ?? "Sem descrição"}
           distance={openShopPOIMarker.distanceLabel}
