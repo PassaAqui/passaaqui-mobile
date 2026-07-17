@@ -24,12 +24,12 @@ export default function ShopkeeperShopScreen() {
   const cardWidth = (width - PADDING * 2 - GAP * (columns - 1)) / columns;
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-white">
-      <View className="flex-row items-center justify-center p-2">
-        <Pressable className="absolute left-7 active:opacity-35">
+    <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-white">
+      <View className="flex-row items-center justify-center p-2" style={{ paddingTop: insets.top }}>
+        <Pressable onPress={() => router.back()} className="p-2 absolute left-7 top-6 active:opacity-35">
           <Image source={require("@/assets/user/settings/back.png")} />
         </Pressable>
-        <Text className="font-itim text-black text-3xl" adjustsFontSizeToFit>Loja de fulano</Text>
+        <Text className="font-itim text-black text-3xl px-20" numberOfLines={1} ellipsizeMode="tail">{poi?.name ?? "Loja"}</Text>
       </View>
 
 
