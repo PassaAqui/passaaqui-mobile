@@ -1,0 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
+import { getAllProducts } from "@/src/features/user/shop/services/shopService";
+
+export function useAllProducts() {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: () => getAllProducts(),
+    staleTime: 2 * 60 * 1000
+  })
+}

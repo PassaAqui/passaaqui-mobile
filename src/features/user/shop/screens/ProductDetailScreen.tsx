@@ -14,7 +14,7 @@ import Header from "@/src/features/user/shop/components/Header";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { useProduct } from "@/src/features/user/shop/hooks/useProduct";
+import { useProductDetail } from "@/src/features/user/shop/hooks/useProductDetail";
 
 const discount = 5.00;
 
@@ -26,7 +26,7 @@ export default function ProductDetailScreen() {
   const { data: user } = useTouristMe();
 
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: product, isLoading } = useProduct(Number(id));
+  const { data: product } = useProductDetail(Number(id));
 
   if (!product) return null;
 
