@@ -4,7 +4,7 @@ import { getAllProducts } from "@/src/features/user/shop/services/productService
 export function useAllProducts() {
   return useQuery({
     queryKey: ["products"],
-    queryFn: () => getAllProducts(),
+    queryFn: getAllProducts,
     staleTime: 2 * 60 * 1000
   })
 }

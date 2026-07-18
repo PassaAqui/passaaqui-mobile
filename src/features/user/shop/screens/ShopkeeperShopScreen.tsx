@@ -2,10 +2,9 @@ import { ScrollView, View, Text, Image, Pressable, useWindowDimensions } from "r
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
-import { products } from "@/src/constants/user/map/poi/shop/products";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { useProductsByPoi } from "@/src/features/user/shop/hooks/useProductsByPoi";
+import { useProductsByPoi } from "@/src/features/user/shop/hooks/products/useProductsByPoi";
 
 export default function ShopkeeperShopScreen() {
   const router = useRouter();

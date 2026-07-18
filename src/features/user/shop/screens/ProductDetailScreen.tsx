@@ -14,7 +14,7 @@ import Header from "@/src/features/user/shop/components/Header";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { useProductDetail } from "@/src/features/user/shop/hooks/useProductDetail";
+import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
 
 const discount = 5.00;
 

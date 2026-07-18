@@ -5,15 +5,18 @@ import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { useAllProducts } from "@/src/features/user/shop/hooks/useAllProducts";
+import { useAllProducts } from "@/src/features/user/shop/hooks/products/useAllProducts";
+import { useAllCategories } from "@/src/features/user/shop/hooks/categories/useAllCategories";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
-const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
+//const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
 
 export default function GlobalShopScreen() {
   const router = useRouter();
   const { data: user } = useTouristMe();
+
   const { data: products } = useAllProducts();
+  const { data: categories } = useAllCategories();
 
   const insets = useSafeAreaInsets();
   const [selectFilter, setSelectFilter] = useState<string>("TODOS");
@@ -47,13 +50,22 @@ export default function GlobalShopScreen() {
           </View>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row" contentContainerClassName="flex-row gap-2">
-            {filters.map((filter) => (
+            <Pressable
+              onPress={() => {
+                setSelectFilter("TODOS");
+              }}
+              className={`${selectFilter === "TODOS" ? 'bg-[#EAAA6A]' : 'bg-white border border-gray-400'} p-2 px-5 rounded-3xl min-w-1/4 items-center justify-center`}
+            >
+              <Text className={`${selectFilter === "TODOS" ? 'text-white' : 'text-black'} font-inter`}>TODOS</Text>  
+            </Pressable>
+
+            {categories?.map((category) => (
               <Pressable
-                key={filter}
-                onPress={() => setSelectFilter(filter)}
-                className={`${selectFilter === filter ? 'bg-[#EAAA6A]' : 'bg-white border border-gray-400'} p-2 px-5 rounded-3xl min-w-1/4 items-center justify-center`}
+                key={category.id}
+                onPress={() => setSelectFilter(category.name)}
+                className={`${selectFilter === category.name ? 'bg-[#EAAA6A]' : 'bg-white border border-gray-400'} p-2 px-5 rounded-3xl min-w-1/4 items-center justify-center`}
               >
-                <Text className={`${selectFilter === filter ? 'text-white' : 'text-black'} font-inter`}>{filter}</Text>  
+                <Text className={`${selectFilter === category.name ? 'text-white' : 'text-black'} font-inter uppercase`} numberOfLines={1}>{category.name}</Text>  
               </Pressable>
             ))}
           </ScrollView>
@@ -62,38 +74,40 @@ export default function GlobalShopScreen() {
             <Text className="text-center text-black opacity-55 font-inter">Ainda não há produtos cadastrados na plataforma.</Text>
           )}
 
-          <View className="flex-row flex-wrap gap-6 items-center justify-center">
-            {products?.map((product) => (
-              <Pressable
-                key={product.id}
-                onPress={() => router.push({
-                  pathname: "/user/(private)/shop/product",
-                  params: { id: product.id }
-                })}
-                className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
-                style={{ width: cardWidth }}
-              >
-                <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
-                <View className="p-5 gap-3">
-                  <Text className="font-interBold text-lg">{product.name}</Text>
-                  <Text className="font-inter">{product.description}</Text>
+          {selectFilter === "TODOS" && (
+            <View className="flex-row flex-wrap gap-6 items-center justify-center">
+              {products?.map((product) => (
+                <Pressable
+                  key={product.id}
+                  onPress={() => router.push({
+                    pathname: "/user/(private)/shop/product",
+                    params: { id: product.id }
+                  })}
+                  className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
+                  style={{ width: cardWidth }}
+                >
+                  <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+                  <View className="p-5 gap-3">
+                    <Text className="font-interBold text-lg">{product.name}</Text>
+                    <Text className="font-inter">{product.description}</Text>
 
-                  <View className="flex-row gap-1 items-center">
-                    <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                    <Text className="font-interBold">R$ {product.price.toFixed(2)}</Text>
-                  </View>
+                    <View className="flex-row gap-1 items-center">
+                      <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
+                      <Text className="font-interBold">R$ {product.price.toFixed(2)}</Text>
+                    </View>
 
-                  <View>
-                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.maxXp ?? 0} thickness={1} />
-                    <View className="flex-row gap-2 items-center">
-                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.maxXp} XP</Text>
-                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.maxXp ?? 0} showText={false} />
+                    <View>
+                      <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.maxXp ?? 0} thickness={1} />
+                      <View className="flex-row gap-2 items-center">
+                        <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.maxXp} XP</Text>
+                        <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.maxXp ?? 0} showText={false} />
+                      </View>
                     </View>
                   </View>
-                </View>
-              </Pressable>
-            ))}
-          </View>
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
