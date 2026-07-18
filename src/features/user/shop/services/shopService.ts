@@ -1,8 +1,20 @@
 import { api } from "@/src/services/api/api";
 
+interface Products {
+  id: number;
+  image?: string;
+  name: string;
+  description: string | null;
+  price: number;
+  maxXp: number | null;
+  stock: number;
+  shopkeeperId: number;
+  categoryId: number;
+}
+
 interface ProductDetail {
   id: number;
-  image?: string ;
+  image?: string;
   name: string;
   description: string;
   price: number;
@@ -33,6 +45,11 @@ interface ProductDetail {
 
 export async function getProductById(id: number): Promise<ProductDetail> {
   const { data } = await api.get<ProductDetail>(`/products/${id}`);
-  console.log("[shopService LOG] - resultado da busca do produto pelo id: ", JSON.stringify(data, null, 2));
   return data
+}
+
+export async function getAllProducts(): Promise<Products[]> {
+  const { data } = await api.get<Products[]>("/products");
+  console.log("[shopService/getAllProducts LOG] - Produtos encontrados: ", data);
+  return data;
 }

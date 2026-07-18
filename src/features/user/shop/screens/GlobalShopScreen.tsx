@@ -5,7 +5,7 @@ import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { products } from "@/src/constants/user/map/poi/shop/products";
+import { useAllProducts } from "@/src/features/user/shop/hooks/useAllProducts";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
 const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
@@ -13,6 +13,7 @@ const filters: string[] = ["TODOS", "GASTRONOMIA", "ARTESANATO", "PASS"];
 export default function GlobalShopScreen() {
   const router = useRouter();
   const { data: user } = useTouristMe();
+  const { data: products } = useAllProducts();
 
   const insets = useSafeAreaInsets();
   const [selectFilter, setSelectFilter] = useState<string>("TODOS");
@@ -57,8 +58,12 @@ export default function GlobalShopScreen() {
             ))}
           </ScrollView>
 
+          {(!products || products.length === 0) && (
+            <Text className="text-center text-black opacity-55 font-inter">Ainda não há produtos cadastrados na plataforma.</Text>
+          )}
+
           <View className="flex-row flex-wrap gap-6 items-center justify-center">
-            {products.map((product) => (
+            {products?.map((product) => (
               <Pressable
                 key={product.id}
                 onPress={() => router.push({
@@ -68,26 +73,26 @@ export default function GlobalShopScreen() {
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
-                <Image className="w-full h-28 bg-gray-400" source={{ uri: product.img }} resizeMode="cover" />
+                <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
                 <View className="p-5 gap-3">
-                  <Text className="text-lg font-interBold">{product.title}</Text>
+                  <Text className="font-interBold text-lg">{product.name}</Text>
                   <Text className="font-inter">{product.description}</Text>
 
                   <View className="flex-row gap-1 items-center">
                     <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                    <Text className="font-interBold">R$ {product.price}</Text>
+                    <Text className="font-interBold">R$ {product.price.toFixed(2)}</Text>
                   </View>
 
                   <View>
-                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.xpRequired} thickness={1} />
+                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.maxXp ?? 0} thickness={1} />
                     <View className="flex-row gap-2 items-center">
-                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.xpRequired} XP</Text>
-                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.xpRequired} showText={false} />
+                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.maxXp} XP</Text>
+                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.maxXp ?? 0} showText={false} />
                     </View>
                   </View>
                 </View>
               </Pressable>
-            ))}          
+            ))}
           </View>
         </View>
       </ScrollView>
