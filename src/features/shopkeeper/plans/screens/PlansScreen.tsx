@@ -209,25 +209,6 @@ export default function PlansScreen() {
           </View>
         ))}
       </ScrollView>
-
-      <View className="flex-row justify-around py-4 border-t border-gray-200 bg-white">
-        <View className="items-center">
-          <Ionicons name="home" size={20} color="#888" />
-          <Text className="text-[11px] text-gray-500 font-inter">Início</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="bar-chart" size={20} color="#888" />
-          <Text className="text-[11px] text-gray-500 font-inter">Pedidos</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="cube" size={20} color="#888" />
-          <Text className="text-[11px] text-gray-500 font-inter">Catálogo</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="pricetag" size={20} color="#EAAA6A" />
-          <Text className="text-[11px] text-[#EAAA6A] font-inter">Planos</Text>
-        </View>
-      </View>
     </SafeAreaView>
   );
 }
