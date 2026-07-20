@@ -60,6 +60,7 @@ function normalizePoi(raw: PoiNearbyRaw): PoiNearby {
 // Buscar detalhes do POI por ID, incluindo os produtos presentes nele
 export interface PoiProduct {
   id: number;
+  image: string;
   name: string;
   description: string | null;
   price: number;
@@ -85,6 +86,7 @@ export interface PoiDetail {
 
 interface PoiProductRaw {
   id: number;
+  image: string;
   name: string;
   description: string | null;
   price: number;
@@ -111,6 +113,7 @@ interface PoiDetailRaw {
 function normalizeProduct(raw: PoiProductRaw): PoiProduct {
   return {
     id: raw.id,
+    image: raw.image,
     name: raw.name,
     description: raw.description,
     price: raw.price,

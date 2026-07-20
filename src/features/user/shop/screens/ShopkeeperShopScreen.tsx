@@ -57,7 +57,7 @@ export default function ShopkeeperShopScreen() {
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
-                <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+                <Image className="w-full h-28 border border-gray-300" source={typeof product.image === "string" ? { uri: product.image } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
                 <View className="p-5 gap-3">
                   <Text className="font-interBold text-lg">{product.name}</Text>
                   <Text className="font-inter">{product.description}</Text>
