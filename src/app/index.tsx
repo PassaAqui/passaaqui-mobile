@@ -3,7 +3,7 @@ import { Redirect } from "expo-router";
 
 export default function Index() {
   // Apenas em desenvolvimento para testar novas telas
-  return <Redirect href={"/shopkeeper/(private)/orders/prepare-order"} />
+  return <Redirect href={"/shopkeeper/(private)/(tabs)"} />
 
   return <HomeScreen />
 }
