@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text, Image, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import { mapStyle } from "@/src/constants/user/map/map";
-import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
 import OutsideRegionModal from "@/src/features/user/map/components/OutsideRegionModal";
 import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPOI";
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
@@ -15,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
+import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
@@ -42,10 +42,19 @@ export default function MapScreen() {
     showSwitchDestinationModal,
     confirmSwitchDestination,
     cancelSwitchDestination,
-    cityToShow, dismissCity, loadingCity
+    cityToShow, dismissCity, loadingCity,
+    checkinReward, setCheckinReward,
+    simulating, startSimulation, stopSimulation, currentSimPosition // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
   } = useMapScreen();
 
   const { data: user } = useTouristMe();
+
+  // Apenas em dev pra testar o checkin
+  const userMarkerCoordinate = currentSimPosition ?? {
+    latitude: -8.0675,
+    longitude: -34.9167,
+  };
+
 
   const handleFollow = () => {
     setIsFollowing(true);
@@ -104,16 +113,19 @@ export default function MapScreen() {
         {location && (
           <>
             <Marker
+            coordinate={userMarkerCoordinate}
+            /*
               coordinate={{
-                latitude: -8.0675, /* Centro de recife (Marco Zero) */
+                latitude: -8.0675, // Centro de recife (Marco Zero) 
                 longitude: -34.9167,
                 /* PAULISTA
                 latitude: -7.94009,
                 longitude: -34.8723
-                */
+                
                 //latitude: -8.2832, Caruaru
                 //longitude: -35.9736
               }}
+              */
               icon={require("@/assets/user/map/user-pin.png")}
             />
 
@@ -159,6 +171,15 @@ export default function MapScreen() {
           </>
         )}
       </MapView>
+
+      {__DEV__ && stop && (
+        <Pressable
+          onPress={simulating ? stopSimulation : startSimulation}
+          className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
+        >
+          <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
+        </Pressable>
+      )}
 
       <AnimatedPostcardModal
         visible={!!cityToShow}
@@ -229,6 +250,14 @@ export default function MapScreen() {
 
       {!gpsActive && (
         <GpsDisabledModal />
+      )}
+
+      {checkinReward && (
+        <CheckinRewardModal
+          visible={!!checkinReward}
+          xpEarned={checkinReward?.xp ?? 0}
+          onClose={() => setCheckinReward(null)}
+        />
       )}
     </SafeAreaView>
   )
