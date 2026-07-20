@@ -4,7 +4,7 @@ import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { useProductsByPoi } from "@/src/features/user/shop/hooks/useProductsByPoi";
+import { useProductsByPoi } from "@/src/features/user/shop/hooks/products/useProductsByPoi";
 
 export default function ShopkeeperShopScreen() {
   const router = useRouter();
@@ -57,7 +57,7 @@ export default function ShopkeeperShopScreen() {
                 className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
                 style={{ width: cardWidth }}
               >
-                <Image className="w-full h-28 bg-gray-400" source={require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+                <Image className="w-full h-28 border border-gray-300" source={typeof product.image === "string" ? { uri: product.image } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
                 <View className="p-5 gap-3">
                   <Text className="font-interBold text-lg">{product.name}</Text>
                   <Text className="font-inter">{product.description}</Text>
