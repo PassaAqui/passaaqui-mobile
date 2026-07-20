@@ -1,8 +1,7 @@
-import { StyleSheet, View, Text, Image, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { StatusBar } from "expo-status-bar";
 import { mapStyle } from "@/src/constants/user/map/map";
-import { touristPOIs, shopPOIs } from "@/src/constants/user/map/poi";
 import OutsideRegionModal from "@/src/features/user/map/components/OutsideRegionModal";
 import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPOI";
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
@@ -15,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
+import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 /* latitude: -8.0675
 longitude: -34.9167 */ // Meio de Recife (Marco Zero)
@@ -32,20 +32,29 @@ export default function MapScreen() {
     setOpenTouristPOIMarker, openTouristPOIMarker,
     setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
+    touristPois, shopPois,
     routeCoords,
     stop,
     showAlertModal, setShowAlertModal,
     handleNavigation,
     setShowStopConfirmation, showStopConfirmation,
     handleStopNavigation,
-    routeDistance,
     showSwitchDestinationModal,
     confirmSwitchDestination,
     cancelSwitchDestination,
-    cityToShow, dismissCity, loadingCity
+    cityToShow, dismissCity, loadingCity,
+    checkinReward, setCheckinReward,
+    simulating, startSimulation, stopSimulation, currentSimPosition // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
   } = useMapScreen();
 
   const { data: user } = useTouristMe();
+
+  // Apenas em dev pra testar o checkin
+  const userMarkerCoordinate = currentSimPosition ?? {
+    latitude: -8.0675,
+    longitude: -34.9167,
+  };
+
 
   const handleFollow = () => {
     setIsFollowing(true);
@@ -58,8 +67,8 @@ export default function MapScreen() {
           /*
             Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
           */
-          latitude: -7.94009,
-          longitude: -34.8723,
+          latitude: -8.0675,
+          longitude: -34.9167,
           latitudeDelta: 0.005,
           longitudeDelta: 0.005,
       });
@@ -104,23 +113,30 @@ export default function MapScreen() {
         {location && (
           <>
             <Marker
+            coordinate={userMarkerCoordinate}
+            /*
               coordinate={{
+                latitude: -8.0675, // Centro de recife (Marco Zero) 
+                longitude: -34.9167,
+                /* PAULISTA
                 latitude: -7.94009,
                 longitude: -34.8723
+                
                 //latitude: -8.2832, Caruaru
                 //longitude: -35.9736
               }}
+              */
               icon={require("@/assets/user/map/user-pin.png")}
             />
 
-            {touristPOIs.map(touristPoi => (
+            {touristPois.map(touristPoi => (
               <Marker
                 key={touristPoi.id}
                 coordinate={{
                   latitude: touristPoi.latitude,
                   longitude: touristPoi.longitude
                 }}
-                title={touristPoi.title}
+                title={touristPoi.name}
                 onPress={() => {
                   setOpenTouristPOIMarker(touristPoi);
                   setOpenPOIMarker(touristPoi);
@@ -129,14 +145,14 @@ export default function MapScreen() {
               />
             ))}
 
-            {shopPOIs.map(shopPoi => (
+            {shopPois.map(shopPoi => (
               <Marker
                 key={shopPoi.id}
                 coordinate={{
                   latitude: shopPoi.latitude,
                   longitude: shopPoi.longitude
                 }}
-                title={shopPoi.title}
+                title={shopPoi.name}
                 onPress={() => {
                   setOpenShopPOIMarker(shopPoi);
                   setOpenPOIMarker(shopPoi);
@@ -156,6 +172,15 @@ export default function MapScreen() {
         )}
       </MapView>
 
+      {__DEV__ && stop && (
+        <Pressable
+          onPress={simulating ? stopSimulation : startSimulation}
+          className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
+        >
+          <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
+        </Pressable>
+      )}
+
       <AnimatedPostcardModal
         visible={!!cityToShow}
         onClose={dismissCity}
@@ -171,10 +196,10 @@ export default function MapScreen() {
       {openTouristPOIMarker && (
         <TouristSpotPOI
           img={require("@/assets/user/map/tmp/no-image.png")}
-          title={openTouristPOIMarker.title}
-          description={openTouristPOIMarker.description}
-          distance={routeDistance}
-          xpQuantity={openTouristPOIMarker.xpQuantity}
+          title={openTouristPOIMarker.name}
+          description={openTouristPOIMarker.description ?? ""}
+          distance={openTouristPOIMarker.distanceLabel}
+          xpQuantity={openTouristPOIMarker.xpReward ?? 0}
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
           onNavigate={(mode) => handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode, openTouristPOIMarker.id)}
@@ -183,11 +208,12 @@ export default function MapScreen() {
 
       {openShopPOIMarker && (
         <ShopkeeperPOI
-          img={require("@/assets/user/map/tmp/no-image.png")}
-          title={openShopPOIMarker.title}
-          description={openShopPOIMarker.description}
-          distance={routeDistance}
-          starQuantity={openShopPOIMarker.xpQuantity}
+          poiId={openShopPOIMarker.id}
+          img={ (!!openShopPOIMarker.image) ? openShopPOIMarker.image : require("@/assets/user/map/tmp/no-image.png")}
+          title={openShopPOIMarker.name}
+          description={openShopPOIMarker.description ?? "Sem descrição"}
+          distance={openShopPOIMarker.distanceLabel}
+          starQuantity={openShopPOIMarker.averageRating ?? 0}
           visible={!!openShopPOIMarker}
           onClose={() => setOpenShopPOIMarker(null)}
           onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode, openShopPOIMarker.id)}
@@ -224,6 +250,14 @@ export default function MapScreen() {
 
       {!gpsActive && (
         <GpsDisabledModal />
+      )}
+
+      {checkinReward && (
+        <CheckinRewardModal
+          visible={!!checkinReward}
+          xpEarned={checkinReward?.xp ?? 0}
+          onClose={() => setCheckinReward(null)}
+        />
       )}
     </SafeAreaView>
   )

@@ -6,7 +6,8 @@ import { Link } from "expo-router";
 type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
 
 interface ShopPOIModalProps {
-  img: ImageSourcePropType
+  poiId: number,
+  img: ImageSourcePropType | string,
   title: string,
   description: string,
   distance: number | string | null,
@@ -16,7 +17,7 @@ interface ShopPOIModalProps {
   onNavigate: (mode: RouteMode) => void;
 }
 
-export default function ShopkeeperPOI({ img, title, description, distance, starQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
+export default function ShopkeeperPOI({ poiId, img, title, description, distance, starQuantity, visible, onClose, onNavigate }: ShopPOIModalProps) {
   const [openLocomotionModal, setOpenLocomotionModal] = useState(false);
 
   if (openLocomotionModal) {
@@ -38,7 +39,7 @@ export default function ShopkeeperPOI({ img, title, description, distance, starQ
           <Pressable onPress={onClose} className="absolute z-10 top-4 right-4 bg-white/50 p-3 rounded-full w-12 h-12 items-center justify-center active:opacity-30">
             <Text className="font-interBold text-xl text-center" numberOfLines={1}>X</Text>
           </Pressable>
-          <Image className="bg-gray-200 w-full h-56" resizeMode="cover" source={img} />
+          <Image className="bg-gray-200 w-full h-56" resizeMode="cover" source={typeof img === "string" ? { uri: img } : img} />
 
           <View className="w-full px-6 pb-6 gap-4 items-center">
             <Text className="font-itim text-3xl text-center" adjustsFontSizeToFit>{title}</Text>
@@ -51,17 +52,23 @@ export default function ShopkeeperPOI({ img, title, description, distance, starQ
               <View className="border border-[#EAAA6A] p-4 w-2/5 rounded-lg items-center justify-center">
                 <Image className="w-10 h-10 opacity-70" source={require("@/assets/user/map/poi/distance.png")} />
                 <Text className="font-itim text-lg opacity-70">Distância</Text>
-                <Text className="font-itim text-3xl">{distance}km</Text>
+                <Text className="font-itim text-3xl">{distance}</Text>
               </View>
 
               <View className="border border-[#EAAA6A] p-4 w-2/5 rounded-lg items-center justify-center">
                 <Image className="w-10 h-10 opacity-70" source={require("@/assets/user/map/poi/shop/star.png")} />
                 <Text className="font-itim text-lg opacity-70">Avaliações</Text>
-                <Text className="font-itim text-3xl">4.6</Text>
+                <Text className="font-itim text-3xl">{starQuantity}</Text>
               </View>
             </View>
 
-            <Link href={"/user/(private)/shop"} className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65">
+            <Link
+              href={{
+                pathname: "/user/(private)/shop",
+                params: { poiId }
+              }}
+              className="bg-[#EAAA6A] w-full p-4 items-center justify-center rounded-lg active:opacity-65"
+            >
               <Text className="font-itim text-xl text-center">Ver produtos</Text>
             </Link>
 

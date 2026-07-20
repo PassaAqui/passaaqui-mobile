@@ -50,7 +50,7 @@ export default function TouristSpotPOI({ img, title, description, distance, xpQu
               <View className="border border-[#EAAA6A] p-4 w-2/5 rounded-lg items-center justify-center">
                 <Image className="w-10 h-10 opacity-70" source={require("@/assets/user/map/poi/distance.png")} />
                 <Text className="font-itim text-lg opacity-70">Distância</Text>
-                <Text className="font-itim text-3xl">{distance}km</Text>
+                <Text className="font-itim text-3xl">{distance}</Text>
               </View>
 
               <View className="border border-[#EAAA6A] p-4 w-2/5 rounded-lg items-center justify-center">

@@ -2,6 +2,7 @@ import { api } from "@/src/services/api/api"
 import axios from "axios";
 
 export interface TouristProfile {
+  id: number;
   name: string,
   currentXP: number
 }

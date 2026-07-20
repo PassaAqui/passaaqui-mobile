@@ -52,8 +52,16 @@ export function useLocation() {
         /*
           Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
         */
+
+       /*
+        ===================
+        VALORES DE PAULISTA
+        ===================
         latitude: -7.94009,
         longitude: -34.8723,
+        */
+        latitude: -8.0675, /* Centro de recife (Marco Zero) */
+        longitude: -34.9167,
         latitudeDelta: 0.005,
         longitudeDelta: 0.005,
       });
@@ -96,10 +104,17 @@ export function useLocation() {
                 //longitude: response.coords.longitude
 
                 /*
-                  Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
-                */
+                ===================
+                VALORES DE PAULISTA
+                ===================
                 latitude: -7.94009,
-                longitude: -34.8723
+                longitude: -34.8723,
+                */
+               /*
+                 Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
+               */
+                latitude: -8.0675, /* Centro de recife (Marco Zero) */
+                longitude: -34.9167,
               },
               //zoom: 19
             });

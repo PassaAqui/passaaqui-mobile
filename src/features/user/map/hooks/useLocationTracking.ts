@@ -4,12 +4,12 @@ import { startRouteSession } from "@/src/services/routeService";
 import { AxiosError } from "axios";
 import { LocationObject } from "expo-location";
 
-export function useLocationTracking(location: LocationObject | null ,active: boolean) {
+export function useLocationTracking(location: LocationObject | null, active: boolean, paused: boolean = false) { // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o parâmetro 'paused'
   const updateLocation = useUpdateRouteLocation();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!active) {
+    if (!active || paused) { // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o '|| paused'
       if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
@@ -21,9 +21,9 @@ export function useLocationTracking(location: LocationObject | null ,active: boo
         //latitude: location.coords.latitude,
         //longitude: location.coords.longitude
 
-        latitude: -7.94009,
-        longitude: -34.8723,
-      };
+        latitude: -8.0675,
+        longitude: -34.9167
+      }
 
       try {
         await updateLocation.mutateAsync(coords);
@@ -49,5 +49,5 @@ export function useLocationTracking(location: LocationObject | null ,active: boo
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [active]);
+  }, [active, paused]); // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o 'paused'
 }
