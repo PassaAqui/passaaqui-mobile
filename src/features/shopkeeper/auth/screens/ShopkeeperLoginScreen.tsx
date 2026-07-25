@@ -1,12 +1,17 @@
-import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useState } from "react";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
+import { loginShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
+import { useRouter } from "expo-router";
 
 export default function ShopkeeperLoginScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,24 +20,25 @@ export default function ShopkeeperLoginScreen() {
     password: ""
   })
 
-  const handleSubmit = () => {
-    const errors = {
-        email: "",
-        password: ""
-    }
+  const handleSubmit = async () => {
+    const errors = { email: "", password: "" };
+    if (email.trim() === "") errors.email = "Preencha o campo com seu email";
+    if (password.trim() === "") errors.password = "Preencha o campo com sua senha";
 
-    if (email.trim() === "") {
-        errors.email = "Preencha o campo com seu email";
-    }
-    if (password.trim() === "") {
-        errors.password = "Preencha o campo com sua senha";
-    }
+    setError(errors);
+    if (Object.values(errors).some(Boolean)) return;
 
-    setError(errors)
-
-    const hasError = Object.values(errors).some(Boolean);
-    if (hasError) return;
-  }
+    setLoading(true);
+    setGeneralError("");
+    try {
+      await loginShopkeeper({ email, password });
+      router.replace("/shopkeeper/(private)/(tabs)");
+    } catch {
+      setGeneralError("Email ou senha incorretos.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -84,7 +90,10 @@ export default function ShopkeeperLoginScreen() {
               )}
 
               <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
-                <Text className="font-itim text-lg">Entrar</Text>
+                {loading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text className="font-itim text-lg">Entrar</Text>
+                }
               </Pressable>
 
               <Text className="text-white font-itim text-base text-center">Estabelecimento não está cadastrado? <Link href={"/shopkeeper/(public)/auth/shopkeeper-signup"} className="text-cyan-500">Cadastre-se</Link></Text>
