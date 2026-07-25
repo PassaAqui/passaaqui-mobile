@@ -1,6 +1,4 @@
-import { api } from "@/src/services/api/api";
-
-interface Products {
+export interface Products {
   id: number;
   image?: string;
   name: string;
@@ -12,7 +10,7 @@ interface Products {
   categoryId: number;
 }
 
-interface ProductDetail {
+export interface ProductDetail {
   id: number;
   image?: string;
   name: string;
@@ -41,15 +39,4 @@ interface ProductDetail {
     id: number;
     name: string
   }
-}
-
-export async function getProductById(id: number): Promise<ProductDetail> {
-  const { data } = await api.get<ProductDetail>(`/products/${id}`);
-  return data
-}
-
-export async function getAllProducts(): Promise<Products[]> {
-  const { data } = await api.get<Products[]>("/products");
-  console.log("[shopService/getAllProducts LOG] - Produtos encontrados: ", data);
-  return data;
 }
