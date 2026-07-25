@@ -1,4 +1,4 @@
-import { ImageBackground, View, Text, TextInput, Pressable, Image } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
@@ -9,8 +9,10 @@ import Checkbox from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
-import { CategoryModal } from "@/src/features/shopkeeper/components/CategoryModal";
+import { CategoryModal, CategoryData } from "@/src/features/shopkeeper/components/CategoryModal";
 import StoreLocationPickerModal, { ExistingPoi } from "@/src/features/shopkeeper/auth/components/StoreLocationPickerModal";
+import { signUpShopkeeper, loginShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
+import { useRouter } from "expo-router";
 
 const formatCpfOrCnpj = (text: string) => {
   const digits = text.replace(/\D/g, "").slice(0, 14);
@@ -56,6 +58,7 @@ function InputWithIcon({ icon, ...props }: React.ComponentProps<typeof TextInput
 
 export default function ShopkeeperSignupScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter()
 
   const [companyName, setCompanyName] = useState("");
   const [ownerName, setOwnerName] = useState("");
@@ -67,12 +70,15 @@ export default function ShopkeeperSignupScreen() {
   const [neighborhood, setNeighborhood] = useState("");
   const [street, setStreet] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<CategoryData | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isChecked, setChecked] = useState(false);
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
+
+  const [generalError, setGeneralError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [error, setError] = useState({
     companyName: "",
@@ -105,7 +111,7 @@ export default function ShopkeeperSignupScreen() {
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const result = shopkeeperSignUpSchema.safeParse({
       companyName,
       ownerName,
@@ -113,7 +119,7 @@ export default function ShopkeeperSignupScreen() {
       documentId,
       password,
       confirmPassword,
-      category,
+      category: category?.name ?? "",
       cityId: FIXED_CITY_ID,
       neighborhood,
       street,
@@ -147,6 +153,45 @@ export default function ShopkeeperSignupScreen() {
     }
 
     console.log(result.data);
+    setLoading(true);
+    try {
+      const formData = new FormData();
+
+      formData.append("data", {
+        uri: `data:application/json;base64,${btoa(JSON.stringify({
+          email: result.data.email,
+          name: result.data.ownerName,
+          password: result.data.password,
+          confirm_password: result.data.confirmPassword,
+          documentId: result.data.documentId.replace(/\D/g, ""),
+          companyName: result.data.companyName,
+          description: result.data.description,
+          categoryId: category!.id,
+          poiName: result.data.companyName,
+          poiDescription: result.data.description,
+          latitude: result.data.location?.latitude,
+          longitude: result.data.location?.longitude,
+          cityId: FIXED_CITY_ID,
+        }))}`,
+        name: "data",
+        type: "application/json",
+      } as any);
+
+      if (image) {
+        const filename = image.split("/").pop() ?? "image.jpg";
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : "image/jpeg";
+        formData.append("image", { uri: image, name: filename, type } as any);
+      }
+
+      await signUpShopkeeper(formData);
+      await loginShopkeeper({ email: result.data.email, password: result.data.password });
+      router.replace("/shopkeeper/(private)/(tabs)");
+    } catch {
+      setGeneralError("Erro ao criar conta. Verifique os dados.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -254,7 +299,7 @@ export default function ShopkeeperSignupScreen() {
                     className="flex-row items-center justify-between bg-white rounded-xl p-4"
                   >
                     <Text className={category ? "text-black" : "text-gray-400"}>
-                      {category || "Selecione a categoria da loja"}
+                      {category?.name || "Selecione a categoria da loja"}
                     </Text>
                     <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
                   </Pressable>
@@ -385,8 +430,15 @@ export default function ShopkeeperSignupScreen() {
                 <FieldError>{error.terms}</FieldError>
               </View>
 
+              {generalError && (
+                <Text className="font-itim text-sm text-red-300 text-center">{generalError}</Text>
+              )}
+
               <Pressable onPress={handleSubmit} className="bg-[#EAAA6A] p-4 items-center justify-center rounded-xl active:opacity-80 flex-row gap-2">
-                <Text className="font-interBold text-black">Cadastrar</Text>
+                {loading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text className="font-interBold text-black">Cadastrar</Text>
+                }
               </Pressable>
             </View>
 

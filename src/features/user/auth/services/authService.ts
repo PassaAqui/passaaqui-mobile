@@ -58,10 +58,10 @@ export async function logout() {
 export async function  tryRestoreSession(): Promise<boolean> {
   try {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN);
-    console.log("[restore] refresh token no SecureStore:", refreshToken ? "existe" : "não existe");
+    console.log("[restore] refresh token do TURISTA no SecureStore:", refreshToken ? "existe" : "não existe");
     if (!refreshToken) return false;
 
-    console.log("[restore] enviando refresh token:", `refresh_token=${refreshToken}`);
+    console.log("[restore] enviando refresh token do TURISTA:", `refresh_token=${refreshToken}`);
     const { data } = await axios.get(`${BASE_URL}/auth/refresh`, {
       headers: {
         Authorization: `Bearer ${refreshToken}`

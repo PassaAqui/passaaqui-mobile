@@ -10,38 +10,44 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   if (!config.headers.Authorization) {
-    const token = useAuthStore.getState().accessToken;
-    console.log("[api.ts] accessToken:", token);
+    const touristToken = useAuthStore.getState().accessToken;
+    const shopkeeperToken = useShopkeeperAuthStore.getState().accessToken;
+    const token = touristToken ?? shopkeeperToken;
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
 
-  console.log("[api.ts] request →", config.method?.toUpperCase(), config.url);
   return config;
-})
+});
 
 let lastRefreshTime = 0;
 
 async function refreshAccessToken(): Promise<string> {
   const now = Date.now();
-
-  if (now - lastRefreshTime < 5000) {
-    throw new Error("Refresh too frequent");
-  }
+  if (now - lastRefreshTime < 5000) throw new Error("Refresh too frequent");
   lastRefreshTime = now;
 
-  const refreshToken = await SecureStore.getItemAsync("refresh_token");
-  if (!refreshToken) throw new Error("[api.ts AUTH ERROR]: refresh token nao existe");
+  const touristRefresh = await SecureStore.getItemAsync("refresh_token");
+  const shopkeeperRefresh = await SecureStore.getItemAsync("shopkeeper_refresh_token");
+  const refreshToken = touristRefresh ?? shopkeeperRefresh;
+  const isTourist = !!touristRefresh;
+
+  if (!refreshToken) throw new Error("sem refresh token");
 
   const { data } = await axios.get(`${BASE_URL}/auth/refresh`, {
-    headers: {
-      Authorization: `Bearer ${refreshToken}`
-    }
+    headers: { Authorization: `Bearer ${refreshToken}` },
   });
 
-  useAuthStore.getState().setAccessToken(data.access_token);
-  await SecureStore.setItemAsync("refresh_token", data.refresh_token);
+  const key = isTourist ? "refresh_token" : "shopkeeper_refresh_token";
+  await SecureStore.setItemAsync(key, data.refresh_token);
+
+  if (isTourist) {
+    useAuthStore.getState().setAccessToken(data.access_token);
+  } else {
+    useShopkeeperAuthStore.getState().setAccessToken(data.access_token);
+  }
 
   return data.access_token;
 }
@@ -58,7 +64,12 @@ api.interceptors.response.use(
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
       } catch (refreshError) {
-        await useAuthStore.getState().logout();
+        const isTourist = !!(await SecureStore.getItemAsync("refresh_token"));
+        if (isTourist) {
+          await useAuthStore.getState().logout();
+        } else {
+          await useShopkeeperAuthStore.getState().logout();
+        }
         return Promise.reject(error);
       }
     }
@@ -105,3 +116,4 @@ api.interceptors.response.use(
 */
 
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
+import { useShopkeeperAuthStore } from "@/src/stores/shopkeeper/auth/shopkeeperAuthStore";

@@ -28,7 +28,7 @@ export default function SettingScreen() {
             setLoggingOut(true);
             try {
               await logout();
-              router.replace("/user/(public)/auth/user-login");
+              router.replace("/");
             } finally {
               setLoggingOut(false);
             }

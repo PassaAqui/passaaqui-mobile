@@ -2,21 +2,26 @@ import { FlatList, Modal, Pressable, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+export interface CategoryData {
+  id: number;
+  name: string;
+}
+
 // substituir por chamada pra API (GET /categories) quando terminar de fazer as outras telas do lojista
-const MOCK_CATEGORIES = [
-  "Tapioca",
-  "Bebidas",
-  "Bolos e doces",
-  "Salgados",
-  "Sorvetes",
-  "Artesanato",
+const MOCK_CATEGORIES: CategoryData[] = [
+  { id: 1, name: "Tapioca" },
+  { id: 2, name: "Bebidas" },
+  { id: 3, name: "Bolos e doces" },
+  { id: 4, name: "Salgados" },
+  { id: 5, name: "Sorvetes" },
+  { id: 6, name: "Artesanato" },
 ];
 
 interface CategoryModalProps {
   visible: boolean;
   onClose: () => void;
-  selectedCategory: string;
-  onSelect: (category: string) => void;
+  selectedCategory: CategoryData | null;
+  onSelect: (category: CategoryData) => void;
 }
 
 export function CategoryModal({ visible, onClose, selectedCategory, onSelect }: CategoryModalProps) {
@@ -31,7 +36,7 @@ export function CategoryModal({ visible, onClose, selectedCategory, onSelect }: 
 
           <FlatList
             data={MOCK_CATEGORIES}
-            keyExtractor={(item) => item}
+            keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <Pressable
                 onPress={() => {
@@ -40,8 +45,8 @@ export function CategoryModal({ visible, onClose, selectedCategory, onSelect }: 
                 }}
                 className="flex-row items-center justify-between py-4 border-b border-gray-100"
               >
-                <Text className="text-sm font-inter">{item}</Text>
-                {selectedCategory === item && (
+                <Text className="text-sm font-inter">{item.name}</Text>
+                {selectedCategory?.id === item.id && (
                   <Ionicons name="checkmark" size={18} color="#EAAA6A" />
                 )}
               </Pressable>
