@@ -1,4 +1,4 @@
-import PixPaymentScreen from "@/src/features/user/payment/screens/PixPaymentScreen";
+import PixPaymentScreen from "@/src/features/roles/user/payment/screens/PixPaymentScreen";
 
 export default function PixPayment() {
   return <PixPaymentScreen />

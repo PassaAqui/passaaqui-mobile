@@ -1,4 +1,4 @@
-import CreateProductScreen from "@/src/features/shopkeeper/products/screens/CreateProductScreen"
+import CreateProductScreen from "@/src/features/roles/shopkeeper/products/screens/CreateProductScreen"
 
 export default function CreateProduct() {
   return <CreateProductScreen />

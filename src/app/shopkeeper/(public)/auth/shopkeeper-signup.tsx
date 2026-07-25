@@ -1,4 +1,4 @@
-import ShopkeeperSignupScreen from "@/src/features/shopkeeper/auth/screens/ShopkeeperSignupScreen"
+import ShopkeeperSignupScreen from "@/src/features/roles/shopkeeper/auth/screens/ShopkeeperSignupScreen"
 
 export default function ShopkeeperSignup() {
   return (
