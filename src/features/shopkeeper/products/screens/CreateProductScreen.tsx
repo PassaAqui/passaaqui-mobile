@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TextInput, Pressable, Image } from "react-nativ
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { CategoryModal } from "@/src/features/shopkeeper/products/components/CategoryModal";
+import { CategoryModal } from "@/src/features/shopkeeper/components/CategoryModal";
 import { useCreateProductForm } from "@/src/features/shopkeeper/products/hooks/useCreateProductForm";
 import { useRouter } from "expo-router";
 

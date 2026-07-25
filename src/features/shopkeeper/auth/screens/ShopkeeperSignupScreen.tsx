@@ -1,12 +1,16 @@
-import { ImageBackground, View, Text, TextInput, Pressable } from "react-native";
+import { ImageBackground, View, Text, TextInput, Pressable, Image } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
-import { shopkeeperSignUpSchema } from "@/src/schemas/shopkeeper/signUpSchema";
+import { shopkeeperSignUpSchema } from "@/src/features/shopkeeper/auth/schemas/signUpSchema";
 import { Link } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
+import { CategoryModal } from "@/src/features/shopkeeper/components/CategoryModal";
+import StoreLocationPickerModal, { ExistingPoi } from "@/src/features/shopkeeper/auth/components/StoreLocationPickerModal";
 
 const formatCpfOrCnpj = (text: string) => {
   const digits = text.replace(/\D/g, "").slice(0, 14);
@@ -25,34 +29,98 @@ const formatCpfOrCnpj = (text: string) => {
     .replace(/(\d{4})(\d{1,2})$/, "$1/$2");
 };
 
+const EXISTING_POIS: ExistingPoi[] = [
+  { id: 1, name: "Loja Exemplo", latitude: -8.0675, longitude: -34.9167 },
+];
+
+const FIXED_CITY_ID = 1;
+const FIXED_CITY_LABEL = "Recife";
+
+function FieldError({ children }: { children?: string }) {
+  if (!children) return null;
+  return <Text className="font-itim text-sm text-red-300 mt-1">{children}</Text>;
+}
+
+function InputWithIcon({ icon, ...props }: React.ComponentProps<typeof TextInput> & { icon: keyof typeof Ionicons.glyphMap }) {
+  return (
+    <View className="flex-row items-center bg-white rounded-xl px-4 border border-transparent focus:border-[#EAAA6A]">
+      <Ionicons name={icon} size={18} color="#9CA3AF" />
+      <TextInput
+        {...props}
+        placeholderTextColor="#9CA3AF"
+        className="flex-1 py-4 px-3 text-black"
+      />
+    </View>
+  );
+}
+
 export default function ShopkeeperSignupScreen() {
   const insets = useSafeAreaInsets();
 
-  const [storeName, setStoreName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [email, setEmail] = useState("");
-  const [cpfOrCnpj, setCpfOrCnpj] = useState("");
+  const [documentId, setDocumentId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [description, setDescription] = useState("");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [street, setStreet] = useState("");
+  const [image, setImage] = useState<string | null>(null);
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isChecked, setChecked] = useState(false);
+
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
   const [error, setError] = useState({
-      storeName: "",
-      ownerName: "",
-      email: "",
-      cpfOrCnpj: "",
-      password: "",
-      confirmPassword: "",
-      terms: ""
+    companyName: "",
+    ownerName: "",
+    email: "",
+    documentId: "",
+    password: "",
+    confirmPassword: "",
+    category: "",
+    neighborhood: "",
+    street: "",
+    description: "",
+    image: "",
+    location: "",
+    terms: "",
   });
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      if (error.image) setError((prev) => ({ ...prev, image: "" }));
+    }
+  }
 
   const handleSubmit = () => {
     const result = shopkeeperSignUpSchema.safeParse({
-      storeName,
+      companyName,
       ownerName,
       email,
-      cpfOrCnpj,
+      documentId,
       password,
       confirmPassword,
+      category,
+      cityId: FIXED_CITY_ID,
+      neighborhood,
+      street,
+      description,
+      poiDescription: description,
+      image: image ?? "",
+      location: location ?? undefined,
       terms: isChecked,
     });
 
@@ -60,12 +128,18 @@ export default function ShopkeeperSignupScreen() {
       const fieldErrors = result.error.flatten().fieldErrors;
 
       setError({
-        storeName: fieldErrors.storeName?.[0] ?? "",
+        companyName: fieldErrors.companyName?.[0] ?? "",
         ownerName: fieldErrors.ownerName?.[0] ?? "",
         email: fieldErrors.email?.[0] ?? "",
-        cpfOrCnpj: fieldErrors.cpfOrCnpj?.[0] ?? "",
+        documentId: fieldErrors.documentId?.[0] ?? "",
         password: fieldErrors.password?.[0] ?? "",
         confirmPassword: fieldErrors.confirmPassword?.[0] ?? "",
+        category: fieldErrors.category?.[0] ?? "",
+        neighborhood: fieldErrors.neighborhood?.[0] ?? "",
+        street: fieldErrors.street?.[0] ?? "",
+        description: fieldErrors.description?.[0] ?? "",
+        image: fieldErrors.image?.[0] ?? "",
+        location: fieldErrors.location?.[0] ?? "",
         terms: fieldErrors.terms?.[0] ?? "",
       });
 
@@ -73,7 +147,7 @@ export default function ShopkeeperSignupScreen() {
     }
 
     console.log(result.data);
-  }
+  };
 
   return (
     <ImageBackground
@@ -82,140 +156,270 @@ export default function ShopkeeperSignupScreen() {
       resizeMode="cover"
     >
       <SafeAreaView edges={["top", "bottom"]} className="flex-1">
-        <View className="bg-black/40 inset-0 absolute" />
+        <View className="bg-black/55 inset-0 absolute" />
 
         <KeyboardAwareScrollView bottomOffset={16} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
-          <View className="justify-center items-center min-h-screen p-9 w-full">
-            <View className="flex-col justify-center items-center gap-3">
+          <View className="items-center px-6 pt-8 pb-10 w-full">
+            <View className="flex-col justify-center items-center gap-2 mb-8">
               <ShopkeeperIcon />
-              <Text className="text-white text-3xl font-irishGrover text-center" adjustsFontSizeToFit numberOfLines={1}>Criar uma conta</Text>
+              <Text className="text-white text-3xl font-interBold text-center" adjustsFontSizeToFit numberOfLines={1}>
+                Criar uma conta
+              </Text>
+              <Text className="text-white font-inter text-sm text-center">
+                Cadastre sua loja e comece a vender no app
+              </Text>
             </View>
 
-            <View className="w-full gap-2">
-              <Text className="text-white font-itim text-lg">Nome do estabelecimento</Text>
-                <TextInput
-                value={storeName}
-                onChangeText={(text) => {
-                  setStoreName(text);
-                  if (error.storeName) {
-                    setError(prev => ({ ...prev, storeName: "" }));
-                  }
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"Digite o nome do estabelecimento"}
-              />
-              {error.storeName && (
-                <Text className="font-itim text-base text-red-300">{error.storeName}</Text>
-              )}
-
-              <Text className="text-white font-itim text-lg">Nome do proprietário</Text>
-              <TextInput
-                value={ownerName}
-                onChangeText={(text) => {
-                  setOwnerName(text);
-                  if (error.ownerName) {
-                    setError(prev => ({ ...prev, ownerName: "" }));
-                  }
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"Digite o nome do proprietário"}
-              />
-              {error.ownerName && (
-                <Text className="font-itim text-base text-red-300">{error.ownerName}</Text>
-              )}
-
-              <Text className="text-white font-itim text-lg">Email</Text>
-              <TextInput
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (error.email) {
-                    setError(prev => ({ ...prev, email: "" }));
-                  }
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"Digite o email do estabelecimento"}
-              />
-              {error.email && (
-                <Text className="font-itim text-base text-red-300">{error.email}</Text>
-              )}
-
-              <Text className="text-white font-itim text-lg">CNPJ ou CPF</Text>
-              <TextInput
-                keyboardType="numeric"
-                value={cpfOrCnpj}
-                onChangeText={(text) => {
-                  setCpfOrCnpj(formatCpfOrCnpj(text));
-                  if (error.cpfOrCnpj) setError(prev => ({ ...prev, cpfOrCnpj: "" }));
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"__.___.___/____-__ ou ___.___.___-__"}
-              />
-              {error.cpfOrCnpj && (
-                <Text className="font-itim text-base text-red-300">{error.cpfOrCnpj}</Text>
-              )}
-
-              <Text className="text-white font-itim text-lg">Senha</Text>
-              <TextInput
-                secureTextEntry
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  if (error.password) {
-                    setError(prev => ({ ...prev, password: "" }));
-                  }
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"Digite sua senha"}
-              />
-              {error.password && (
-                <Text className="font-itim text-base text-red-300">{error.password}</Text>
-              )}
-
-              <Text className="text-white font-itim text-lg">Confirmar senha</Text>
-              <TextInput
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (error.confirmPassword) {
-                    setError(prev => ({ ...prev, confirmPassword: "" }));
-                  }
-                }}
-                className="bg-white rounded-lg p-4"
-                placeholder={"Confirme sua senha"}
-              />
-              {error.confirmPassword && (
-                <Text className="font-itim text-base text-red-300">{error.confirmPassword}</Text>
-              )}
-
-              <View className="flex-row items-center gap-2">
-                <Checkbox
-                  value={isChecked}
-                  onValueChange={(state) => {
-                    setChecked(state);
-                    if (error.terms) {
-                      setError(prev => ({ ...prev, terms: "" }))
-                    }
-                  }}
-                  color={isChecked? "#2463EB" : undefined}
-                  className="border-red-500"
-              />
-              <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.</Text>
+            <View className="w-full bg-white/10 border border-white/15 rounded-3xl p-5 gap-6">
+              <View>
+                <Pressable onPress={pickImage} className="items-center justify-center bg-white/10 border-2 border-dashed border-white/40 rounded-2xl h-36 overflow-hidden">
+                  {image ? (
+                    <Image source={{ uri: image }} className="w-full h-full" resizeMode="cover" />
+                  ) : (
+                    <View className="items-center gap-2">
+                      <Ionicons name="camera-outline" size={28} color="#fff" />
+                      <Text className="text-white/80 font-itim text-sm">Adicionar foto do estabelecimento</Text>
+                    </View>
+                  )}
+                </Pressable>
+                <FieldError>{error.image}</FieldError>
               </View>
 
-              <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
-                <Text>Cadastrar</Text>
-              </Pressable>
+              <View className="gap-3">
+                <Text className="text-white font-itim text-lg border-b border-white/20 pb-1">Dados do estabelecimento</Text>
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Nome do estabelecimento</Text>
+                  <InputWithIcon
+                    icon="storefront-outline"
+                    value={companyName}
+                    onChangeText={(text) => {
+                      setCompanyName(text);
+                      if (error.companyName) setError((prev) => ({ ...prev, companyName: "" }));
+                    }}
+                    placeholder="Digite o nome do estabelecimento"
+                  />
+                  <FieldError>{error.companyName}</FieldError>
+                </View>
 
-              <Text className="font-itim text-lg text-white text-center">Já possui uma conta? Faça o <Link href={"/shopkeeper/(public)/auth/shopkeeper-login"} className="text-cyan-500">Login</Link></Text>
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Nome do proprietário</Text>
+                  <InputWithIcon
+                    icon="person-outline"
+                    value={ownerName}
+                    onChangeText={(text) => {
+                      setOwnerName(text);
+                      if (error.ownerName) setError((prev) => ({ ...prev, ownerName: "" }));
+                    }}
+                    placeholder="Digite o nome do proprietário"
+                  />
+                  <FieldError>{error.ownerName}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Email</Text>
+                  <InputWithIcon
+                    icon="mail-outline"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    value={email}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (error.email) setError((prev) => ({ ...prev, email: "" }));
+                    }}
+                    placeholder="Digite o email do estabelecimento"
+                  />
+                  <FieldError>{error.email}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">CNPJ ou CPF</Text>
+                  <InputWithIcon
+                    icon="document-text-outline"
+                    keyboardType="numeric"
+                    value={documentId}
+                    onChangeText={(text) => {
+                      setDocumentId(formatCpfOrCnpj(text));
+                      if (error.documentId) setError((prev) => ({ ...prev, documentId: "" }));
+                    }}
+                    placeholder="__.___.___/____-__ ou ___.___.___-__"
+                  />
+                  <FieldError>{error.documentId}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Categoria</Text>
+                  <Pressable
+                    onPress={() => setShowCategoryModal(true)}
+                    className="flex-row items-center justify-between bg-white rounded-xl p-4"
+                  >
+                    <Text className={category ? "text-black" : "text-gray-400"}>
+                      {category || "Selecione a categoria da loja"}
+                    </Text>
+                    <Ionicons name="chevron-down" size={18} color="#9CA3AF" />
+                  </Pressable>
+                  <FieldError>{error.category}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Descrição</Text>
+                  <TextInput
+                    value={description}
+                    onChangeText={(text) => {
+                      setDescription(text);
+                      if (error.description) setError((prev) => ({ ...prev, description: "" }));
+                    }}
+                    className="bg-white rounded-xl p-4 text-black min-h-[80px]"
+                    placeholder="Fale um pouco sobre a sua loja"
+                    placeholderTextColor="#9CA3AF"
+                    multiline
+                    textAlignVertical="top"
+                  />
+                  <FieldError>{error.description}</FieldError>
+                </View>
+              </View>
+
+              <View className="gap-3">
+                <Text className="text-white font-itim text-lg border-b border-white/20 pb-1">Endereço</Text>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Cidade</Text>
+                  <View className="flex-row items-center gap-2 bg-white/50 rounded-xl p-4">
+                    <Ionicons name="location-outline" size={18} color="#4B5563" />
+                    <Text className="text-gray-700 font-itim">{FIXED_CITY_LABEL}</Text>
+                  </View>
+                  <Text className="text-white/60 text-xs font-itim mt-1">
+                    No momento só é possível cadastrar lojas em Recife
+                  </Text>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Bairro</Text>
+                  <InputWithIcon
+                    icon="map-outline"
+                    value={neighborhood}
+                    onChangeText={(text) => {
+                      setNeighborhood(text);
+                      if (error.neighborhood) setError((prev) => ({ ...prev, neighborhood: "" }));
+                    }}
+                    placeholder="Digite o bairro"
+                  />
+                  <FieldError>{error.neighborhood}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Rua</Text>
+                  <InputWithIcon
+                    icon="navigate-outline"
+                    value={street}
+                    onChangeText={(text) => {
+                      setStreet(text);
+                      if (error.street) setError((prev) => ({ ...prev, street: "" }));
+                    }}
+                    placeholder="Digite a rua"
+                  />
+                  <FieldError>{error.street}</FieldError>
+                </View>
+
+                <View>
+                  <Pressable onPress={() => setShowLocationModal(true)} className={`flex-row items-center justify-center gap-2 p-4 rounded-xl active:opacity-80 ${location ? "bg-emerald-600" : "bg-[#EAAA6A]"}`}>
+                    <Ionicons name={location ? "checkmark-circle" : "location-outline"} size={18} color="#fff" />
+                    <Text className="text-white font-interBold">
+                      {location ? "Localização marcada — toque para ajustar" : "Marcar localização da loja no mapa"}
+                    </Text>
+                  </Pressable>
+                  <FieldError>{error.location}</FieldError>
+                </View>
+              </View>
+
+              <View className="gap-3">
+                <Text className="text-white font-itim text-lg border-b border-white/20 pb-1">Segurança</Text>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Senha</Text>
+                  <InputWithIcon
+                    icon="lock-closed-outline"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={(text) => {
+                      setPassword(text);
+                      if (error.password) setError((prev) => ({ ...prev, password: "" }));
+                    }}
+                    placeholder="Digite sua senha"
+                  />
+                  <FieldError>{error.password}</FieldError>
+                </View>
+
+                <View>
+                  <Text className="text-white/90 font-itim text-base mb-1">Confirmar senha</Text>
+                  <InputWithIcon
+                    icon="lock-closed-outline"
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={(text) => {
+                      setConfirmPassword(text);
+                      if (error.confirmPassword) setError((prev) => ({ ...prev, confirmPassword: "" }));
+                    }}
+                    placeholder="Confirme sua senha"
+                  />
+                  <FieldError>{error.confirmPassword}</FieldError>
+                </View>
+              </View>
+
+              <View>
+                <View className="flex-row items-start gap-2">
+                  <Checkbox
+                    value={isChecked}
+                    onValueChange={(state) => {
+                      setChecked(state);
+                      if (error.terms) setError((prev) => ({ ...prev, terms: "" }));
+                    }}
+                    color={isChecked ? "#EAAA6A" : undefined}
+                    className="mt-0.5"
+                  />
+                  <Text className={`flex-1 text-sm font-roboto ${error.terms ? "text-red-300" : "text-white/90"}`}>
+                    Li e aceito os <Text className="text-cyan-400 font-itim">Termos de Uso</Text> e a{" "}
+                    <Text className="text-cyan-400 font-itim">Política de Privacidade</Text>.
+                  </Text>
+                </View>
+                <FieldError>{error.terms}</FieldError>
+              </View>
+
+              <Pressable onPress={handleSubmit} className="bg-[#EAAA6A] p-4 items-center justify-center rounded-xl active:opacity-80 flex-row gap-2">
+                <Text className="font-interBold text-black">Cadastrar</Text>
+              </Pressable>
             </View>
+
+            <Text className="font-itim text-base text-white text-center mt-6">
+              Já possui uma conta? Faça o{" "}
+              <Link href={"/shopkeeper/(public)/auth/shopkeeper-login"} className="text-cyan-400">
+                Login
+              </Link>
+            </Text>
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
+
+      <CategoryModal
+        visible={showCategoryModal}
+        selectedCategory={category}
+        onSelect={(selected) => {
+          setCategory(selected);
+          if (error.category) setError((prev) => ({ ...prev, category: "" }));
+        }}
+        onClose={() => setShowCategoryModal(false)}
+      />
+
+      <StoreLocationPickerModal
+        visible={showLocationModal}
+        existingPois={EXISTING_POIS}
+        initialLocation={location ?? undefined}
+        onConfirm={(coords) => {
+          setLocation(coords);
+          if (error.location) setError((prev) => ({ ...prev, location: "" }));
+        }}
+        onClose={() => setShowLocationModal(false)}
+      />
     </ImageBackground>
-  )
+  );
 }
