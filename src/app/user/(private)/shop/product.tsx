@@ -1,4 +1,4 @@
-import ProductDetailScreen from "@/src/features/user/shop/screens/ProductDetailScreen";
+import ProductDetailScreen from "@/src/features/roles/user/shop/screens/ProductDetailScreen";
 
 export default function Product() {
   return <ProductDetailScreen />

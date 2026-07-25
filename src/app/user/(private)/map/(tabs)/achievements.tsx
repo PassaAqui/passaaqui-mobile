@@ -1,4 +1,4 @@
-import AchievementScreen from "@/src/features/user/achievements/screens/AchievementScreen";
+import AchievementScreen from "@/src/features/roles/user/achievements/screens/AchievementScreen";
 
 export default function Achievements() {
   return <AchievementScreen />

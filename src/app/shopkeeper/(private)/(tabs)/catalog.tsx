@@ -1,4 +1,4 @@
-import CatalogScreen from "@/src/features/shopkeeper/catalog/screens/CatalogScreen"
+import CatalogScreen from "@/src/features/roles/shopkeeper/catalog/screens/CatalogScreen"
 
 export default function Catalog() {
   return <CatalogScreen />

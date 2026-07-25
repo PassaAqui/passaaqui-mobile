@@ -1,11 +1,11 @@
 import { Stack, useRouter } from "expo-router";
 import { useFonts } from "expo-font";
 import { useState, useEffect } from "react";
-import { tryRestoreSession } from "@/src/features/user/auth/services/authService";
+import { tryRestoreSession } from "@/src/features/roles/user/auth/services/authService";
 import { IrishGrover_400Regular } from "@expo-google-fonts/irish-grover";
 import { Itim_400Regular } from "@expo-google-fonts/itim";
 import "@/global.css";
-import { tryRestoreShopkeeperSession } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
+import { tryRestoreShopkeeperSession } from "@/src/features/roles/shopkeeper/auth/services/shopkeeperAuthService";
 
 let sessionChecked = false;
 
