@@ -1,6 +1,5 @@
-// src/features/user/shop/hooks/categories/useCategoryProducts.ts
 import { useQuery } from "@tanstack/react-query";
-import { getCategoryById } from "@/src/features/user/shop/services/categoryService";
+import { getCategoryById } from "@/src/features/category/services/categoryService";
 
 export function useCategoryProducts(categoryId: number | undefined) {
   return useQuery({

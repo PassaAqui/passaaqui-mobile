@@ -6,7 +6,7 @@ import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequ
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { useAllProducts } from "@/src/features/user/shop/hooks/products/useAllProducts";
-import { useAllCategories } from "@/src/features/user/shop/hooks/categories/useAllCategories";
+import { useAllCategories } from "@/src/features/category/hooks/useAllCategories";
 import { useCategoryProducts } from "@/src/features/user/shop/hooks/categories/useCategoryProducts";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
