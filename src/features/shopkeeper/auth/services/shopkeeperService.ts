@@ -7,6 +7,7 @@ export interface ShopkeeperMe {
   companyName: string;
   description: string | null;
   category: { id: number; name: string };
+  poi: { id: number; name: string }
 }
 
 export async function getShopkeeperMe(): Promise<ShopkeeperMe> {

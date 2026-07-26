@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TextInput, Pressable, Image } from "react-native";
+import { View, Text, ScrollView, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -15,21 +15,19 @@ export default function CreateProductScreen() {
     category,
     categoryModalVisible,
     description,
-    originalPrice,
-    discount,
-    xpCost,
+    price,
     quantity,
     images,
     errors,
-    finalPrice,
     descriptionMaxLength,
     maxImages,
+    isSubmitting,
+    submitError,
+    submitResult,
     handleNameChange,
     handleSelectCategory,
     handleDescriptionChange,
-    handleOriginalPriceChange,
-    setDiscount,
-    setXpCost,
+    handlePriceChange,
     incrementQuantity,
     decrementQuantity,
     pickImages,
@@ -43,7 +41,7 @@ export default function CreateProductScreen() {
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
       <View className="flex-row items-center p-5 border-b border-gray-200">
         <Pressable onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#000"  className="py-3"/>
+          <Ionicons name="chevron-back" size={24} color="#000" className="py-3" />
         </Pressable>
         <View className="flex-1 justify-center items-center pr-5">
           <Text className="text-lg font-interBold text-center">Novo Produto</Text>
@@ -150,85 +148,41 @@ export default function CreateProductScreen() {
           </View>
         </View>
 
-        <Text className="text-sm font-interBold text-gray-500 mb-4">PREÇO E DESCONTO</Text>
+        <Text className="text-sm font-interBold text-gray-500 mb-4">PREÇO</Text>
 
         <View className="border-2 border-[#EAAA6A] rounded-2xl p-4 mb-6">
-          <View className="flex-row gap-4 mb-1">
-            <View className="flex-1">
-              <Text className="text-xs text-gray-500 mb-1 font-inter">PREÇO ORIGINAL *</Text>
-              <TextInput
-                value={originalPrice}
-                onChangeText={handleOriginalPriceChange}
-                placeholder="R$ 0,00"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="decimal-pad"
-                className={`w-full bg-gray-100 border rounded-xl p-3 text-sm font-inter ${
-                  errors.originalPrice ? "border-red-500" : "border-gray-200"
-                }`}
-              />
-            </View>
-            <View className="flex-1">
-              <Text className="text-xs text-gray-500 mb-1 font-inter">DESCONTO (R$)</Text>
-              <TextInput
-                value={discount}
-                onChangeText={setDiscount}
-                placeholder="R$ 0,00"
-                placeholderTextColor="#9CA3AF"
-                keyboardType="decimal-pad"
-                className="w-full bg-gray-100 border border-gray-200 rounded-xl p-3 text-sm font-inter"
-              />
-            </View>
-          </View>
-          {errors.originalPrice && (
-            <Text className="text-xs text-red-500 font-inter mb-3">{errors.originalPrice}</Text>
-          )}
-
-          <View className="bg-gray-100 rounded-xl p-4 flex-row justify-between items-center mt-3">
-            <Text className="text-sm font-inter">Preço final para o cliente</Text>
-            <Text className="font-interBold">
-              R$ {finalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </Text>
-          </View>
+          <Text className="text-xs text-gray-500 mb-1 font-inter">PREÇO *</Text>
+          <TextInput
+            value={price}
+            onChangeText={handlePriceChange}
+            placeholder="R$ 0,00"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="decimal-pad"
+            className={`w-full bg-gray-100 border rounded-xl p-3 text-sm font-inter ${
+              errors.price ? "border-red-500" : "border-gray-200"
+            }`}
+          />
+          {errors.price && <Text className="text-xs text-red-500 font-inter mt-1">{errors.price}</Text>}
         </View>
 
-        <Text className="text-sm font-interBold text-gray-500 mb-4">XP E ESTOQUE</Text>
+        <Text className="text-sm font-interBold text-gray-500 mb-4">ESTOQUE</Text>
 
         <View className={`border-2 rounded-2xl p-4 mb-1 ${errors.quantity ? "border-red-500" : "border-[#EAAA6A]"}`}>
-          <View className="flex-row gap-4">
-            <View className="flex-1">
-              <Text className="text-xs text-gray-500 mb-1 font-inter">CUSTO EM XP</Text>
-              <View className="w-full bg-gray-100 border border-gray-200 rounded-xl p-3 flex-row items-center gap-2">
-                <Ionicons name="ellipse" size={14} color="#EAAA6A" />
-                <TextInput
-                  value={xpCost}
-                  onChangeText={setXpCost}
-                  placeholder="0"
-                  placeholderTextColor="#9CA3AF"
-                  keyboardType="number-pad"
-                  className="flex-1 text-sm font-interBold text-[#A86830]"
-                />
-                <Text className="text-sm font-interBold text-[#A86830]">XP</Text>
-              </View>
-            </View>
-
-            <View className="flex-1">
-              <Text className="text-xs text-gray-500 mb-1 font-inter">QUANTIDADE *</Text>
-              <View className="w-full flex-row items-center justify-between">
-                <Pressable
-                  onPress={decrementQuantity}
-                  className="w-9 h-9 rounded-full border border-gray-300 items-center justify-center active:opacity-70"
-                >
-                  <Ionicons name="remove" size={18} color="#000" />
-                </Pressable>
-                <Text className="text-base font-interBold">{quantity}</Text>
-                <Pressable
-                  onPress={incrementQuantity}
-                  className="w-9 h-9 rounded-full border border-gray-300 items-center justify-center active:opacity-70"
-                >
-                  <Ionicons name="add" size={18} color="#000" />
-                </Pressable>
-              </View>
-            </View>
+          <Text className="text-xs text-gray-500 mb-1 font-inter">QUANTIDADE *</Text>
+          <View className="w-full flex-row items-center justify-between">
+            <Pressable
+              onPress={decrementQuantity}
+              className="w-9 h-9 rounded-full border border-gray-300 items-center justify-center active:opacity-70"
+            >
+              <Ionicons name="remove" size={18} color="#000" />
+            </Pressable>
+            <Text className="text-base font-interBold">{quantity}</Text>
+            <Pressable
+              onPress={incrementQuantity}
+              className="w-9 h-9 rounded-full border border-gray-300 items-center justify-center active:opacity-70"
+            >
+              <Ionicons name="add" size={18} color="#000" />
+            </Pressable>
           </View>
         </View>
 
@@ -253,9 +207,37 @@ export default function CreateProductScreen() {
           </View>
         )}
 
-        <Pressable onPress={handlePublish} className="w-full bg-[#EAAA6A] py-5 rounded-2xl items-center mb-8 active:opacity-70">
-          <Text className="text-white font-interBold text-lg">Publicar produto</Text>
+        {submitResult && submitResult.failedImages > 0 && (
+          <View className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex-row gap-3 mb-5">
+            <Ionicons name="warning" size={21} color="#D97706" />
+            <Text className="text-sm text-yellow-700 font-inter flex-1">
+              Produto publicado, mas {submitResult.failedImages} de {submitResult.totalImages} foto(s) não
+              puderam ser enviadas. Você pode tentar adicioná-las depois na edição do produto.
+            </Text>
+          </View>
+        )}
+
+        <Pressable
+          onPress={() => handlePublish(() => router.back())}
+          disabled={isSubmitting}
+          className="w-full bg-[#EAAA6A] py-5 rounded-2xl items-center mb-8 active:opacity-70"
+          style={{ opacity: isSubmitting ? 0.6 : 1 }}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white font-interBold text-lg">Publicar produto</Text>
+          )}
         </Pressable>
+
+        {submitError && (
+          <View className="bg-red-50 border border-red-200 rounded-xl p-4 flex-row gap-3 mb-5">
+            <Ionicons name="close-circle" size={21} color="#DC2626" />
+            <Text className="text-sm text-red-600 font-inter flex-1">
+              Não foi possível publicar o produto. Tente novamente.
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
       <CategoryModal

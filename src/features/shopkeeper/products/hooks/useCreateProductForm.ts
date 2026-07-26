@@ -2,6 +2,8 @@ import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { createProductSchema, CreateProductFormErrors } from "@/src/features/shopkeeper/products/schemas/createProductSchema";
 import { CategoryData } from "@/src/features/shopkeeper/components/CategoryModal";
+import { useCreateProduct } from "@/src/features/shopkeeper/products/hooks/useCreateProduct";
+import { useShopkeeperMe } from "@/src/features/shopkeeper/auth/hooks/useShopkeeperMe";
 
 const DESCRIPTION_MAX_LENGTH = 700;
 const MAX_IMAGES = 4;
@@ -18,16 +20,18 @@ export function useCreateProductForm() {
   const [category, setCategory] = useState<CategoryData | null>(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [description, setDescription] = useState("");
-  const [originalPrice, setOriginalPrice] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [xpCost, setXpCost] = useState("");
+  const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [errors, setErrors] = useState<CreateProductFormErrors>({});
 
-  const parsedPrice = parseCurrency(originalPrice);
-  const parsedDiscount = parseCurrency(discount);
-  const finalPrice = Math.max(parsedPrice - parsedDiscount, 0);
+  const createProductMutation = useCreateProduct();
+  
+  const { data: shopkeeperMe } = useShopkeeperMe();
+  const shopkeeperId = shopkeeperMe?.id;
+  const poiId = shopkeeperMe?.poi.id;
+
+  const parsedPrice = parseCurrency(price);
 
   const clearError = (field: keyof CreateProductFormErrors) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -42,9 +46,9 @@ export function useCreateProductForm() {
     setDescription(text.slice(0, DESCRIPTION_MAX_LENGTH));
   };
 
-  const handleOriginalPriceChange = (text: string) => {
-    setOriginalPrice(text);
-    if (parseCurrency(text) > 0) clearError("originalPrice");
+  const handlePriceChange = (text: string) => {
+    setPrice(text);
+    if (parseCurrency(text) > 0) clearError("price");
   };
 
   const handleSelectCategory = (value: CategoryData) => {
@@ -58,10 +62,7 @@ export function useCreateProductForm() {
   };
 
   const decrementQuantity = () => {
-    setQuantity((q) => {
-      const next = Math.max(q - 1, 0);
-      return next;
-    });
+    setQuantity((q) => Math.max(q - 1, 0));
   };
 
   const pickImages = async () => {
@@ -100,11 +101,9 @@ export function useCreateProductForm() {
   const validate = () => {
     const result = createProductSchema.safeParse({
       name,
-      category: category?.name ?? "",
+      category,
       description,
-      originalPrice: parsedPrice,
-      discount: parsedDiscount,
-      xpCost: parseFloat(xpCost) || 0,
+      price: parsedPrice,
       quantity,
       images,
     });
@@ -124,9 +123,33 @@ export function useCreateProductForm() {
     return false;
   };
 
-  const handlePublish = () => {
+  const handlePublish = (onSuccess?: () => void) => {
     if (!validate()) return;
-    // enviar produto pra API (usar category?.id como categoryId)
+    if (!category || !shopkeeperId || !poiId) {
+      return;
+    }
+
+    createProductMutation.mutate(
+      {
+        payload: {
+          name,
+          description: description || undefined,
+          price: parsedPrice,
+          stock: quantity,
+          active: true,
+          highlight: false,
+          shopkeeperId,
+          categoryId: category.id,
+          poiId,
+        },
+        images,
+      },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+      }
+    );
   };
 
   return {
@@ -134,21 +157,19 @@ export function useCreateProductForm() {
     category,
     categoryModalVisible,
     description,
-    originalPrice,
-    discount,
-    xpCost,
+    price,
     quantity,
     images,
     errors,
-    finalPrice,
     descriptionMaxLength: DESCRIPTION_MAX_LENGTH,
     maxImages: MAX_IMAGES,
+    isSubmitting: createProductMutation.isPending,
+    submitError: createProductMutation.isError,
+    submitResult: createProductMutation.data,
     handleNameChange,
     handleSelectCategory,
     handleDescriptionChange,
-    handleOriginalPriceChange,
-    setDiscount,
-    setXpCost,
+    handlePriceChange,
     incrementQuantity,
     decrementQuantity,
     pickImages,
@@ -156,5 +177,5 @@ export function useCreateProductForm() {
     handlePublish,
     openCategoryModal: () => setCategoryModalVisible(true),
     closeCategoryModal: () => setCategoryModalVisible(false),
-  };
+  }
 }
