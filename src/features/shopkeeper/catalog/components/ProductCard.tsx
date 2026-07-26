@@ -1,25 +1,18 @@
 import { View, Image, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ShopkeeperProduct } from "@/src/features/shopkeeper/catalog/services/shopkeeperProductsService";
 
-export interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-}
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+});
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: ShopkeeperProduct }) {
   return (
-    <View
-      className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center"
-      style={{ opacity: product.active ? 1 : 0.55 }}
-    >
+    <View className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center" style={{ opacity: product.active ? 1 : 0.55 }}>
       <Image
-        source={{ uri: product.image }}
-        className="w-16 h-16 rounded-xl"
+        source={{ uri: product.image ?? undefined }}
+        className="w-16 h-16 rounded-xl bg-[#F3F3F3]"
         resizeMode="cover"
       />
 
@@ -28,7 +21,7 @@ export function ProductCard({ product }: { product: Product }) {
           <Text className="font-interBold text-base text-[#2D2D2D] flex-1" numberOfLines={1}>
             {product.name}
           </Text>
-          {product.featured && (
+          {product.highlight && (
             <View className="bg-[#E7A35A] w-5 h-5 rounded-full items-center justify-center">
               <Ionicons name="star" size={10} color="white" />
             </View>
@@ -40,7 +33,9 @@ export function ProductCard({ product }: { product: Product }) {
         </View>
 
         <View className="flex-row items-center justify-between mt-2">
-          <Text className="font-interBold text-base text-[#2D2D2D]">{product.price}</Text>
+          <Text className="font-interBold text-base text-[#2D2D2D]">
+            {currencyFormatter.format(product.price)}
+          </Text>
           {!product.active && (
             <View className="bg-gray-200 px-2 py-0.5 rounded-lg">
               <Text className="text-gray-500 text-[10px] font-inter">Inativo</Text>
