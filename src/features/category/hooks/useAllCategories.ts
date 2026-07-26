@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategories } from "@/src/features/user/shop/services/categoryService";
+import { getAllCategories } from "@/src/features/category/services/categoryService";
 
 export function useAllCategories() {
   return useQuery({
