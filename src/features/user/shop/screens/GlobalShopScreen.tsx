@@ -13,10 +13,8 @@ import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 export default function GlobalShopScreen() {
   const router = useRouter();
   const { data: user } = useTouristMe();
-
   const { data: categories } = useAllCategories();
 
-  // guarda o id selecionado, "TODOS" (string) representa o estado padrão
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "TODOS">("TODOS");
 
   const { data: allProducts, isLoading: isLoadingAll } = useAllProducts();

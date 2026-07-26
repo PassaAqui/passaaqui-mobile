@@ -1,21 +1,12 @@
 import { FlatList, Modal, Pressable, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAllCategories } from "@/src/features/category/hooks/useAllCategories";
 
 export interface CategoryData {
   id: number;
   name: string;
 }
-
-// substituir por chamada pra API (GET /categories) quando terminar de fazer as outras telas do lojista
-const MOCK_CATEGORIES: CategoryData[] = [
-  { id: 1, name: "Tapioca" },
-  { id: 2, name: "Bebidas" },
-  { id: 3, name: "Bolos e doces" },
-  { id: 4, name: "Salgados" },
-  { id: 5, name: "Sorvetes" },
-  { id: 6, name: "Artesanato" },
-];
 
 interface CategoryModalProps {
   visible: boolean;
@@ -27,6 +18,8 @@ interface CategoryModalProps {
 export function CategoryModal({ visible, onClose, selectedCategory, onSelect }: CategoryModalProps) {
   const insets = useSafeAreaInsets();
 
+  const { data: categories } = useAllCategories();
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable className="flex-1 bg-black/40 justify-end" onPress={onClose}>
@@ -35,7 +28,7 @@ export function CategoryModal({ visible, onClose, selectedCategory, onSelect }: 
           <Text className="text-lg font-interBold mb-3">Selecione a categoria</Text>
 
           <FlatList
-            data={MOCK_CATEGORIES}
+            data={categories}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
               <Pressable
