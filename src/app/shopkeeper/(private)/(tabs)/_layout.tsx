@@ -5,10 +5,11 @@ import { Itim_400Regular } from "@expo-google-fonts/itim";
 import { Inter_400Regular, Inter_700Bold, Inter_400Regular_Italic } from "@expo-google-fonts/inter"
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
-import { Image } from "react-native";
 import "@/global.css";
 import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/src/services/queryClient";
 
 export default function TabLayout() {
   let [fontsLoaded] = useFonts({
@@ -26,7 +27,7 @@ export default function TabLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <StatusBar style="dark" />
 
       <Tabs screenOptions={{ tabBarActiveTintColor: "black", headerShown: false }}>
@@ -70,7 +71,7 @@ export default function TabLayout() {
             }}
           />
       </Tabs>
-    </>
+    </QueryClientProvider>
   );
 }
 
