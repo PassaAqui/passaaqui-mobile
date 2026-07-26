@@ -1,22 +1,24 @@
 import { z } from "zod";
 
 export const createProductSchema = z.object({
-  name: z.string().trim().min(1, "Informe o nome do produto"),
-  category: z.string().min(1, "Selecione uma categoria"),
+  name: z.string().trim().min(1, "Nome é obrigatório"),
+  category: z.object({
+    id: z.number(),
+    name: z.string(),
+  }, { error: "Categoria é obrigatória" }),
   description: z.string().optional(),
-  originalPrice: z
-    .number({ error: "Informe um preço válido" })
-    .positive("Informe um preço válido"),
-  discount: z.number().min(0).optional(),
-  xpCost: z.number().min(0).optional(),
-  quantity: z
-    .number({ error: "Informe a quantidade em estoque" })
-    .int()
-    .positive("Informe a quantidade em estoque"),
-  images: z
-    .array(z.object({ uri: z.string(), name: z.string() }))
-    .min(1, "Adicione ao menos uma foto do produto"),
+  price: z.number().min(0.01, "Preço deve ser maior que zero"),
+  quantity: z.number().min(1, "Quantidade deve ser maior que zero"),
+  images: z.array(z.object({ uri: z.string(), name: z.string() })).min(1, "Adicione ao menos uma foto"),
 });
 
-export type CreateProductFormData = z.infer<typeof createProductSchema>;
-export type CreateProductFormErrors = Partial<Record<keyof CreateProductFormData, string>>;
+export type CreateProductFormValues = z.infer<typeof createProductSchema>;
+
+export interface CreateProductFormErrors {
+  name?: string;
+  category?: string;
+  description?: string;
+  price?: string;
+  quantity?: string;
+  images?: string;
+}

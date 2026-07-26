@@ -1,8 +1,12 @@
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { createProductSchema, CreateProductFormErrors } from "@/src/features/shopkeeper/products/schemas/createProductSchema";
+import { CategoryData } from "@/src/features/shopkeeper/components/CategoryModal";
+import { useCreateProduct } from "@/src/features/shopkeeper/products/hooks/useCreateProduct";
+import { useShopkeeperMe } from "@/src/features/shopkeeper/auth/hooks/useShopkeeperMe";
+
 const DESCRIPTION_MAX_LENGTH = 700;
-const MAX_IMAGES = 5;
+const MAX_IMAGES = 4;
 
 export interface SelectedImage {
   uri: string;
@@ -13,19 +17,21 @@ const parseCurrency = (value: string) => parseFloat(value.replace(",", ".")) || 
 
 export function useCreateProductForm() {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<CategoryData | null>(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [description, setDescription] = useState("");
-  const [originalPrice, setOriginalPrice] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [xpCost, setXpCost] = useState("");
+  const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [images, setImages] = useState<SelectedImage[]>([]);
   const [errors, setErrors] = useState<CreateProductFormErrors>({});
 
-  const parsedPrice = parseCurrency(originalPrice);
-  const parsedDiscount = parseCurrency(discount);
-  const finalPrice = Math.max(parsedPrice - parsedDiscount, 0);
+  const createProductMutation = useCreateProduct();
+  
+  const { data: shopkeeperMe } = useShopkeeperMe();
+  const shopkeeperId = shopkeeperMe?.id;
+  const poiId = shopkeeperMe?.poi.id;
+
+  const parsedPrice = parseCurrency(price);
 
   const clearError = (field: keyof CreateProductFormErrors) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -40,12 +46,12 @@ export function useCreateProductForm() {
     setDescription(text.slice(0, DESCRIPTION_MAX_LENGTH));
   };
 
-  const handleOriginalPriceChange = (text: string) => {
-    setOriginalPrice(text);
-    if (parseCurrency(text) > 0) clearError("originalPrice");
+  const handlePriceChange = (text: string) => {
+    setPrice(text);
+    if (parseCurrency(text) > 0) clearError("price");
   };
 
-  const handleSelectCategory = (value: string) => {
+  const handleSelectCategory = (value: CategoryData) => {
     setCategory(value);
     clearError("category");
   };
@@ -56,10 +62,7 @@ export function useCreateProductForm() {
   };
 
   const decrementQuantity = () => {
-    setQuantity((q) => {
-      const next = Math.max(q - 1, 0);
-      return next;
-    });
+    setQuantity((q) => Math.max(q - 1, 0));
   };
 
   const pickImages = async () => {
@@ -100,9 +103,7 @@ export function useCreateProductForm() {
       name,
       category,
       description,
-      originalPrice: parsedPrice,
-      discount: parsedDiscount,
-      xpCost: parseFloat(xpCost) || 0,
+      price: parsedPrice,
       quantity,
       images,
     });
@@ -122,34 +123,53 @@ export function useCreateProductForm() {
     return false;
   };
 
-  const handlePublish = () => {
+  const handlePublish = (onSuccess?: () => void) => {
     if (!validate()) return;
-    // TODO: enviar produto pra API
+    if (!category || !shopkeeperId || !poiId) {
+      return;
+    }
+
+    createProductMutation.mutate(
+      {
+        payload: {
+          name,
+          description: description || undefined,
+          price: parsedPrice,
+          stock: quantity,
+          active: true,
+          highlight: false,
+          shopkeeperId,
+          categoryId: category.id,
+          poiId,
+        },
+        images,
+      },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+      }
+    );
   };
 
   return {
-    // valores
     name,
     category,
     categoryModalVisible,
     description,
-    originalPrice,
-    discount,
-    xpCost,
+    price,
     quantity,
     images,
     errors,
-    finalPrice,
     descriptionMaxLength: DESCRIPTION_MAX_LENGTH,
     maxImages: MAX_IMAGES,
-
-    // handlers
+    isSubmitting: createProductMutation.isPending,
+    submitError: createProductMutation.isError,
+    submitResult: createProductMutation.data,
     handleNameChange,
     handleSelectCategory,
     handleDescriptionChange,
-    handleOriginalPriceChange,
-    setDiscount,
-    setXpCost,
+    handlePriceChange,
     incrementQuantity,
     decrementQuantity,
     pickImages,
@@ -157,5 +177,5 @@ export function useCreateProductForm() {
     handlePublish,
     openCategoryModal: () => setCategoryModalVisible(true),
     closeCategoryModal: () => setCategoryModalVisible(false),
-  };
+  }
 }
