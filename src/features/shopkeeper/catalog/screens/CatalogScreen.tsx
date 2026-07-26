@@ -1,21 +1,9 @@
-import { useEffect, useState } from "react";
-import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native";
+import { useState } from "react";
+import { View, Text, TextInput, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import * as NavigationBar from "expo-navigation-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-}
+import { ProductCard, Product } from "@/src/features/shopkeeper/catalog/components/ProductCard";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 // TODO: substituir por chamada à API (GET /shopkeeper/products) quando o backend estiver pronto
@@ -71,70 +59,6 @@ const PRODUCTS: Product[] = [
 const FILTERS = ["GASTRONOMIA", "DISPONÍVEL", "ARTESANATO"] as const;
 type Filter = (typeof FILTERS)[number];
 
-const C = {
-  primary:      "#E7A35A",
-  primaryLight: "#FBE6CF",
-  bg:           "#F8F5F2",
-  text:         "#2D2D2D",
-  muted:        "#8A8A8A",
-  border:       "#E8E3DE",
-};
-
-// ─── ProductCard ──────────────────────────────────────────────────────────────
-
-function ProductCard({ product }: { product: Product }) {
-  return (
-    <View
-      className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center"
-      style={{ opacity: product.active ? 1 : 0.55 }}
-    >
-      <Image
-        source={{ uri: product.image }}
-        className="w-16 h-16 rounded-xl"
-        resizeMode="cover"
-      />
-
-      <View className="flex-1 ml-3">
-        <View className="flex-row items-center gap-1.5">
-          <Text className="font-interBold text-base text-[#2D2D2D] flex-1" numberOfLines={1}>
-            {product.name}
-          </Text>
-          {product.featured && (
-            <View className="bg-[#E7A35A] w-5 h-5 rounded-full items-center justify-center">
-              <Ionicons name="star" size={10} color="white" />
-            </View>
-          )}
-        </View>
-
-        <View className="bg-[#FBE6CF] self-start px-2.5 py-0.5 rounded-lg mt-1">
-          <Text className="text-[#E7A35A] text-xs font-inter">{product.category}</Text>
-        </View>
-
-        <View className="flex-row items-center justify-between mt-2">
-          <Text className="font-interBold text-base text-[#2D2D2D]">{product.price}</Text>
-          {!product.active && (
-            <View className="bg-gray-200 px-2 py-0.5 rounded-lg">
-              <Text className="text-gray-500 text-[10px] font-inter">Inativo</Text>
-            </View>
-          )}
-        </View>
-      </View>
-
-      {/* Action buttons — vertical column on the right */}
-      <View className="justify-between items-center self-stretch py-1 ml-3 gap-4">
-        <TouchableOpacity accessibilityLabel={`Editar ${product.name}`}>
-          <Ionicons name="pencil-outline" size={17} color={C.muted} />
-        </TouchableOpacity>
-        <TouchableOpacity accessibilityLabel={`Excluir ${product.name}`}>
-          <Ionicons name="trash-outline" size={17} color="#EF4444" />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
-
-// ─── Main screen ─────────────────────────────────────────────────────────────
-
 export default function CatalogScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -166,14 +90,12 @@ export default function CatalogScreen() {
       >
         {/* Header */}
         <View className="px-5 pt-5 pb-4 bg-[#F8F5F2] border-b border-[#E8E3DE]">
-          
-
           {/* Search */}
           <View className="flex-row items-center bg-[#F3F3F3] rounded-xl px-3.5 h-11 mt-3">
-            <Ionicons name="search-outline" size={17} color={C.muted} />
+            <Ionicons name="search-outline" size={17} color="#8A8A8A" />
             <TextInput
               placeholder="Buscar produto..."
-              placeholderTextColor={C.muted}
+              placeholderTextColor="#8A8A8A"
               className="flex-1 ml-2 font-inter text-sm text-[#2D2D2D]"
               value={search}
               onChangeText={setSearch}
@@ -182,7 +104,7 @@ export default function CatalogScreen() {
             />
             {search.length > 0 && (
               <TouchableOpacity onPress={() => setSearch("")}>
-                <Ionicons name="close-circle" size={17} color={C.muted} />
+                <Ionicons name="close-circle" size={17} color="#8A8A8A" />
               </TouchableOpacity>
             )}
           </View>
@@ -238,7 +160,7 @@ export default function CatalogScreen() {
 
         {/* List header */}
         <View className="flex-row items-center gap-2 px-5 mt-6 mb-3">
-          <Ionicons name="clipboard-outline" size={16} color={C.text} />
+          <Ionicons name="clipboard-outline" size={16} color="#2D2D2D" />
           <Text className="font-interBold text-base text-[#2D2D2D]">Produtos cadastrados</Text>
           <View className="flex-1" />
           <TouchableOpacity
@@ -246,7 +168,7 @@ export default function CatalogScreen() {
             accessibilityLabel="Ordenar produtos"
           >
             <Text className="font-inter text-sm text-[#8A8A8A]">Ordenar</Text>
-            <Ionicons name="swap-vertical-outline" size={14} color={C.muted} />
+            <Ionicons name="swap-vertical-outline" size={14} color="#8A8A8A" />
           </TouchableOpacity>
         </View>
 
@@ -254,7 +176,7 @@ export default function CatalogScreen() {
         <View className="px-5">
           {filtered.length === 0 ? (
             <View className="items-center py-16">
-              <Ionicons name="search-outline" size={44} color={C.border} />
+              <Ionicons name="search-outline" size={44} color="#E8E3DE" />
               <Text className="font-inter text-[#8A8A8A] mt-3">Nenhum produto encontrado</Text>
             </View>
           ) : (
