@@ -124,7 +124,7 @@ export default function CreateProductScreen() {
               }`}
             >
               <Text className={`text-sm font-inter ${category ? "text-black" : "text-gray-400"}`}>
-                {category || "Selecione uma categoria"}
+                {category?.name || "Selecione uma categoria"}
               </Text>
               <Ionicons name="chevron-down" size={16} color="#888" />
             </Pressable>

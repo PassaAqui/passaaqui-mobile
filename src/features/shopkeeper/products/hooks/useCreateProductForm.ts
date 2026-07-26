@@ -1,8 +1,10 @@
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { createProductSchema, CreateProductFormErrors } from "@/src/features/shopkeeper/products/schemas/createProductSchema";
+import { CategoryData } from "@/src/features/shopkeeper/components/CategoryModal";
+
 const DESCRIPTION_MAX_LENGTH = 700;
-const MAX_IMAGES = 5;
+const MAX_IMAGES = 4;
 
 export interface SelectedImage {
   uri: string;
@@ -13,7 +15,7 @@ const parseCurrency = (value: string) => parseFloat(value.replace(",", ".")) || 
 
 export function useCreateProductForm() {
   const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState<CategoryData | null>(null);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [description, setDescription] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
@@ -45,7 +47,7 @@ export function useCreateProductForm() {
     if (parseCurrency(text) > 0) clearError("originalPrice");
   };
 
-  const handleSelectCategory = (value: string) => {
+  const handleSelectCategory = (value: CategoryData) => {
     setCategory(value);
     clearError("category");
   };
@@ -98,7 +100,7 @@ export function useCreateProductForm() {
   const validate = () => {
     const result = createProductSchema.safeParse({
       name,
-      category,
+      category: category?.name ?? "",
       description,
       originalPrice: parsedPrice,
       discount: parsedDiscount,
@@ -124,11 +126,10 @@ export function useCreateProductForm() {
 
   const handlePublish = () => {
     if (!validate()) return;
-    // TODO: enviar produto pra API
+    // enviar produto pra API (usar category?.id como categoryId)
   };
 
   return {
-    // valores
     name,
     category,
     categoryModalVisible,
@@ -142,8 +143,6 @@ export function useCreateProductForm() {
     finalPrice,
     descriptionMaxLength: DESCRIPTION_MAX_LENGTH,
     maxImages: MAX_IMAGES,
-
-    // handlers
     handleNameChange,
     handleSelectCategory,
     handleDescriptionChange,
