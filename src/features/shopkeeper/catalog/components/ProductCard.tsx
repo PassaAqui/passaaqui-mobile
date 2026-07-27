@@ -11,8 +11,8 @@ export function ProductCard({ product }: { product: ShopkeeperProduct }) {
   return (
     <View className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center" style={{ opacity: product.active ? 1 : 0.55 }}>
       <Image
-        source={{ uri: product.image ?? undefined }}
-        className="w-16 h-16 rounded-xl bg-[#F3F3F3]"
+        source={typeof product.image === "string" ? { uri: product.image } : require("@/assets/user/map/tmp/no-image.png")}
+        className="w-16 h-16 rounded-xl"
         resizeMode="cover"
       />
 

@@ -7,13 +7,13 @@ import { ProductCard } from "@/src/features/shopkeeper/catalog/components/Produc
 import { useShopkeeperProducts } from "@/src/features/shopkeeper/catalog/hooks/useShopkeeperProducts";
 import { useShopkeeperProductMetrics } from "@/src/features/shopkeeper/catalog/hooks/useShopkeeperProductMetrics";
 
-const FILTERS = ["GASTRONOMIA", "DISPONÍVEL", "ARTESANATO"] as const;
+const FILTERS = ["DISPONÍVEL", "GASTRONOMIA", "ARTESANATO"] as const;
 type Filter = (typeof FILTERS)[number];
 
 export default function CatalogScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<Filter>("GASTRONOMIA");
+  const [activeFilter, setActiveFilter] = useState<Filter>("DISPONÍVEL");
   const [search, setSearch] = useState("");
 
   const {
