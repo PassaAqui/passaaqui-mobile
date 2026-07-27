@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { WeeklySale } from "../services/dashboardService";
+import { WeeklySale } from "@/src/features/shopkeeper/dashboard/services/dashboardService";
 
 const CHART_HEIGHT = 120;
 const Y_AXIS_WIDTH = 28;
