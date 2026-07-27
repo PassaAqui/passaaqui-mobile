@@ -58,6 +58,7 @@ export default function ShopkeeperLoginScreen() {
               <Text className="text-white font-itim">Email</Text>
               <TextInput
                 keyboardType="email-address"
+                autoCapitalize="none"
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
