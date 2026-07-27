@@ -1,31 +1,26 @@
-import { useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import * as NavigationBar from "expo-navigation-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { MetricCard } from "@/src/features/shopkeeper/dashboard/components/MetricCard";
 import { WeekChart } from "@/src/features/shopkeeper/dashboard/components/WeekChart";
+import { useShopkeeperMe } from "@/src/features/shopkeeper/auth/hooks/useShopkeeperMe";
+import { useDashboard } from "@/src/features/shopkeeper/dashboard/hooks/useDashboard";
+import { OrderApiStatus } from "@/src/features/shopkeeper/dashboard/services/dashboardService";
 
-type OrderStatus = "confirmado" | "pendente";
+const currencyFormatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
 
-interface RecentOrder {
-  id: number;
-  code: string;
-  customer: string;
-  product: string;
-  status: OrderStatus;
+function isPending(status: OrderApiStatus) {
+  return status === "PENDING";
 }
 
-const RECENT_ORDERS: RecentOrder[] = [
-  { id: 1, code: "#0042", customer: "Maria Silva", product: "Vaso decorativo pequeno", status: "confirmado" },
-  { id: 2, code: "#0041", customer: "João Costa",  product: "Tapioca Clássica",        status: "pendente"   },
-  { id: 3, code: "#0040", customer: "Ana Souza",   product: "Açaí Bowl",               status: "pendente"   },
-  { id: 4, code: "#0039", customer: "Pedro Lima",  product: "Água de Coco",            status: "pendente"   },
-];
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-  const confirmed = status === "confirmado";
+function StatusBadge({ status }: { status: OrderApiStatus }) {
+  const confirmed = !isPending(status);
   return (
     <View
       className="px-2.5 py-1 rounded-xl"
@@ -42,15 +37,38 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  useEffect(() => {
-    NavigationBar.setButtonStyleAsync("dark");
-  }, []);
+  const { data: shopkeeper } = useShopkeeperMe();
+  const { data: dashboard, isLoading, isError, error, refetch, isRefetching } = useDashboard();
+
+  if (isLoading) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2] items-center justify-center">
+        <ActivityIndicator color="#E7A35A" size="large" />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !dashboard) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2] items-center justify-center px-8">
+        <Text className="text-sm text-[#2D2D2D] text-center mb-3">
+          Não foi possível carregar os dados do dashboard.
+        </Text>
+        <TouchableOpacity onPress={() => refetch()} className="bg-[#E7A35A] rounded-xl px-4 py-2.5">
+          <Text className="text-white text-sm">Tentar novamente</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2]">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor="#E7A35A" />
+        }
       >
         <View className="bg-[#F8F5F2] border-b border-[#E8E3DE] px-5 pt-5 pb-4">
           <View className="flex-row justify-between items-center">
@@ -61,24 +79,24 @@ export default function DashboardScreen() {
               <Text className="text-xl font-interBold text-[#2D2D2D]">PassaAqui</Text>
             </View>
             <View className="items-end">
-              <Text className="text-sm text-[#2D2D2D]" numberOfLines={1}>Bom dia, David </Text>
-              <Text className="text-xs text-[#8A8A8A]">Loja do seu Zé</Text>
+              <Text className="text-sm text-[#2D2D2D]" numberOfLines={1}>Bom dia, {shopkeeper?.name} </Text>
+              <Text className="text-xs text-[#8A8A8A]">{shopkeeper?.companyName}</Text>
             </View>
           </View>
         </View>
 
         <View className="px-5 mt-5 gap-3">
           <View className="flex-row gap-3">
-            <MetricCard label="Pedidos hoje" value="23" icon="bag-handle-outline" badge="+12%" />
-            <MetricCard label="Receita hoje" value="R$347" icon="cash-outline" badge="+8%" />
+            <MetricCard label="Pedidos hoje" value={String(dashboard.ordersToday)} icon="bag-handle-outline" />
+            <MetricCard label="Receita hoje" value={currencyFormatter.format(dashboard.revenueToday)} icon="cash-outline" />
           </View>
           <View className="flex-row gap-3">
-            <MetricCard label="Produtos ativos" value="142" icon="grid-outline" />
-            <MetricCard label="Pedidos pendentes" value="5" icon="hourglass-outline" />
+            <MetricCard label="Produtos ativos" value={String(dashboard.activeProducts)} icon="grid-outline" />
+            <MetricCard label="Pedidos pendentes" value={String(dashboard.pendingOrders)} icon="hourglass-outline" />
           </View>
         </View>
 
-        <WeekChart />
+        <WeekChart data={dashboard.weeklySales} />
 
         <View className="px-5 mt-6">
           <View className="flex-row justify-between items-center mb-3">
@@ -89,7 +107,11 @@ export default function DashboardScreen() {
           </View>
 
           <View className="gap-2.5">
-            {RECENT_ORDERS.map((order) => (
+            {dashboard.recentOrders.length === 0 && (
+              <Text className="text-sm text-[#8A8A8A] text-center py-4">Nenhum pedido recente.</Text>
+            )}
+
+            {dashboard.recentOrders.map((order) => (
               <TouchableOpacity
                 key={order.id}
                 className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center"
@@ -106,10 +128,10 @@ export default function DashboardScreen() {
                 </View>
                 <View className="flex-1 mx-3">
                   <Text className="text-sm text-[#2D2D2D]" numberOfLines={1}>
-                    {order.code} · {order.customer}
+                    {order.code} · {order.customerName}
                   </Text>
                   <Text className="text-xs text-[#8A8A8A] mt-0.5" numberOfLines={1}>
-                    {order.product}
+                    {order.items.map((item) => item.name).join(", ")}
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-1.5">
