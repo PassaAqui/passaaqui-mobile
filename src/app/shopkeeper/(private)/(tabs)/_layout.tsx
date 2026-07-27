@@ -70,6 +70,16 @@ export default function TabLayout() {
               )
             }}
           />
+
+          <Tabs.Screen
+            name="shopkeeper-settings"
+            options={{
+              title: "Configurações",
+              tabBarIcon: ({ focused }: { focused: boolean }) => (
+                <Ionicons name="settings" size={20} color="#555" style={{ opacity: focused ? 1 : 0.5 }} />
+              )
+            }}
+          />
       </Tabs>
     </QueryClientProvider>
   );
