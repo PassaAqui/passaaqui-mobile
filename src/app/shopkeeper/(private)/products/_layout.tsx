@@ -9,6 +9,7 @@ import "@/global.css";
 import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/src/services/queryClient";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 export default function RootLayout() {
   let [fontsLoaded] = useFonts({
@@ -26,8 +27,10 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <KeyboardProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </KeyboardProvider>
     </QueryClientProvider>
   )
 }

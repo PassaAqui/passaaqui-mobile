@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, Pressable, Image, ActivityIndicator, ScrollView } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -48,7 +49,12 @@ export default function CreateProductScreen() {
         </View>
       </View>
 
-      <ScrollView className="flex-1 px-5 pt-5" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        bottomOffset={16}
+        className="flex-1 px-5 pt-5"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View className="flex-row items-center justify-between mb-2">
           <Text className="text-sm font-interBold text-gray-500">FOTO DO PRODUTO</Text>
           <Text className="text-xs text-gray-400 font-inter">{images.length}/{maxImages}</Text>
@@ -238,7 +244,7 @@ export default function CreateProductScreen() {
             </Text>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <CategoryModal
         visible={categoryModalVisible}
