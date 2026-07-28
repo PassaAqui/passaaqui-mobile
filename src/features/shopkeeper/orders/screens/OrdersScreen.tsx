@@ -1,18 +1,12 @@
 import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { OrderCard, Order, StatusType } from "../components/OrderCard";
-import { SummaryCard } from "../components/SummaryCard";
-
-// TODO: substituir por chamada à API (GET /shopkeeper/orders) quando o backend estiver pronto
-const ORDERS: Order[] = [
-  { initials: "MR", name: "Maria Ribeiro", time: "Há 5 min",  items: "1x Tapioca Clássica, 1x Suco de Caju",  code: "A3F92", status: "Pendente"   },
-  { initials: "JS", name: "João Silva",    time: "Há 8 min",  items: "2x Açaí Bowl, 1x Água de Coco",         code: "B7K45", status: "Em Preparo" },
-  { initials: "AC", name: "Ana Costa",     time: "Há 12 min", items: "1x Bolo de Rolo, 1x Café Expresso",     code: "C9N73", status: "Pendente"   },
-  { initials: "PL", name: "Pedro Luz",     time: "Há 20 min", items: "1x Pastel de Camarão, 2x Água de Coco", code: "D2M11", status: "Concluído"  },
-];
+import { OrderCard } from "@/src/features/shopkeeper/orders/components/OrderCard";
+import { SummaryCard } from "@/src/features/shopkeeper/orders/components/SummaryCard";
+import { useShopkeeperOrders } from "@/src/features/shopkeeper/orders/hooks/useShopkeeperOrders";
+import { mapToDisplayOrder, StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 const TABS: StatusType[] = ["Pendente", "Em Preparo", "Concluído"];
 
@@ -21,13 +15,17 @@ export default function OrdersScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<StatusType>("Pendente");
 
+  const { data: apiOrders, isLoading, isError, refetch } = useShopkeeperOrders();
+
+  const orders = (apiOrders ?? []).map(mapToDisplayOrder);
+
   const counts = {
-    Pendente:     ORDERS.filter((o) => o.status === "Pendente").length,
-    "Em Preparo": ORDERS.filter((o) => o.status === "Em Preparo").length,
-    Concluído:    ORDERS.filter((o) => o.status === "Concluído").length,
+    Pendente:     orders.filter((o) => o.status === "Pendente").length,
+    "Em Preparo": orders.filter((o) => o.status === "Em Preparo").length,
+    Concluído:    orders.filter((o) => o.status === "Concluído").length,
   };
 
-  const filtered = ORDERS.filter((o) => o.status === activeTab);
+  const filtered = orders.filter((o) => o.status === activeTab);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2]">
@@ -62,16 +60,34 @@ export default function OrdersScreen() {
           })}
         </View>
 
-        <View className="flex-row items-center justify-between px-5 py-2.5  border-b border-[#E8E3DE]">
+        <View className="flex-row items-center justify-between px-5 py-2.5 border-b border-[#E8E3DE]">
           <View className="flex-row items-center gap-1.5">
             <Ionicons name="time-outline" size={14} color="#8A8A8A" />
             <Text className="font-inter text-xs text-[#8A8A8A]">Pedidos mais recentes</Text>
           </View>
-          <Text className="font-inter text-xs text-[#22C55E]">Atualizado agora</Text>
+          <TouchableOpacity onPress={() => refetch()}>
+            <Text className="font-inter text-xs text-[#22C55E]">
+              {isLoading ? "Atualizando..." : "Atualizado agora"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View className="px-5 mt-4">
-          {filtered.length === 0 ? (
+          {isLoading ? (
+            <View className="items-center py-16">
+              <ActivityIndicator color="#E7A35A" />
+            </View>
+          ) : isError ? (
+            <View className="items-center py-16">
+              <Ionicons name="alert-circle-outline" size={48} color="#E8E3DE" />
+              <Text className="font-inter text-[#8A8A8A] mt-3 text-center">
+                Não foi possível carregar os pedidos
+              </Text>
+              <TouchableOpacity onPress={() => refetch()} className="mt-3">
+                <Text className="font-inter text-[#E7A35A] text-sm">Tentar novamente</Text>
+              </TouchableOpacity>
+            </View>
+          ) : filtered.length === 0 ? (
             <View className="items-center py-16">
               <Ionicons name="clipboard-outline" size={48} color="#E8E3DE" />
               <Text className="font-inter text-[#8A8A8A] mt-3">Nenhum pedido nesta categoria</Text>
@@ -79,12 +95,12 @@ export default function OrdersScreen() {
           ) : (
             filtered.map((order) => (
               <OrderCard
-                key={order.code}
+                key={order.id}
                 order={order}
                 onPress={() =>
                   router.push({
                     pathname: "/shopkeeper/(private)/orders/order-detail",
-                    params: { code: order.code },
+                    params: { id: order.id },
                   })
                 }
               />

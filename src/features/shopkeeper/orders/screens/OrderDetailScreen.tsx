@@ -1,115 +1,31 @@
-import { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import * as NavigationBar from "expo-navigation-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-
-type StatusType = "Pendente" | "Em Preparo" | "Concluído";
-
-interface OrderItem {
-  name: string;
-  qty: number;
-  price: string;
-}
-
-interface OrderDetail {
-  code: string;
-  initials: string;
-  name: string;
-  time: string;
-  status: StatusType;
-  items: OrderItem[];
-  total: string;
-}
-
-// Mock lookup — in a real app this would come from the orders store/API by code
-const ORDER_DETAILS: Record<string, OrderDetail> = {
-  A3F92: {
-    code: "A3F92",
-    initials: "MR",
-    name: "Maria Ribeiro",
-    time: "Há 5 min",
-    status: "Pendente",
-    items: [
-      { name: "Tapioca Clássica", qty: 1, price: "R$ 12,00" },
-      { name: "Suco de Caju", qty: 1, price: "R$ 6,00" },
-    ],
-    total: "R$ 18,00",
-  },
-  B7K45: {
-    code: "B7K45",
-    initials: "JS",
-    name: "João Silva",
-    time: "Há 8 min",
-    status: "Em Preparo",
-    items: [
-      { name: "Açaí Bowl", qty: 2, price: "R$ 8,50" },
-      { name: "Água de Coco", qty: 1, price: "R$ 5,00" },
-    ],
-    total: "R$ 22,00",
-  },
-  C9N73: {
-    code: "C9N73",
-    initials: "AC",
-    name: "Ana Costa",
-    time: "Há 12 min",
-    status: "Pendente",
-    items: [
-      { name: "Bolo de Rolo", qty: 1, price: "R$ 9,00" },
-      { name: "Café Expresso", qty: 1, price: "R$ 4,50" },
-    ],
-    total: "R$ 13,50",
-  },
-  D2M11: {
-    code: "D2M11",
-    initials: "PL",
-    name: "Pedro Luz",
-    time: "Há 20 min",
-    status: "Concluído",
-    items: [
-      { name: "Pastel de Camarão", qty: 1, price: "R$ 15,50" },
-      { name: "Água de Coco", qty: 2, price: "R$ 5,00" },
-    ],
-    total: "R$ 25,50",
-  },
-};
-
-const STATUS_CONFIG: Record<StatusType, {
-  icon: keyof typeof Ionicons.glyphMap;
-  bgColor: string;
-  textColor: string;
-}> = {
-  Pendente:     { icon: "hourglass-outline", bgColor: "#F3F3F3", textColor: "#8A8A8A" },
-  "Em Preparo": { icon: "flame",             bgColor: "#FBE6CF", textColor: "#E7A35A" },
-  Concluído:    { icon: "checkmark-circle",  bgColor: "#DCFCE7", textColor: "#22C55E" },
-};
-
-const NEXT_STATUS: Record<StatusType, StatusType | null> = {
-  Pendente: "Em Preparo",
-  "Em Preparo": "Concluído",
-  Concluído: null,
-};
-
-const NEXT_LABEL: Record<StatusType, string> = {
-  Pendente: "Iniciar preparo",
-  "Em Preparo": "Marcar como concluído",
-  Concluído: "",
-};
+import { useShopkeeperOrders } from "@/src/features/shopkeeper/orders/hooks/useShopkeeperOrders";
+import { useUpdateOrderStatus } from "@/src/features/shopkeeper/orders/hooks/useUpdateOrderStatus";
+import { mapToDisplayOrder, STATUS_CONFIG, STATUS_API, NEXT_STATUS, NEXT_LABEL } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 export default function OrderDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { code } = useLocalSearchParams<{ code: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
-  const order = ORDER_DETAILS[code ?? ""];
-  const [status, setStatus] = useState<StatusType>(order?.status ?? "Pendente");
+  const { data: apiOrders, isLoading, isError } = useShopkeeperOrders();
+  const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
 
-  useEffect(() => {
-    NavigationBar.setButtonStyleAsync("dark");
-  }, []);
+  const apiOrder = apiOrders?.find((o) => o.id === id);
+  const order = apiOrder ? mapToDisplayOrder(apiOrder) : null;
 
-  if (!order) {
+  if (isLoading) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2] items-center justify-center">
+        <ActivityIndicator color="#E7A35A" />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !order) {
     return (
       <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2] items-center justify-center px-8">
         <Ionicons name="alert-circle-outline" size={44} color="#8A8A8A" />
@@ -123,8 +39,13 @@ export default function OrderDetailScreen() {
     );
   }
 
-  const cfg = STATUS_CONFIG[status];
-  const next = NEXT_STATUS[status];
+  const cfg = STATUS_CONFIG[order.status];
+  const next = NEXT_STATUS[order.status];
+
+  const handleAdvanceStatus = () => {
+    if (!next) return;
+    updateStatus({ id: order.id, status: STATUS_API[next] });
+  };
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2]">
@@ -141,7 +62,6 @@ export default function OrderDetailScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
       >
         <View className="px-5 pt-5 gap-4">
-          {/* Customer card */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full bg-[#E7A35A] items-center justify-center">
               <Text className="text-white font-inter text-base">{order.initials}</Text>
@@ -155,11 +75,10 @@ export default function OrderDetailScreen() {
             </View>
             <View className="px-3 py-1.5 rounded-xl flex-row items-center" style={{ backgroundColor: cfg.bgColor }}>
               <Ionicons name={cfg.icon} size={13} color={cfg.textColor} />
-              <Text className="ml-1 text-xs font-inter" style={{ color: cfg.textColor }}>{status}</Text>
+              <Text className="ml-1 text-xs font-inter" style={{ color: cfg.textColor }}>{order.status}</Text>
             </View>
           </View>
 
-          {/* Pickup code */}
           <View className="bg-[#E7A35A] rounded-2xl p-5 items-center">
             <Text className="font-inter text-white text-xs">Código de retirada</Text>
             <Text className="font-interBold text-white text-3xl mt-1 tracking-widest">
@@ -167,37 +86,43 @@ export default function OrderDetailScreen() {
             </Text>
           </View>
 
-          {/* Items */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4">
             <Text className="font-interBold text-base text-[#2D2D2D] mb-3">Itens do pedido</Text>
-            {order.items.map((item, i) => (
+            {order.itemsList.map((item, i) => (
               <View key={i}>
                 <View className="flex-row items-center justify-between py-2">
                   <Text className="font-inter text-sm text-[#2D2D2D] flex-1" numberOfLines={1}>
-                    {item.qty}x {item.name}
+                    {item.quantity}x {item.name}
                   </Text>
-                  <Text className="font-inter text-sm text-[#2D2D2D]">{item.price}</Text>
                 </View>
-                {i < order.items.length - 1 && <View className="h-px bg-[#E8E3DE]" />}
+                {i < order.itemsList.length - 1 && <View className="h-px bg-[#E8E3DE]" />}
               </View>
             ))}
             <View className="h-px bg-[#E8E3DE] my-3" />
             <View className="flex-row items-center justify-between">
               <Text className="font-inter text-base text-[#2D2D2D]">Total</Text>
-              <Text className="font-interBold text-lg text-[#E7A35A]">{order.total}</Text>
+              <Text className="font-interBold text-lg text-[#E7A35A]">
+                {order.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </Text>
             </View>
           </View>
 
-          {/* Status action */}
           {next && (
             <TouchableOpacity
               className="bg-[#E7A35A] rounded-xl py-3.5 items-center flex-row justify-center gap-2"
-              onPress={() => setStatus(next)}
+              onPress={handleAdvanceStatus}
+              disabled={isPending}
               accessibilityRole="button"
-              accessibilityLabel={NEXT_LABEL[status]}
+              accessibilityLabel={NEXT_LABEL[order.status]}
             >
-              <Ionicons name="arrow-forward-circle-outline" size={18} color="white" />
-              <Text className="font-inter text-white text-base">{NEXT_LABEL[status]}</Text>
+              {isPending ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Ionicons name="arrow-forward-circle-outline" size={18} color="white" />
+                  <Text className="font-inter text-white text-base">{NEXT_LABEL[order.status]}</Text>
+                </>
+              )}
             </TouchableOpacity>
           )}
         </View>

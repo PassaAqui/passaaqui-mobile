@@ -1,26 +1,10 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-export type StatusType = "Pendente" | "Em Preparo" | "Concluído";
-
-export interface Order {
-  initials: string;
-  name: string;
-  time: string;
-  items: string;
-  code: string;
-  status: StatusType;
-}
-
-export const STATUS_CONFIG: Record<StatusType, { icon: keyof typeof Ionicons.glyphMap, iconColor: string, bgColor: string, textColor: string, label: string }> = {
-  Pendente:     { icon: "hourglass-outline", iconColor: "#8A8A8A", bgColor: "#F3F3F3", textColor: "#8A8A8A", label: "Pendente"   },
-  "Em Preparo": { icon: "flame",             iconColor: "#E7A35A", bgColor: "#FBE6CF", textColor: "#E7A35A", label: "Em Preparo" },
-  Concluído:    { icon: "checkmark-circle",  iconColor: "#22C55E", bgColor: "#DCFCE7", textColor: "#22C55E", label: "Concluído"  },
-};
+import { DisplayOrder, STATUS_CONFIG } from "../utils/orderMapper";
 
 interface OrderCardProps {
-  order: Order;
+  order: DisplayOrder;
   onPress: () => void;
 }
 
