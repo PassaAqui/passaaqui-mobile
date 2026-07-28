@@ -1,20 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import * as NavigationBar from "expo-navigation-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-
-type StatusType = "Pendente" | "Em Preparo" | "Concluído";
-
-interface Order {
-  initials: string;
-  name: string;
-  time: string;
-  items: string;
-  code: string;
-  status: StatusType;
-}
+import { OrderCard, Order, StatusType } from "../components/OrderCard";
+import { SummaryCard } from "../components/SummaryCard";
 
 // TODO: substituir por chamada à API (GET /shopkeeper/orders) quando o backend estiver pronto
 const ORDERS: Order[] = [
@@ -25,96 +15,11 @@ const ORDERS: Order[] = [
 ];
 
 const TABS: StatusType[] = ["Pendente", "Em Preparo", "Concluído"];
-const COLORS = { primary: "#E7A35A", muted: "#8A8A8A", border: "#E8E3DE" };
-
-const STATUS_CONFIG: Record<StatusType, {
-  icon: keyof typeof Ionicons.glyphMap;
-  iconColor: string;
-  bgColor: string;
-  textColor: string;
-  label: string;
-}> = {
-  Pendente:     { icon: "hourglass-outline", iconColor: COLORS.muted,   bgColor: "#F3F3F3", textColor: "#8A8A8A", label: "Pendente"   },
-  "Em Preparo": { icon: "flame",             iconColor: COLORS.primary, bgColor: "#FBE6CF", textColor: "#E7A35A", label: "Em Preparo" },
-  Concluído:    { icon: "checkmark-circle",  iconColor: "#22C55E",      bgColor: "#DCFCE7", textColor: "#22C55E", label: "Concluído"  },
-};
-
-function SummaryCard({ icon, count, label }: {
-  icon: keyof typeof Ionicons.glyphMap; count: number; label: string;
-}) {
-  return (
-    <View className="flex-1 bg-[#E7A35A] rounded-2xl py-4 items-center justify-center">
-      <Ionicons name={icon} size={20} color="white" />
-      <Text className="text-white text-3xl font-interBold mt-1" adjustsFontSizeToFit numberOfLines={1}>{count}</Text>
-      <Text className="text-white text-xs font-inter text-center px-1 mt-0.5">{label}</Text>
-    </View>
-  );
-}
-
-function StatusBadge({ status }: { status: StatusType }) {
-  const cfg = STATUS_CONFIG[status];
-  return (
-    <View className="px-3 py-1.5 rounded-xl flex-row items-center" style={{ backgroundColor: cfg.bgColor }}>
-      <Ionicons name={cfg.icon} size={13} color={cfg.iconColor} />
-      <Text className="ml-1 text-xs font-inter" style={{ color: cfg.textColor }}>{cfg.label}</Text>
-    </View>
-  );
-}
-
-function OrderCard({ order, onPress }: { order: Order; onPress: () => void }) {
-  return (
-    <TouchableOpacity
-      className="bg-white rounded-2xl border border-[#E8E3DE] px-4 py-4 mb-3"
-      activeOpacity={0.7}
-      onPress={onPress}
-    >
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center flex-1 mr-2">
-          <View className="w-10 h-10 rounded-full bg-[#E7A35A] items-center justify-center">
-            <Text className="text-white font-interBold text-sm">{order.initials}</Text>
-          </View>
-          <Text className="ml-2.5 text-base font-interBold text-[#2D2D2D] flex-1" numberOfLines={1}>{order.name}</Text>
-        </View>
-        <View className="flex-row items-center">
-          <Ionicons name="time-outline" size={13} color={COLORS.muted} />
-          <Text className="ml-1 text-xs text-[#8A8A8A] font-inter">{order.time}</Text>
-        </View>
-      </View>
-
-      <View className="h-px bg-[#E8E3DE] my-3" />
-
-      <View className="flex-row items-start">
-        <Ionicons name="bag-handle-outline" size={14} color={COLORS.muted} />
-        <Text className="ml-2 text-sm text-[#8A8A8A] font-inter flex-1" numberOfLines={2}>{order.items}</Text>
-      </View>
-
-      <View className="h-px bg-[#E8E3DE] my-3" />
-
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row items-center">
-          <Ionicons name="key-outline" size={13} color={COLORS.muted} />
-          <Text className="ml-1.5 text-xs text-[#8A8A8A] font-inter">Código</Text>
-          <View className="bg-[#E7A35A] px-2.5 py-1 rounded-lg ml-2">
-            <Text className="text-white text-xs font-interBold">#{order.code}</Text>
-          </View>
-        </View>
-        <View className="flex-row items-center gap-1.5">
-          <StatusBadge status={order.status} />
-          <Ionicons name="chevron-forward" size={16} color={COLORS.muted} />
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 export default function OrdersScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<StatusType>("Pendente");
-
-  useEffect(() => {
-    NavigationBar.setButtonStyleAsync("dark");
-  }, []);
 
   const counts = {
     Pendente:     ORDERS.filter((o) => o.status === "Pendente").length,
@@ -131,7 +36,7 @@ export default function OrdersScreen() {
           <Text className="text-xl font-interBold text-[#2D2D2D]">Pedidos</Text>
         </View>
       </View>
-      
+
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
@@ -168,7 +73,7 @@ export default function OrdersScreen() {
         <View className="px-5 mt-4">
           {filtered.length === 0 ? (
             <View className="items-center py-16">
-              <Ionicons name="clipboard-outline" size={48} color={COLORS.border} />
+              <Ionicons name="clipboard-outline" size={48} color="#E8E3DE" />
               <Text className="font-inter text-[#8A8A8A] mt-3">Nenhum pedido nesta categoria</Text>
             </View>
           ) : (
