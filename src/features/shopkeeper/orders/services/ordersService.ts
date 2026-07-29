@@ -17,6 +17,21 @@ export interface ApiOrder {
   items: ApiOrderItem[];
 }
 
+export interface OrderDetail {
+  id: string;
+  productId: number;
+  productName: string;
+  shopkeeperId: number;
+  shopkeeperName: string;
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
+  status: string; // ver com meu backenzo :)
+  transactionId: string;
+  createdAt: string;
+  pickupCode: string | null;
+}
+
 export async function getShopkeeperOrders(status?: ApiOrderStatus): Promise<ApiOrder[]> {
   const { data } = await api.get<ApiOrder[]>("/orders/shopkeeper", {
     params: status ? { status } : undefined,
@@ -26,5 +41,10 @@ export async function getShopkeeperOrders(status?: ApiOrderStatus): Promise<ApiO
 
 export async function updateOrderStatus(id: string, status: ApiOrderStatus): Promise<ApiOrder> {
   const { data } = await api.put<ApiOrder>(`/orders/${id}/status`, { status });
+  return data;
+}
+
+export async function getOrderById(id: string): Promise<OrderDetail> {
+  const { data } = await api.get<OrderDetail>(`/orders/${id}`);
   return data;
 }

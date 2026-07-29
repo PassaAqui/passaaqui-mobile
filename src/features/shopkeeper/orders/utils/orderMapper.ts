@@ -58,7 +58,7 @@ function getInitials(name: string): string {
   return (first + last).toUpperCase();
 }
 
-function formatRelativeTime(isoDate: string): string {
+export function formatRelativeTime(isoDate: string): string {
   const diffMs = Date.now() - new Date(isoDate).getTime();
   const diffMin = Math.max(0, Math.floor(diffMs / 60000));
 

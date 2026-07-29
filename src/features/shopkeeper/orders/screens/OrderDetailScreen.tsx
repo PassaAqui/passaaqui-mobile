@@ -2,20 +2,19 @@ import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "rea
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useShopkeeperOrders } from "@/src/features/shopkeeper/orders/hooks/useShopkeeperOrders";
+import { useOrderById } from "@/src/features/shopkeeper/orders/hooks/useOrderById";
 import { useUpdateOrderStatus } from "@/src/features/shopkeeper/orders/hooks/useUpdateOrderStatus";
-import { mapToDisplayOrder, STATUS_CONFIG, STATUS_API, NEXT_STATUS, NEXT_LABEL } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { formatRelativeTime } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { resolveDetailStatus, resolveDetailStatusConfig } from "@/src/features/shopkeeper/orders/utils/orderDetailStatusAdapter";
+import { NEXT_STATUS, NEXT_LABEL, STATUS_API } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 export default function OrderDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: apiOrders, isLoading, isError } = useShopkeeperOrders();
+  const { data: order, isLoading, isError } = useOrderById(id);
   const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
-
-  const apiOrder = apiOrders?.find((o) => o.id === id);
-  const order = apiOrder ? mapToDisplayOrder(apiOrder) : null;
 
   if (isLoading) {
     return (
@@ -39,8 +38,9 @@ export default function OrderDetailScreen() {
     );
   }
 
-  const cfg = STATUS_CONFIG[order.status];
-  const next = NEXT_STATUS[order.status];
+  const status = resolveDetailStatus(order.status);
+  const cfg = resolveDetailStatusConfig(order.status);
+  const next = NEXT_STATUS[status];
 
   const handleAdvanceStatus = () => {
     if (!next) return;
@@ -53,7 +53,7 @@ export default function OrderDetailScreen() {
         <TouchableOpacity onPress={() => router.back()} accessibilityLabel="Voltar">
           <Ionicons name="chevron-back" size={24} color="#2D2D2D" />
         </TouchableOpacity>
-        <Text className="text-xl font-interBold text-[#2D2D2D]">Pedido #{order.code}</Text>
+        <Text className="text-xl font-interBold text-[#2D2D2D]">Pedido</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -62,65 +62,83 @@ export default function OrderDetailScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
       >
         <View className="px-5 pt-5 gap-4">
+          {/* Produto + status */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full bg-[#E7A35A] items-center justify-center">
-              <Text className="text-white font-inter text-base">{order.initials}</Text>
+              <Ionicons name="bag-handle-outline" size={20} color="white" />
             </View>
             <View className="ml-3 flex-1">
-              <Text className="font-inter text-base text-[#2D2D2D]">{order.name}</Text>
+              <Text className="font-inter text-base text-[#2D2D2D]" numberOfLines={1}>
+                {order.productName}
+              </Text>
               <View className="flex-row items-center mt-0.5">
                 <Ionicons name="time-outline" size={12} color="#8A8A8A" />
-                <Text className="font-inter text-xs text-[#8A8A8A] ml-1">{order.time}</Text>
+                <Text className="font-inter text-xs text-[#8A8A8A] ml-1">
+                  {formatRelativeTime(order.createdAt)}
+                </Text>
               </View>
             </View>
             <View className="px-3 py-1.5 rounded-xl flex-row items-center" style={{ backgroundColor: cfg.bgColor }}>
               <Ionicons name={cfg.icon} size={13} color={cfg.textColor} />
-              <Text className="ml-1 text-xs font-inter" style={{ color: cfg.textColor }}>{order.status}</Text>
+              <Text className="ml-1 text-xs font-inter" style={{ color: cfg.textColor }}>{cfg.label}</Text>
             </View>
           </View>
 
-          <View className="bg-[#E7A35A] rounded-2xl p-5 items-center">
-            <Text className="font-inter text-white text-xs">Código de retirada</Text>
-            <Text className="font-interBold text-white text-3xl mt-1 tracking-widest">
-              #{order.code}
-            </Text>
-          </View>
+          {/* Código de retirada — só existe quando pago/confirmado */}
+          {order.pickupCode ? (
+            <View className="bg-[#E7A35A] rounded-2xl p-5 items-center">
+              <Text className="font-inter text-white text-xs">Código de retirada</Text>
+              <Text className="font-interBold text-white text-3xl mt-1 tracking-widest">
+                #{order.pickupCode}
+              </Text>
+            </View>
+          ) : (
+            <View className="bg-[#F3F3F3] rounded-2xl p-4 items-center flex-row justify-center gap-2">
+              <Ionicons name="hourglass-outline" size={16} color="#8A8A8A" />
+              <Text className="font-inter text-[#8A8A8A] text-sm">
+                Código de retirada disponível após confirmação do pagamento
+              </Text>
+            </View>
+          )}
 
+          {/* Item do pedido (1 produto, quantidade variável) */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4">
-            <Text className="font-interBold text-base text-[#2D2D2D] mb-3">Itens do pedido</Text>
-            {order.itemsList.map((item, i) => (
-              <View key={i}>
-                <View className="flex-row items-center justify-between py-2">
-                  <Text className="font-inter text-sm text-[#2D2D2D] flex-1" numberOfLines={1}>
-                    {item.quantity}x {item.name}
-                  </Text>
-                </View>
-                {i < order.itemsList.length - 1 && <View className="h-px bg-[#E8E3DE]" />}
-              </View>
-            ))}
+            <Text className="font-interBold text-base text-[#2D2D2D] mb-3">Item do pedido</Text>
+
+            <View className="flex-row items-center justify-between py-2">
+              <Text className="font-inter text-sm text-[#2D2D2D] flex-1" numberOfLines={1}>
+                {order.quantity}x {order.productName}
+              </Text>
+              <Text className="font-inter text-sm text-[#8A8A8A]">
+                {order.unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} / un
+              </Text>
+            </View>
+
             <View className="h-px bg-[#E8E3DE] my-3" />
+
             <View className="flex-row items-center justify-between">
               <Text className="font-inter text-base text-[#2D2D2D]">Total</Text>
               <Text className="font-interBold text-lg text-[#E7A35A]">
-                {order.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                {order.totalAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </Text>
             </View>
           </View>
 
+          {/* Avançar status */}
           {next && (
             <TouchableOpacity
               className="bg-[#E7A35A] rounded-xl py-3.5 items-center flex-row justify-center gap-2"
               onPress={handleAdvanceStatus}
               disabled={isPending}
               accessibilityRole="button"
-              accessibilityLabel={NEXT_LABEL[order.status]}
+              accessibilityLabel={NEXT_LABEL[status]}
             >
               {isPending ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <>
                   <Ionicons name="arrow-forward-circle-outline" size={18} color="white" />
-                  <Text className="font-inter text-white text-base">{NEXT_LABEL[order.status]}</Text>
+                  <Text className="font-inter text-white text-base">{NEXT_LABEL[status]}</Text>
                 </>
               )}
             </TouchableOpacity>
