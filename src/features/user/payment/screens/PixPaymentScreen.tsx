@@ -1,47 +1,52 @@
-import { ScrollView, View, Image, Text, Pressable } from "react-native";
+import { ScrollView, View, Image, Text, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useEffect, useState, useRef } from "react";
-import QRCode from "react-native-qrcode-svg";
+import { useEffect, useState } from "react";
 import * as ClipBoard from "expo-clipboard";
-import { useRouter } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
-import { products } from "@/src/constants/user/map/poi/shop/products";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { useOrderStore } from "@/src/stores/user/payment/orderStore";
+import { useOrder } from "@/src/features/user/payment/hooks/useOrder";
+import { useOrderSocket } from "@/src/features/user/payment/hooks/useOrderSocket";
 
 export default function PixPaymentScreen() {
-  const { id, discount } = useLocalSearchParams<{ id: string, discount: string }>();
-  const product = products.find(p => p.id === Number(id));
-  
-  if (!product) return null;
-
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const TIMER_DURATION = 5 * 60;
-  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [paymentData, setPaymentData] = useState(() => JSON.stringify({
-    orderId: "123456",
-    amount: 25,
-    currency: "BRL",
-    token: Date.now()
-  }))
-  const [qrSize, setQrSize] = useState<number>(200);
-  const [pixCode, setPixCode] = useState<string>("dasdjsabjasdhj837174898412JSIFJASHFASUFABFJN8721478164BJfjdhfas8B432BJNFDW8bds867FNOh78ft32n")
-  const [copied, setCopied] = useState<boolean>(false);
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
+
+  const storeOrder = useOrderStore((s) => s.order);
+  const setOrder = useOrderStore((s) => s.setOrder);
+
+  const needsFetch = !storeOrder || storeOrder.id !== orderId;
+  const { data: fetchedOrder, isLoading } = useOrder(needsFetch ? orderId : undefined);
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    if (fetchedOrder) setOrder(fetchedOrder);
+  }, [fetchedOrder]);
 
-    return () => clearInterval(intervalRef.current!);
-  }, []);
+  const order = needsFetch ? fetchedOrder : storeOrder;
+
+  useOrderSocket(order?.id, (data) => {
+    if (data.status === "PAID") {
+      router.replace("/user/(private)/payment/payment-confirmed");
+    }
+  });
+
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!order?.pixExpiresAt) return;
+    const expiresAt = new Date(order.pixExpiresAt).getTime();
+
+    const tick = () => {
+      const diff = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+      setTimeLeft(diff);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [order?.pixExpiresAt]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -49,33 +54,22 @@ export default function PixPaymentScreen() {
     return `${m}:${s}`;
   };
 
-  const generateNewCode = () => {
-    clearInterval(intervalRef.current!);
-
-    setPaymentData(JSON.stringify({
-      orderId: "123456",
-      amount: 25,
-      currency: "BRL",
-      token: Date.now()
-    }));
-
-    setTimeLeft(TIMER_DURATION);
-    intervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
   const copyPixCode = async () => {
-    await ClipBoard.setStringAsync(pixCode);
+    if (!order) return;
+    await ClipBoard.setStringAsync(order.pix);
     setCopied(true);
     setTimeout(() => setCopied(false), 7000);
+  };
+
+  if (isLoading || !order) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white items-center justify-center">
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
   }
+
+  const expired = order.status === "EXPIRED" || timeLeft === 0;
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
@@ -89,26 +83,20 @@ export default function PixPaymentScreen() {
             </View>
           </View>
 
-          <View
-            className="border border-gray-300 w-full rounded-xl px-4 py-12 items-center justify-center gap-3"
-            onLayout={e => {
-              const { width } = e.nativeEvent.layout;
-              setQrSize(Math.min(width - 64, 200));
-            }}
-          >
-            <QRCode
-              value={paymentData}
-              size={qrSize}
-              color="#000"
-              backgroundColor="#fff"
+          <View className="border border-gray-300 w-full rounded-xl px-4 py-12 items-center justify-center gap-3">
+            <Image
+              source={{ uri: `data:image/png;base64,${order.qrCodeBase64}` }}
+              style={{ width: 200, height: 200 }}
+              resizeMode="contain"
             />
 
             <Text className="font-inter text-center">Copie o código abaixo para pagar no app do seu banco:</Text>
             <View className="bg-gray-200 w-full p-4 border border-dashed border-gray-400 rounded-xl items-center">
-              <Text className="opacity-70 font-inter text-center">{pixCode}</Text>
+              <Text className="opacity-70 font-inter text-center">{order.pix}</Text>
             </View>
 
-            <Text className="font-inter text-center">O código expira em:{" "}
+            <Text className="font-inter text-center">
+              O código expira em:{" "}
               <Text className={`font-interBold ${timeLeft <= 60 ? "text-red-500" : "text-black"}`}>
                 {timeLeft > 0 ? formatTime(timeLeft) : "Expirado"}
               </Text>
@@ -117,22 +105,19 @@ export default function PixPaymentScreen() {
 
           <View className="w-full gap-2">
             <Pressable
-              onPress={timeLeft === 0 ? generateNewCode : copyPixCode}
-              className={`${timeLeft === 0 ? 'bg-red-800' : 'bg-[#311e08]'} p-4 items-center justify-center rounded-xl active:opacity-70`}
+              onPress={copyPixCode}
+              disabled={expired}
+              className={`${expired ? "bg-gray-400" : "bg-[#311e08]"} p-4 items-center justify-center rounded-xl active:opacity-70`}
             >
-              <Text className="text-white font-interBold text-lg text-center">{
-              timeLeft === 0
-                ? "Gerar novo código"
-                : copied ? "Copiado"
-                : "Copiar código PIX"
-              }
-            </Text>
+              <Text className="text-white font-interBold text-lg text-center">
+                {expired ? "Código expirado" : copied ? "Copiado" : "Copiar código PIX"}
+              </Text>
             </Pressable>
 
             <Pressable
               onPress={() => router.push({
                 pathname: "/user/(private)/shop/product",
-                params: { id: product.id, discount }
+                params: { id: order.productId },
               })}
               className="bg-transparent p-4 items-center justify-center rounded-xl active:opacity-50 border border-gray-400"
             >
@@ -142,5 +127,5 @@ export default function PixPaymentScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
