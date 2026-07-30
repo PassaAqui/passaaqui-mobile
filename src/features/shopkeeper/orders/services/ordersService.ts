@@ -1,6 +1,6 @@
 import { api } from "@/src/services/api/api";
 
-export type ApiOrderStatus = "PENDING" | "PREPARING" | "COMPLETED";
+export type ApiOrderStatus = "AWAIT_PAYMENT" | "COMPLETED";
 
 export interface ApiOrderItem {
   name: string;
@@ -36,11 +36,6 @@ export async function getShopkeeperOrders(status?: ApiOrderStatus): Promise<ApiO
   const { data } = await api.get<ApiOrder[]>("/orders/shopkeeper", {
     params: status ? { status } : undefined,
   });
-  return data;
-}
-
-export async function updateOrderStatus(id: string, status: ApiOrderStatus): Promise<ApiOrder> {
-  const { data } = await api.put<ApiOrder>(`/orders/${id}/status`, { status });
   return data;
 }
 

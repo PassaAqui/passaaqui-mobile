@@ -2,14 +2,14 @@ import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-nati
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useShopkeeperOrders } from "@/src/features/shopkeeper/orders/hooks/useShopkeeperOrders";
-import { useUpdateOrderStatus } from "@/src/features/shopkeeper/orders/hooks/useUpdateOrderStatus";
-import { mapToDisplayOrder, StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { useOrderById } from "@/src/features/shopkeeper/orders/hooks/useOrderById";
+import { formatRelativeTime } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { resolveDetailStatus, resolveDetailStatusConfig } from "@/src/features/shopkeeper/orders/utils/orderDetailStatusAdapter";
+import { StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 const STATUS_STEPS: { key: StatusType; icon: string; label: string }[] = [
-  { key: "Pendente",    icon: "checkmark",  label: "Recebido" },
-  { key: "Em Preparo",  icon: "restaurant", label: "Em Preparo" },
-  { key: "Concluído",   icon: "storefront", label: "Pronto para Retirada" },
+  { key: "Pendente",  icon: "hourglass", label: "Aguardando Pagamento" },
+  { key: "Concluído", icon: "storefront", label: "Pronto para Retirada" },
 ];
 
 export default function PrepareOrderScreen() {
@@ -17,11 +17,7 @@ export default function PrepareOrderScreen() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: apiOrders, isLoading, isError } = useShopkeeperOrders();
-  const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
-
-  const apiOrder = apiOrders?.find((o) => o.id === id);
-  const order = apiOrder ? mapToDisplayOrder(apiOrder) : null;
+  const { data: order, isLoading, isError } = useOrderById(id);
 
   if (isLoading) {
     return (
@@ -43,8 +39,9 @@ export default function PrepareOrderScreen() {
     );
   }
 
-  const statusIndex = STATUS_STEPS.findIndex((s) => s.key === order.status);
-  const isReady = order.status === "Concluído";
+  const status = resolveDetailStatus(order.status);
+  const cfg = resolveDetailStatusConfig(order.status);
+  const statusIndex = STATUS_STEPS.findIndex((s) => s.key === status);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">
@@ -52,7 +49,7 @@ export default function PrepareOrderScreen() {
         <Pressable className="absolute left-5" onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#000" />
         </Pressable>
-        <Text className="text-lg font-interBold">Preparar Pedido</Text>
+        <Text className="text-lg font-interBold">Detalhes do Pedido</Text>
       </View>
 
       <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }} showsVerticalScrollIndicator={false}>
@@ -60,55 +57,67 @@ export default function PrepareOrderScreen() {
           <View className="flex-row justify-between mb-2">
             <View className="flex-row items-center gap-2">
               <Ionicons name="document-text" size={20} color="#fff" />
-              <Text className="text-2xl font-interBold text-white">#{order.code}</Text>
+              <Text className="text-2xl font-interBold text-white" numberOfLines={1}>
+                {order.productName}
+              </Text>
             </View>
             <View className="bg-white rounded-full items-center justify-center px-3 py-1">
-              <Text className="text-sm text-center text-[#EAAA6A] font-inter">{order.status}</Text>
+              <Text className="text-sm text-center font-inter" style={{ color: cfg.textColor === "#22C55E" ? "#22C55E" : "#EAAA6A" }}>
+                {cfg.label}
+              </Text>
             </View>
-          </View>
-          <View className="flex-row items-center gap-2 mt-1">
-            <Ionicons name="person" size={16} color="#fff" />
-            <Text className="text-white font-inter">{order.name}</Text>
           </View>
           <View className="flex-row items-center gap-2 mt-1">
             <Ionicons name="time" size={16} color="#fff" />
-            <Text className="text-white font-inter">Solicitado {order.time.toLowerCase()}</Text>
+            <Text className="text-white font-inter">
+              Solicitado {formatRelativeTime(order.createdAt).toLowerCase()}
+            </Text>
           </View>
         </View>
 
         <View className="flex-row items-center gap-2 mb-4 opacity-60">
           <Ionicons name="bag" size={16} color="#000" />
-          <Text className="text-lg font-interBold">Itens do Pedido</Text>
+          <Text className="text-lg font-interBold">Item do Pedido</Text>
         </View>
 
-        {order.itemsList.map((item, i) => (
-          <View key={i} className="flex-row items-center border border-gray-200 rounded-xl p-4 mb-2">
-            <View className="bg-gray-100 rounded-lg px-3 py-2 mr-4">
-              <Text className="text-sm font-inter">x{item.quantity}</Text>
-            </View>
-            <View className="flex-1">
-              <Text className="font-interBold">{item.name}</Text>
-            </View>
+        <View className="flex-row items-center border border-gray-200 rounded-xl p-4 mb-2">
+          <View className="bg-gray-100 rounded-lg px-3 py-2 mr-4">
+            <Text className="text-sm font-inter">x{order.quantity}</Text>
           </View>
-        ))}
+          <View className="flex-1">
+            <Text className="font-interBold">{order.productName}</Text>
+          </View>
+          <Text className="text-[#EAAA6A] font-interBold">
+            {order.unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+          </Text>
+        </View>
 
         <View className="flex-row items-center justify-end gap-1 mt-2 mb-5">
           <Ionicons name="receipt-outline" size={14} color="#888" />
           <Text className="text-sm text-gray-500 font-inter">
-            Total: {order.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+            Total: {order.totalAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
           </Text>
         </View>
 
-        <View className="bg-[#EAAA6A] rounded-2xl p-6 items-center mb-6">
-          <Ionicons name="key" size={24} color="#fff" />
-          <Text className="text-white font-inter mt-2">Código do Cliente</Text>
-          <View className="bg-white rounded-3xl px-6 py-2 my-2">
-            <Text className="text-2xl font-interBold text-[#EAAA6A]">#{order.code}</Text>
+        {order.pickupCode ? (
+          <View className="bg-[#EAAA6A] rounded-2xl p-6 items-center mb-6">
+            <Ionicons name="key" size={24} color="#fff" />
+            <Text className="text-white font-inter mt-2">Código do Cliente</Text>
+            <View className="bg-white rounded-3xl px-6 py-2 my-2">
+              <Text className="text-2xl font-interBold text-[#EAAA6A]">#{order.pickupCode}</Text>
+            </View>
+            <Text className="text-sm text-white/80 font-interBold text-center">
+              Peça esse código ao cliente na retirada
+            </Text>
           </View>
-          <Text className="text-sm text-white/80 font-interBold text-center">
-            Peça esse código ao cliente na retirada
-          </Text>
-        </View>
+        ) : (
+          <View className="bg-gray-100 rounded-2xl p-6 items-center mb-6">
+            <Ionicons name="hourglass-outline" size={24} color="#8A8A8A" />
+            <Text className="text-gray-500 font-inter mt-2 text-center">
+              Código de retirada disponível após a confirmação do pagamento
+            </Text>
+          </View>
+        )}
 
         <View className="mb-6">
           <View className="flex-row items-center gap-2 mb-4 opacity-60">
@@ -126,35 +135,12 @@ export default function PrepareOrderScreen() {
                   </View>
                   <View className={`flex-1 h-0.5 ${i === STATUS_STEPS.length - 1 ? "opacity-0" : i < statusIndex ? "bg-[#EAAA6A]" : "bg-gray-200"}`} />
                 </View>
-                <Text numberOfLines={1} className={`text-sm mt-1 font-interBold text-center w-16 ${i <= statusIndex ? "text-[#EAAA6A]" : "text-gray-300"}`}>
+                <Text numberOfLines={1} className={`text-sm mt-1 font-interBold text-center w-20 ${i <= statusIndex ? "text-[#EAAA6A]" : "text-gray-300"}`}>
                   {step.label}
                 </Text>
               </View>
             ))}
           </View>
-        </View>
-
-        <View className="flex gap-2">
-          {!isReady && (
-            <Pressable
-              className="w-full bg-[#EAAA6A] py-4 rounded-full flex-row items-center justify-center gap-2 mb-2 active:opacity-65"
-              disabled={isPending}
-              onPress={() => updateStatus({ id: order.id, status: "COMPLETED" })}
-            >
-              {isPending ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <>
-                  <Ionicons name="checkmark" size={18} color="#fff" />
-                  <Text className="font-interBold text-white text-base">Marcar como Pronto</Text>
-                </>
-              )}
-            </Pressable>
-          )}
-          <Pressable className="w-full bg-white py-4 border-2 border-[#EAAA6A] rounded-full flex-row items-center justify-center gap-2 mb-2 active:opacity-50">
-            <Ionicons name="storefront" size={18} color="#EAAA6A" />
-            <Text className="font-interBold text-[#EAAA6A] text-base">Confirmar Retirada em Loja</Text>
-          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>

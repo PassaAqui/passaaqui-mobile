@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ApiOrder, ApiOrderStatus } from "../services/ordersService";
 
-export type StatusType = "Pendente" | "Em Preparo" | "Concluído";
+export type StatusType = "Pendente" | "Concluído";
 
 export interface DisplayOrder {
   id: string;
@@ -12,31 +12,16 @@ export interface DisplayOrder {
   code: string;
   status: StatusType;
   total: number;
-  itemsList: { name: string; quantity: number }[];
 }
 
 export const STATUS_LABEL: Record<ApiOrderStatus, StatusType> = {
-  PENDING: "Pendente",
-  PREPARING: "Em Preparo",
+  AWAIT_PAYMENT: "Pendente",
   COMPLETED: "Concluído",
 };
 
 export const STATUS_API: Record<StatusType, ApiOrderStatus> = {
-  Pendente: "PENDING",
-  "Em Preparo": "PREPARING",
+  Pendente: "AWAIT_PAYMENT",
   Concluído: "COMPLETED",
-};
-
-export const NEXT_STATUS: Record<StatusType, StatusType | null> = {
-  Pendente: "Em Preparo",
-  "Em Preparo": "Concluído",
-  Concluído: null,
-};
-
-export const NEXT_LABEL: Record<StatusType, string> = {
-  Pendente: "Iniciar preparo",
-  "Em Preparo": "Marcar como concluído",
-  Concluído: "",
 };
 
 export const STATUS_CONFIG: Record<StatusType, {
@@ -46,17 +31,9 @@ export const STATUS_CONFIG: Record<StatusType, {
   textColor: string;
   label: string;
 }> = {
-  Pendente:     { icon: "hourglass-outline", iconColor: "#8A8A8A", bgColor: "#F3F3F3", textColor: "#8A8A8A", label: "Pendente"   },
-  "Em Preparo": { icon: "flame",             iconColor: "#E7A35A", bgColor: "#FBE6CF", textColor: "#E7A35A", label: "Em Preparo" },
-  Concluído:    { icon: "checkmark-circle",  iconColor: "#22C55E", bgColor: "#DCFCE7", textColor: "#22C55E", label: "Concluído"  },
+  Pendente:  { icon: "hourglass-outline", iconColor: "#8A8A8A", bgColor: "#F3F3F3", textColor: "#8A8A8A", label: "Pendente"  },
+  Concluído: { icon: "checkmark-circle",  iconColor: "#22C55E", bgColor: "#DCFCE7", textColor: "#22C55E", label: "Concluído" },
 };
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  const first = parts[0]?.[0] ?? "";
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return (first + last).toUpperCase();
-}
 
 export function formatRelativeTime(isoDate: string): string {
   const diffMs = Date.now() - new Date(isoDate).getTime();
@@ -72,8 +49,11 @@ export function formatRelativeTime(isoDate: string): string {
   return `Há ${diffDays}d`;
 }
 
-function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
 }
 
 export function mapToDisplayOrder(order: ApiOrder): DisplayOrder {
@@ -86,11 +66,5 @@ export function mapToDisplayOrder(order: ApiOrder): DisplayOrder {
     code: order.code.replace(/^#/, ""),
     status: STATUS_LABEL[order.status],
     total: order.total,
-    itemsList: order.items.map((i) => ({
-      name: i.name,
-      quantity: i.quantity
-    })) as any,
   };
 }
-
-export { formatCurrency };

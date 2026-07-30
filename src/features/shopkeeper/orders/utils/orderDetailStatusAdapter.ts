@@ -1,12 +1,8 @@
-import { StatusType, STATUS_CONFIG } from "./orderMapper";
+import { StatusType, STATUS_CONFIG } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 const RAW_STATUS_TO_DISPLAY: Record<string, StatusType> = {
-  PENDING: "Pendente",
-  PREPARING: "Em Preparo",
+  AWAIT_PAYMENT: "Pendente",
   COMPLETED: "Concluído",
-
-  AWAITING_PAYMENT: "Pendente",
-  PAID: "Pendente",
 };
 
 const FALLBACK_STATUS: StatusType = "Pendente";

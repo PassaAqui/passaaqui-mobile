@@ -3,10 +3,8 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useOrderById } from "@/src/features/shopkeeper/orders/hooks/useOrderById";
-import { useUpdateOrderStatus } from "@/src/features/shopkeeper/orders/hooks/useUpdateOrderStatus";
 import { formatRelativeTime } from "@/src/features/shopkeeper/orders/utils/orderMapper";
-import { resolveDetailStatus, resolveDetailStatusConfig } from "@/src/features/shopkeeper/orders/utils/orderDetailStatusAdapter";
-import { NEXT_STATUS, NEXT_LABEL, STATUS_API } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { resolveDetailStatusConfig } from "@/src/features/shopkeeper/orders/utils/orderDetailStatusAdapter";
 
 export default function OrderDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -14,7 +12,6 @@ export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const { data: order, isLoading, isError } = useOrderById(id);
-  const { mutate: updateStatus, isPending } = useUpdateOrderStatus();
 
   if (isLoading) {
     return (
@@ -38,14 +35,7 @@ export default function OrderDetailScreen() {
     );
   }
 
-  const status = resolveDetailStatus(order.status);
   const cfg = resolveDetailStatusConfig(order.status);
-  const next = NEXT_STATUS[status];
-
-  const handleAdvanceStatus = () => {
-    if (!next) return;
-    updateStatus({ id: order.id, status: STATUS_API[next] });
-  };
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2]">
@@ -62,7 +52,6 @@ export default function OrderDetailScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
       >
         <View className="px-5 pt-5 gap-4">
-          {/* Produto + status */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4 flex-row items-center">
             <View className="w-12 h-12 rounded-full bg-[#E7A35A] items-center justify-center">
               <Ionicons name="bag-handle-outline" size={20} color="white" />
@@ -84,7 +73,6 @@ export default function OrderDetailScreen() {
             </View>
           </View>
 
-          {/* Código de retirada — só existe quando pago/confirmado */}
           {order.pickupCode ? (
             <View className="bg-[#E7A35A] rounded-2xl p-5 items-center">
               <Text className="font-inter text-white text-xs">Código de retirada</Text>
@@ -101,7 +89,6 @@ export default function OrderDetailScreen() {
             </View>
           )}
 
-          {/* Item do pedido (1 produto, quantidade variável) */}
           <View className="bg-white border border-[#E8E3DE] rounded-2xl p-4">
             <Text className="font-interBold text-base text-[#2D2D2D] mb-3">Item do pedido</Text>
 
@@ -110,7 +97,7 @@ export default function OrderDetailScreen() {
                 {order.quantity}x {order.productName}
               </Text>
               <Text className="font-inter text-sm text-[#8A8A8A]">
-                {order.unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} / un
+                {order.unitPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </Text>
             </View>
 
@@ -123,26 +110,6 @@ export default function OrderDetailScreen() {
               </Text>
             </View>
           </View>
-
-          {/* Avançar status */}
-          {next && (
-            <TouchableOpacity
-              className="bg-[#E7A35A] rounded-xl py-3.5 items-center flex-row justify-center gap-2"
-              onPress={handleAdvanceStatus}
-              disabled={isPending}
-              accessibilityRole="button"
-              accessibilityLabel={NEXT_LABEL[status]}
-            >
-              {isPending ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  <Ionicons name="arrow-forward-circle-outline" size={18} color="white" />
-                  <Text className="font-inter text-white text-base">{NEXT_LABEL[status]}</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>

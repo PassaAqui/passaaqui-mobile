@@ -6,26 +6,31 @@ import { useRouter } from "expo-router";
 import { OrderCard } from "@/src/features/shopkeeper/orders/components/OrderCard";
 import { SummaryCard } from "@/src/features/shopkeeper/orders/components/SummaryCard";
 import { useShopkeeperOrders } from "@/src/features/shopkeeper/orders/hooks/useShopkeeperOrders";
-import { mapToDisplayOrder, StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { mapToDisplayOrder } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
-const TABS: StatusType[] = ["Pendente", "Em Preparo", "Concluído"];
+// "Todos" não é um status da API — é a ausência de filtro.
+type TabType = "Todos" | "Pendente" | "Concluído";
+
+const TABS: TabType[] = ["Todos", "Pendente", "Concluído"];
 
 export default function OrdersScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<StatusType>("Pendente");
+  const [activeTab, setActiveTab] = useState<TabType>("Todos");
 
   const { data: apiOrders, isLoading, isError, refetch } = useShopkeeperOrders();
 
   const orders = (apiOrders ?? []).map(mapToDisplayOrder);
 
   const counts = {
-    Pendente:     orders.filter((o) => o.status === "Pendente").length,
-    "Em Preparo": orders.filter((o) => o.status === "Em Preparo").length,
-    Concluído:    orders.filter((o) => o.status === "Concluído").length,
+    Todos:     orders.length,
+    Pendente:  orders.filter((o) => o.status === "Pendente").length,
+    Concluído: orders.filter((o) => o.status === "Concluído").length,
   };
 
-  const filtered = orders.filter((o) => o.status === activeTab);
+  const filtered = activeTab === "Todos"
+    ? orders
+    : orders.filter((o) => o.status === activeTab);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#F8F5F2]">
@@ -41,9 +46,9 @@ export default function OrdersScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row px-5 mt-4 gap-2.5">
-          <SummaryCard icon="hourglass-outline" count={counts["Pendente"]}    label="Pendentes"       />
-          <SummaryCard icon="flame"             count={counts["Em Preparo"]}  label="Em Preparo"      />
-          <SummaryCard icon="checkmark-circle"  count={counts["Concluído"]}   label="Concluídos hoje" />
+          <SummaryCard icon="receipt-outline"     count={counts["Todos"]}     label="Todos os pedidos" />
+          <SummaryCard icon="hourglass-outline"   count={counts["Pendente"]}  label="Pendentes"        />
+          <SummaryCard icon="checkmark-circle"    count={counts["Concluído"]} label="Concluídos"       />
         </View>
 
         <View className="flex-row px-5 mt-6 border-b border-[#E8E3DE]">
