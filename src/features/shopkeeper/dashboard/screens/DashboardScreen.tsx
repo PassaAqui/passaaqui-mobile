@@ -119,7 +119,7 @@ export default function DashboardScreen() {
                 onPress={() =>
                   router.push({
                     pathname: "/shopkeeper/(private)/orders/order-detail",
-                    params: { code: order.code.replace("#", "") },
+                    params: { id: order.id },
                   })
                 }
               >
