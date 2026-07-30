@@ -30,7 +30,7 @@ export default function ProductDetailScreen() {
 
   if (!product) return null;
 
-  const canRescue = user?.currentXP ?? 0 >= Number(product.maxXp);
+  const canRescue = (user?.currentXP ?? 0) >= Number(product.maxXp);
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-white">

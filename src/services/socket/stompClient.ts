@@ -1,4 +1,4 @@
-import { Client } from "@stomp/stompjs";
+import { Client, IMessage, StompSubscription } from "@stomp/stompjs";
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
 
 const WS_URL = process.env.EXPO_PUBLIC_WS_URL;
@@ -29,4 +29,32 @@ export function connectStomp(onConnected?: () => void) {
 export function disconnectStomp() {
   client?.deactivate();
   client = null;
+}
+
+export function getStompClient() {
+  return client;
+}
+
+export function subscribeTopic(
+  topic: string,
+  callback: (message: IMessage) => void
+): () => void {
+  let subscription: StompSubscription | null = null;
+  let ownsConnection = false;
+
+  const doSubscribe = () => {
+    subscription = client?.subscribe(topic, callback) ?? null;
+  };
+
+  if (client?.connected) {
+    doSubscribe();
+  } else {
+    ownsConnection = !client;
+    connectStomp(doSubscribe);
+  }
+
+  return () => {
+    subscription?.unsubscribe();
+    if (ownsConnection) disconnectStomp();
+  };
 }
