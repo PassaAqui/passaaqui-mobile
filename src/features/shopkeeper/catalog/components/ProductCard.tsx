@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { View, Image, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { ShopkeeperProduct } from "@/src/features/shopkeeper/catalog/services/shopkeeperProductsService";
+import { useDeleteProduct } from "@/src/features/shopkeeper/products/hooks/useDeleteProduct";
+import DeleteProductModal from "@/src/features/shopkeeper/products/components/DeleteProductModal";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -8,6 +12,16 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 });
 
 export function ProductCard({ product }: { product: ShopkeeperProduct }) {
+  const router = useRouter();
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const deleteProductMutation = useDeleteProduct();
+
+  const handleConfirmDelete = () => {
+    deleteProductMutation.mutate(product.id, {
+      onSuccess: () => setDeleteModalVisible(false),
+    });
+  };
+
   return (
     <View className="bg-white border border-[#E8E3DE] rounded-2xl p-3.5 flex-row items-center" style={{ opacity: product.active ? 1 : 0.55 }}>
       <Image
@@ -45,13 +59,29 @@ export function ProductCard({ product }: { product: ShopkeeperProduct }) {
       </View>
 
       <View className="justify-between items-center self-stretch py-1 ml-3 gap-4">
-        <TouchableOpacity accessibilityLabel={`Editar ${product.name}`}>
+        <TouchableOpacity
+          accessibilityLabel={`Editar ${product.name}`}
+          onPress={() =>
+            router.push({
+              pathname: "/shopkeeper/(private)/products/edit-product",
+              params: { id: product.id },
+            })
+          }
+        >
           <Ionicons name="pencil-outline" size={17} color="#8A8A8A" />
         </TouchableOpacity>
-        <TouchableOpacity accessibilityLabel={`Excluir ${product.name}`}>
+        <TouchableOpacity accessibilityLabel={`Excluir ${product.name}`} onPress={() => setDeleteModalVisible(true)}>
           <Ionicons name="trash-outline" size={17} color="#EF4444" />
         </TouchableOpacity>
       </View>
+
+      <DeleteProductModal
+        visible={deleteModalVisible}
+        productName={product.name}
+        isDeleting={deleteProductMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setDeleteModalVisible(false)}
+      />
     </View>
   );
 }

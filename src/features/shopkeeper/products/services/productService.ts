@@ -12,7 +12,7 @@ export interface CreateProductPayload {
   poiId: number;
 }
 
-export interface CreatedProduct {
+export interface ProductModel {
   id: number;
   name: string;
   description: string | null;
@@ -24,14 +24,14 @@ export interface CreatedProduct {
   highlight: boolean;
   category: { id: number; name: string };
   image: string | null;
-  shopkeeper: { id: number; name: string; companyName: string };
-  poi: { id: number; name: string; type: string };
+  shopkeeper: { id: number; name: string; companyName?: string };
+  poi?: { id: number; name: string; type: string };
   createdAt: string;
   updatedAt: string;
 }
 
-export async function createProduct(payload: CreateProductPayload): Promise<CreatedProduct> {
-  const { data } = await api.post<CreatedProduct>("/products", payload);
+export async function createProduct(payload: CreateProductPayload): Promise<ProductModel> {
+  const { data } = await api.post<ProductModel>("/products", payload);
   return data;
 }
 
@@ -51,7 +51,17 @@ const getImageMimeType = (name: string): string => {
   }
 }
 
-export async function uploadProductImage(productId: number, imageUri: string, imageName: string): Promise<CreatedProduct> {
+export interface UpdateProductPayload {
+  name?: string;
+  description?: string;
+  price?: number;
+  stock?: number;
+  active?: boolean;
+  highlight?: boolean;
+  categoryId?: number;
+}
+
+export async function uploadProductImage(productId: number, imageUri: string, imageName: string): Promise<ProductModel> {
   const formData = new FormData();
   formData.append("image", {
     uri: imageUri,
@@ -59,8 +69,27 @@ export async function uploadProductImage(productId: number, imageUri: string, im
     type: getImageMimeType(imageName),
   } as any);
 
-  const { data } = await api.post<CreatedProduct>(`/products/${productId}/images`, formData, {
+  const { data } = await api.post<ProductModel>(`/products/${productId}/images`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+  return data;
+}
+
+export async function getProductById(id: number): Promise<ProductModel> {
+  const { data } = await api.get<ProductModel>(`/products/${id}`);
+  return data;
+}
+
+export async function updateProduct(id: number, payload: UpdateProductPayload): Promise<ProductModel> {
+  const { data } = await api.put<ProductModel>(`/products/${id}`, payload);
+  return data;
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  await api.delete(`/products/${id}`);
+}
+
+export async function deleteProductImage(id: number, index: number): Promise<ProductModel> {
+  const { data } = await api.delete<ProductModel>(`/products/${id}/images/${index}`);
   return data;
 }
