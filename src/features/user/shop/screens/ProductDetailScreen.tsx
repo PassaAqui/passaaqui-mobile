@@ -1,7 +1,3 @@
-// currentXP - colocar na posta constants
-// pegar a quantidade de avaliações do backend
-// pegar 'category' do backend
-
 import { ScrollView, View, Image, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +11,7 @@ import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
+import { ProductImageCarousel } from "@/src/features/user/shop/components/ProductImageCarousel";
 
 const discount = 5.00;
 
@@ -39,11 +36,12 @@ export default function ProductDetailScreen() {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
         <View className="items-center justify-center p-6 gap-5">
           <View className="w-full relative overflow-hidden">
-            <Image className="border border-gray-300 w-full h-56" source={typeof product.image === "string" ? { uri: product.image } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
-
+            <ProductImageCarousel images={product.images ?? []} />
             <View className="absolute bottom-3 right-3 bg-[#3D2408] px-3 p-1 flex-row rounded-full gap-1 items-center justify-center">
-              <Image className={`${canRescue ? 'w-5 h-5' : 'w-6 h-6'}`} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
-              <Text className="text-white text-sm text-center font-interBold">R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</Text>
+              <Image className={canRescue ? "w-5 h-5" : "w-6 h-6"} source={canRescue ? require("@/assets/user/map/poi/shop/coin.png") : require("@/assets/user/map/poi/shop/no-coin.png")} />
+              <Text className="text-white text-sm text-center font-interBold">
+                R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </Text>
             </View>
           </View>
 
@@ -129,7 +127,7 @@ export default function ProductDetailScreen() {
       </ScrollView>
 
       {hasRedeemed && (
-        <RedemptionAlertModal img={product.image!} title={product.name} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
+        <RedemptionAlertModal img={product.images?.[0] ?? null} title={product.name} discount={discount} visible={hasRedeemed} onClose={() => setRedeemed(false)} />
       )}
     </SafeAreaView>
   )

@@ -2,7 +2,7 @@ import { Modal, View, Text, Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 interface RedemptionAlertModalProps {
-  img: string,
+  img: string | null,
   title: string,
   discount: number,
   visible: boolean,
