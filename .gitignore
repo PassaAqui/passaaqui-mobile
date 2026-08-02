@@ -2,6 +2,7 @@
 
 .env
 
+.cursor/
 .vscode/
 .vscode
 nativewind-env.d.ts
