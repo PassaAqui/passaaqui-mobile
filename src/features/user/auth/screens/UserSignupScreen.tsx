@@ -1,7 +1,7 @@
 import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
-import { signUpSchema } from "@/src/schemas/user/signUpSchema";
+import { signUpSchema } from "@/src/features/user/auth/schemas/signUpSchema";
 import { Link, useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
