@@ -61,6 +61,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^30.0.0",
     "@types/mapbox__polyline": "^1.0.5",
     "@types/react": "~19.1.0",
