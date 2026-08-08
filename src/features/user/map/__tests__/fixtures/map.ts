@@ -76,6 +76,58 @@ export const cityResponse = {
   cityImage: "https://cdn.example.com/recife.jpg",
 };
 
+export const rawPoiDetail = {
+  id: 1,
+  name: "Marco Zero",
+  description: "Praça histórica do Recife",
+  xp_reward: 50,
+  type: "TOURIST_POINT",
+  latitude: -8.0632,
+  longitude: -34.8711,
+  average_rating: 4.8,
+  ratings_count: 120,
+  image: "https://cdn.example.com/marco-zero.jpg",
+  products: [
+    {
+      id: 10,
+      image: "https://cdn.example.com/guia-turistico.jpg",
+      name: "Guia turístico",
+      description: "Guia impresso do Recife",
+      price: 29.9,
+      max_xp: 30,
+      stock: 5,
+      shopkeeper_id: 2,
+      category_id: 3,
+    },
+  ],
+};
+
+export const poiDetail = {
+  id: 1,
+  name: "Marco Zero",
+  description: "Praça histórica do Recife",
+  xpReward: 50,
+  type: "TOURIST_POINT",
+  latitude: -8.0632,
+  longitude: -34.8711,
+  averageRating: 4.8,
+  ratingsCount: 120,
+  image: "https://cdn.example.com/marco-zero.jpg",
+  products: [
+    {
+      id: 10,
+      image: "https://cdn.example.com/guia-turistico.jpg",
+      name: "Guia turístico",
+      description: "Guia impresso do Recife",
+      price: 29.9,
+      maxXp: 30,
+      stock: 5,
+      shopkeeperId: 2,
+      categoryId: 3,
+    },
+  ],
+};
+
 export function createAxiosError(status: number) {
   const error = new Error("Request failed") as Error & {
     isAxiosError: boolean;
