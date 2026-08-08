@@ -1,5 +1,15 @@
 /** @type {import('jest').Config} */
 module.exports = {
+  collectCoverage: false,
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/__tests__/**",
+    "!src/e2e/**",
+    "!src/**/index.ts",
+  ],
+  coverageDirectory: "<rootDir>/coverage",
+  coverageReporters: ["text", "lcov", "html"],
   projects: [
     {
       displayName: "unit",

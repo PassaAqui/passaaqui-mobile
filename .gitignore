@@ -16,6 +16,9 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Jest
+coverage/
+
 # Native
 .kotlin/
 *.orig.*
