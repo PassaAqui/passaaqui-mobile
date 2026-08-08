@@ -1,0 +1,35 @@
+appId: ${APP_ID}
+---
+- assertVisible: "Continuar como aventureiro"
+- tapOn: "Continuar como aventureiro"
+- assertVisible: "Entrar na sua conta"
+- tapOn: "Cadastre-se"
+- assertVisible: "Criar uma conta"
+
+- tapOn: "Digite seu nome"
+- inputText: "Turista E2E"
+- hideKeyboard
+
+- tapOn: "Digite seu email aqui"
+- inputText: "turista@email.com"
+- hideKeyboard
+
+- tapOn: "___.___.___-__"
+- inputText: "12345678900"
+- hideKeyboard
+
+- tapOn: "Digite sua senha"
+- inputText: "Senha@123"
+- hideKeyboard
+
+- tapOn: "Confirme sua senha"
+- inputText: "Senha@123"
+- hideKeyboard
+
+- tapOn:
+    id: "terms-checkbox"
+- tapOn: "Cadastrar"
+
+- extendedWaitUntil:
+    visible: "SEGUIR|Explorar|Toque no cartão para virar"
+    timeout: 20000

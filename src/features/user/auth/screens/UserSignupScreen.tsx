@@ -135,6 +135,7 @@ export default function UserSignupScreen() {
 
               <View className="flex-row items-center gap-2">
                 <Checkbox
+                  testID="terms-checkbox"
                   value={isChecked}
                   onValueChange={(state) => { setChecked(state); if (error.terms) setError(prev => ({ ...prev, terms: "" })); }}
                   color={isChecked ? "#2463EB" : undefined}
