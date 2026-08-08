@@ -1,21 +1,14 @@
 import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
-import { signUpSchema } from "@/src/schemas/user/signUpSchema";
+import { signUpSchema } from "@/src/features/user/auth/schemas/signUpSchema";
 import { Link, useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
 import { singUp } from "@/src/features/user/auth/services/authService";
-
-const formatCpf = (text: string) => {
-  const digits = text.replace(/\D/g, "").slice(0, 11);
-  return digits
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-};
+import { formatCpf } from "@/src/features/user/auth/utils/formatCpf";
 
 export default function UserSignupScreen() {
   const insets = useSafeAreaInsets();
@@ -142,6 +135,7 @@ export default function UserSignupScreen() {
 
               <View className="flex-row items-center gap-2">
                 <Checkbox
+                  testID="terms-checkbox"
                   value={isChecked}
                   onValueChange={(state) => { setChecked(state); if (error.terms) setError(prev => ({ ...prev, terms: "" })); }}
                   color={isChecked ? "#2463EB" : undefined}

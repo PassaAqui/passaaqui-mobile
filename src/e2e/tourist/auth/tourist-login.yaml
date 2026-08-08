@@ -1,0 +1,15 @@
+appId: ${APP_ID}
+---
+- assertVisible: "Continuar como aventureiro"
+- tapOn: "Continuar como aventureiro"
+- assertVisible: "Entrar na sua conta"
+- tapOn: "Digite seu email"
+- inputText: "turista@email.com"
+- hideKeyboard
+- tapOn: "Digite sua senha"
+- inputText: "Senha@123"
+- hideKeyboard
+- tapOn: "Entrar"
+- extendedWaitUntil:
+    visible: "SEGUIR|Explorar|Toque no cartão para virar"
+    timeout: 20000

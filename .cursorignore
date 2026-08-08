@@ -1,0 +1,28 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+
+# dependências
+node_modules/
+
+# builds e caches
+.expo/
+.expo-shared/
+dist/
+build/
+coverage/
+
+# variaveis de ambiente
+.env
+*.pem
+*.key
+*.p12
+*.keystore
+
+# logs
+*.log
+*.tmp
+*.bak
+
+# configurações do editor
+.DS_Store
+.vscode/
+.idea/

@@ -2,6 +2,7 @@
 
 .env
 
+.cursor/
 .vscode/
 .vscode
 nativewind-env.d.ts
@@ -14,6 +15,9 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+
+# Jest
+coverage/
 
 # Native
 .kotlin/
