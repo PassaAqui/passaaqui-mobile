@@ -34,6 +34,21 @@ export const poiNearby: PoiNearby = {
   distanceLabel: "1.2 km",
 };
 
+export const storePoi: PoiNearby = {
+  id: 2,
+  name: "Café do Recife",
+  description: "Cafeteria no bairro do Recife",
+  xpReward: 30,
+  type: "STORE",
+  latitude: -8.0569,
+  longitude: -34.8712,
+  averageRating: 4.6,
+  ratingsCount: 89,
+  image: "https://cdn.example.com/cafe-recife.jpg",
+  distanceKm: 0.5,
+  distanceLabel: "500 m",
+};
+
 export const directionResponse = {
   features: [
     {
