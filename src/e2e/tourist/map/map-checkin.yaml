@@ -1,0 +1,92 @@
+appId: ${APP_ID}
+---
+# ATENÇÃO — LIMITAÇÃO CONHECIDA (revisar quando useLocationTracking.ts mudar):
+# useLocationTracking.ts atualmente envia coords fixas de dev
+# ({-8.0675, -34.9167}) ao backend, independente do GPS real do device.
+# Por isso o setLocation abaixo NÃO exercita o watcher de localização real —
+# ele só garante que `location` seja truthy (renderiza os markers).
+# O check-in dispara porque o POI seed está posicionado exatamente nas
+# mesmas coords fixas do hardcode (-8.0675, -34.9167), não porque o app
+# calculou distância real via GPS.
+# QUANDO location.coords for restaurado em useLocationTracking.ts (uso real
+# de GPS), este teste precisa ser revisitado: o setLocation final deverá
+# usar as coordenadas reais do POI seed (que poderão ser diferentes do
+# Marco Zero), e os setLocation intermediários passarão a exercitar
+# de fato o cálculo de raio/distância do backend.
+
+# Este fluxo substitui o botão __DEV__ "Simular rota" (startSimulation/
+# stopSimulation): o botão é uma ferramenta manual de debug e não vai para
+# produção. O setLocation injeta coordenadas de GPS no emulador/simulador,
+# exercitando o caminho de produção (watcher de localização, useMapScreen,
+# envio de posição ao backend) em vez de um atalho de dev.
+
+- runFlow:
+    file: ../auth/tourist-login.yaml
+
+# Permissão de localização do SO (primeira execução). Se já concedida,
+# o bloco é pulado. Alternativa mais confiável (Android):
+#   adb shell pm grant host.exp.exponent android.permission.ACCESS_FINE_LOCATION
+- runFlow:
+    when:
+      visible: "Permitir|Allow|While using the app"
+    commands:
+      - tapOn:
+          text: "Permitir|Allow|While using the app"
+
+# Torna `location` truthy (o estado só é preenchido pelo callback do watch),
+# o que habilita a query de POIs e a renderização dos markers.
+- setLocation:
+    latitude: -8.0675
+    longitude: -34.9167
+
+# Conta nova em Recife dispara o postcard de cidade — fecha antes de tocar
+# nos markers.
+- runFlow:
+    when:
+      visible: "Toque no cartão para virar"
+    commands:
+      - tapOn: "✕"
+
+# POI seed de teste (id numérico fixo). Se o testID não for exposto pelo
+# overlay nativo no Android, usar fallback por texto:
+#   - tapOn:
+#       text: "tourist-poi-1"
+- extendedWaitUntil:
+    visible:
+      id: "tourist-poi-1"
+    timeout: 20000
+
+- tapOn:
+    id: "tourist-poi-1"
+
+- assertVisible: "Marco Zero (E2E)"
+- tapOn: "Ir agora"
+- assertVisible: "Partiu destino!"
+- tapOn: "A pé"
+
+# Rota ativa (stop=true) após handleNavigation concluir.
+- extendedWaitUntil:
+    visible: "PARAR"
+    timeout: 20000
+
+# "Caminhada" simulada até as coords do seed. Sem efeito no check-in (o app
+# envia sempre as coords fixas) — mantido por fidelidade ao fluxo real e
+# para quando as coords reais forem restauradas.
+- setLocation:
+    latitude: -8.0673
+    longitude: -34.9165
+
+- extendedWaitUntil: { visible: "PARAR", timeout: 6000 }  
+
+- setLocation:
+    latitude: -8.0675
+    longitude: -34.9167
+
+# Backend detecta a posição dentro do raio e envia checkin-result (WS).
+- extendedWaitUntil:
+    visible: "Novo lugar descoberto!"
+    timeout: 30000
+
+- assertVisible: "+50 XP"
+- tapOn: "Fechar"
+- assertNotVisible: "Novo lugar descoberto!"

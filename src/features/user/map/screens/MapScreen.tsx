@@ -137,6 +137,8 @@ export default function MapScreen() {
                   longitude: touristPoi.longitude
                 }}
                 title={touristPoi.name}
+                testID={`tourist-poi-${touristPoi.id}`}
+                accessibilityLabel={`tourist-poi-${touristPoi.id}`}
                 onPress={() => {
                   setOpenTouristPOIMarker(touristPoi);
                   setOpenPOIMarker(touristPoi);
@@ -153,6 +155,8 @@ export default function MapScreen() {
                   longitude: shopPoi.longitude
                 }}
                 title={shopPoi.name}
+                testID={`shopkeeper-poi-${shopPoi.id}`}
+                accessibilityLabel={`shopkeeper-poi-${shopPoi.id}`}
                 onPress={() => {
                   setOpenShopPOIMarker(shopPoi);
                   setOpenPOIMarker(shopPoi);
