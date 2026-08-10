@@ -1,12 +1,12 @@
 import { api } from "@/src/services/api/api";
 
-interface CategoryResponse {
+export interface CategoryResponse {
   id: number;
   name: string;
   description: string;
 }
 
-interface RawCategoryProduct {
+export interface RawCategoryProduct {
   id: number;
   name: string;
   description: string | null;
@@ -38,7 +38,7 @@ export interface CategoryProduct {
   updatedAt: string;
 }
 
-interface CategoryWithProducts {
+export interface CategoryWithProducts {
   id: number;
   name: string;
   description: string;
@@ -53,7 +53,7 @@ interface CategoryWithProducts {
   };
 }
 
-interface RawCategoryWithProducts {
+export interface RawCategoryWithProducts {
   id: number;
   name: string;
   description: string;

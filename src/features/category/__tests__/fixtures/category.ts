@@ -1,6 +1,11 @@
-import type { CategoryProduct } from "@/src/features/category/services/categoryService";
+import type {
+  CategoryProduct,
+  CategoryResponse,
+  CategoryWithProducts,
+  RawCategoryWithProducts,
+} from "@/src/features/category/services/categoryService";
 
-export const categories = [
+export const categories: CategoryResponse[] = [
   {
     id: 3,
     name: "Café",
@@ -13,7 +18,7 @@ export const categories = [
   },
 ];
 
-export const rawCategoryProducts = {
+export const rawCategoryProducts: RawCategoryWithProducts = {
   id: 3,
   name: "Café",
   description: "Cafés especiais",
@@ -59,7 +64,7 @@ export const rawCategoryProducts = {
   },
 };
 
-export const categoryProductsWithImages = {
+export const categoryProductsWithImages: CategoryWithProducts = {
   id: 3,
   name: "Café",
   description: "Cafés especiais",
@@ -97,7 +102,7 @@ export const categoryProductsWithImages = {
         createdAt: "2026-01-02T00:00:00.000Z",
         updatedAt: "2026-01-02T00:00:00.000Z",
       },
-    ] as CategoryProduct[],
+    ] as NormalizedCategoryProduct[],
     totalElements: 2,
     totalPages: 1,
     number: 0,
@@ -106,6 +111,8 @@ export const categoryProductsWithImages = {
     last: true,
   },
 };
+
+type NormalizedCategoryProduct = CategoryProduct & { image: string | null };
 
 export function createAxiosError(status: number) {
   const error = new Error("Request failed") as Error & {
