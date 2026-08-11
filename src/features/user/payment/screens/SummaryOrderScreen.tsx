@@ -59,7 +59,7 @@ export default function SummaryOrderScreen() {
             <View className="w-full flex-row items-center py-3 gap-3">
               <Image
                 className="w-20 h-20 rounded-lg"
-                source={typeof product.image === "string" ? { uri: product.image } : require("@/assets/user/map/tmp/no-image.png")}
+                source={product.images && product.images.length > 0 ? { uri: product.images[0] } : require("@/assets/user/map/tmp/no-image.png")}
               />
               <View className="flex-col flex-1">
                 <Text className="text-lg font-interBold" adjustsFontSizeToFit>{product.name}</Text>
@@ -168,7 +168,7 @@ export default function SummaryOrderScreen() {
       </ScrollView>
 
       <RedemptionAlertModal
-        img={typeof product.image === "string" ? product.image : ""}
+        img={product.images && product.images.length > 0 ? product.images[0] : null}
         title={product.name}
         discount={MOCKED_XP_DISCOUNT}
         visible={showActiveOrderModal}
