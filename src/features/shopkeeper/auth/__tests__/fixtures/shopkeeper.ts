@@ -2,6 +2,7 @@ import type { ShopkeeperMe } from "@/src/features/shopkeeper/auth/services/shopk
 import type { ShopkeeperSignUpData } from "@/src/features/shopkeeper/auth/schemas/signUpSchema";
 
 export const SHOPKEEPER_REFRESH_TOKEN_KEY = "shopkeeper_refresh_token";
+export const BASE_URL = "https://api.test.com";
 
 export const shopkeeperLoginInput = {
   email: "loja@email.com",
