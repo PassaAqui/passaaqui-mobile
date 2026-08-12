@@ -1,8 +1,16 @@
 import type { ShopkeeperMe } from "@/src/features/shopkeeper/auth/services/shopkeeperService";
 import type { ShopkeeperSignUpData } from "@/src/features/shopkeeper/auth/schemas/signUpSchema";
+import type { ExistingPoi } from "@/src/features/shopkeeper/auth/components/StoreLocationPickerModal";
 
 export const SHOPKEEPER_REFRESH_TOKEN_KEY = "shopkeeper_refresh_token";
 export const BASE_URL = "https://api.test.com";
+
+export const existingShopPoi: ExistingPoi = {
+  id: 1,
+  name: "Café do Recife",
+  latitude: -8.0675,
+  longitude: -34.9167,
+};
 
 export const shopkeeperLoginInput = {
   email: "loja@email.com",
