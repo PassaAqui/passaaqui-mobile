@@ -414,6 +414,7 @@ export default function ShopkeeperSignupScreen() {
               <View>
                 <View className="flex-row items-start gap-2">
                   <Checkbox
+                    testID="terms-checkbox"
                     value={isChecked}
                     onValueChange={(state) => {
                       setChecked(state);
