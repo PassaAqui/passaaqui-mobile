@@ -126,6 +126,23 @@ describe("interceptors do api", () => {
       expect(result).toBe(config);
     });
 
+    it("adiciona o token do lojista no header quando só o lojista tem token", () => {
+      // Arrange
+      mockedShopkeeperAuthStoreGetState.mockReturnValue({
+        accessToken: "shopkeeper-token",
+        setAccessToken: mockedShopkeeperSetAccessToken,
+        logout: mockedShopkeeperLogout,
+      });
+      const config: AuthConfig = { headers: {} };
+
+      // Act
+      const result = mockedRequestHandler(config);
+
+      // Assert
+      expect(config.headers.Authorization).toBe("Bearer shopkeeper-token");
+      expect(result).toBe(config);
+    });
+
     it("não sobrescreve o Authorization já presente no header", () => {
       // Arrange
       const config: AuthConfig = {
@@ -223,6 +240,92 @@ describe("interceptors do api", () => {
       expect(mockAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedSetAccessToken).toHaveBeenCalledTimes(1);
       expect(mockedLogout).toHaveBeenCalled();
+    });
+
+    it("faz refresh com a chave do lojista e retenta a requisição original", async () => {
+      // Arrange
+      mockedSecureStore.getItemAsync.mockImplementation((key) =>
+        key === "shopkeeper_refresh_token"
+          ? Promise.resolve("shopkeeper-refresh-token")
+          : Promise.resolve(null)
+      );
+      mockAxios.get.mockResolvedValueOnce({
+        data: {
+          access_token: "new-shopkeeper-access-token",
+          refresh_token: "new-shopkeeper-refresh-token",
+        },
+      });
+      mockedApi.mockResolvedValueOnce({ data: { ok: true } });
+      const original: AuthConfig = { headers: {} };
+      const error = createUnauthorizedError(original);
+
+      // Act
+      const result = await mockedResponseErrorHandler(error);
+
+      // Assert
+      expect(mockAxios.get).toHaveBeenCalledWith(
+        expect.stringContaining("/auth/refresh"),
+        { headers: { Authorization: "Bearer shopkeeper-refresh-token" } }
+      );
+      expect(mockedSecureStore.setItemAsync).toHaveBeenCalledWith(
+        "shopkeeper_refresh_token",
+        "new-shopkeeper-refresh-token"
+      );
+      expect(mockedShopkeeperSetAccessToken).toHaveBeenCalledWith(
+        "new-shopkeeper-access-token"
+      );
+      expect(mockedSetAccessToken).not.toHaveBeenCalled();
+      expect(original.headers.Authorization).toBe(
+        "Bearer new-shopkeeper-access-token"
+      );
+      expect(mockedApi).toHaveBeenCalledWith(original);
+      expect(result).toEqual({ data: { ok: true } });
+    });
+
+    it("faz logout do lojista (não do turista) quando o refresh falha com sessão lojista", async () => {
+      // Arrange
+      mockedSecureStore.getItemAsync.mockImplementation((key) =>
+        key === "shopkeeper_refresh_token"
+          ? Promise.resolve("shopkeeper-refresh-token")
+          : Promise.resolve(null)
+      );
+      mockAxios.get.mockRejectedValueOnce(new Error("network"));
+      const error = createUnauthorizedError({ headers: {} });
+
+      // Act
+      const result = mockedResponseErrorHandler(error);
+
+      // Assert
+      await expect(result).rejects.toBe(error);
+      expect(mockedShopkeeperLogout).toHaveBeenCalled();
+      expect(mockedLogout).not.toHaveBeenCalled();
+      expect(mockedShopkeeperSetAccessToken).not.toHaveBeenCalled();
+      expect(mockedApi).not.toHaveBeenCalled();
+    });
+
+    // Comportamento atual do código (api.ts:77-80): o ramo `_retry` chama
+    // `useAuthStore.getState().logout()` incondicionalmente, mesmo quando a
+    // sessão é do lojista. Produção não alterada; o teste reflete o código.
+    it("faz logout do turista (incondicional) quando o 401 se repete com sessão lojista", async () => {
+      // Arrange
+      mockedSecureStore.getItemAsync.mockImplementation((key) =>
+        key === "shopkeeper_refresh_token"
+          ? Promise.resolve("shopkeeper-refresh-token")
+          : Promise.resolve(null)
+      );
+      const error = createUnauthorizedError({ headers: {}, _retry: true });
+
+      // Act
+      const result = mockedResponseErrorHandler(error);
+
+      // Assert
+      await expect(result).rejects.toThrow(
+        "Sessão expirada, faça login novamente"
+      );
+      expect(mockedLogout).toHaveBeenCalled();
+      expect(mockedShopkeeperLogout).not.toHaveBeenCalled();
+      expect(mockAxios.get).not.toHaveBeenCalled();
+      expect(mockedApi).not.toHaveBeenCalled();
     });
   });
 });

@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import MapView, { Marker, MapPressEvent } from "react-native-maps";
+import { MIN_DISTANCE_METERS, distanceInMeters } from "@/src/features/shopkeeper/auth/utils/distanceInMeters";
 
 export interface ExistingPoi {
   id: number;
@@ -17,20 +18,6 @@ interface StoreLocationPickerModalProps {
   initialLocation?: { latitude: number; longitude: number };
   onConfirm: (location: { latitude: number; longitude: number }) => void;
   onClose: () => void;
-}
-
-const MIN_DISTANCE_METERS = 15;
-
-function distanceInMeters(a: { latitude: number; longitude: number }, b: { latitude: number; longitude: number }) {
-  const R = 6371000;
-  const dLat = ((b.latitude - a.latitude) * Math.PI) / 180;
-  const dLon = ((b.longitude - a.longitude) * Math.PI) / 180;
-  const lat1 = (a.latitude * Math.PI) / 180;
-  const lat2 = (b.latitude * Math.PI) / 180;
-
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-
-  return 2 * R * Math.asin(Math.sqrt(h));
 }
 
 export default function StoreLocationPickerModal({ visible, existingPois, initialLocation, onConfirm, onClose }: StoreLocationPickerModalProps) {

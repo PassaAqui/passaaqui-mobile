@@ -13,23 +13,7 @@ import { CategoryModal, CategoryData } from "@/src/features/shopkeeper/component
 import StoreLocationPickerModal, { ExistingPoi } from "@/src/features/shopkeeper/auth/components/StoreLocationPickerModal";
 import { signUpShopkeeper, loginShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
 import { useRouter } from "expo-router";
-
-const formatCpfOrCnpj = (text: string) => {
-  const digits = text.replace(/\D/g, "").slice(0, 14);
-
-  if (digits.length <= 11) {
-    return digits
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
-
-  return digits
-    .replace(/(\d{2})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{3})(\d)/, "$1.$2")
-    .replace(/(\d{4})(\d{1,2})$/, "$1/$2");
-};
+import { formatCpfOrCnpj } from "@/src/features/shopkeeper/auth/utils/formatCpfOrCnpj";
 
 const EXISTING_POIS: ExistingPoi[] = [
   { id: 1, name: "Loja Exemplo", latitude: -8.0675, longitude: -34.9167 },
@@ -414,6 +398,7 @@ export default function ShopkeeperSignupScreen() {
               <View>
                 <View className="flex-row items-start gap-2">
                   <Checkbox
+                    testID="terms-checkbox"
                     value={isChecked}
                     onValueChange={(state) => {
                       setChecked(state);
