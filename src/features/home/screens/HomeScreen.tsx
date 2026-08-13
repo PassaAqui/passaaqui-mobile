@@ -32,7 +32,7 @@ export default function HomeScreen() {
               </View>
 
               <Link href={"/shopkeeper/(public)/auth/shopkeeper-signup"} className="bg-white p-3 rounded-3xl items-center flex-row gap-2 justify-center active:opacity-70">
-                <Text className="font-itim text-lg text-center">Contiuar como comerciante</Text>
+                <Text className="font-itim text-lg text-center">Continuar como comerciante</Text>
               </Link>
             </View>
           </View>
