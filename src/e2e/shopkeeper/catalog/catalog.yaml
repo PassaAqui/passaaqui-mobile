@@ -1,0 +1,25 @@
+appId: ${APP_ID}
+---
+- runFlow:
+    file: ../auth/shopkeeper-login.yaml
+
+- tapOn: "Catálogo"
+
+- extendedWaitUntil:
+    visible: "Meu Catálogo"
+    timeout: 20000
+
+- assertVisible: "Produtos"
+- assertVisible: "Ativos"
+- assertVisible: "Destaque"
+
+- assertVisible: "Produtos cadastrados"
+
+- tapOn: "GASTRONOMIA"
+- assertVisible: "Produtos cadastrados"
+
+- tapOn: "Buscar produto..."
+- inputText: "Café E2E"
+- hideKeyboard
+- assertVisible: "Café E2E"
+
