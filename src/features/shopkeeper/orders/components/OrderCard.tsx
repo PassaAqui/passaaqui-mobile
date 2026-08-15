@@ -16,6 +16,7 @@ export function OrderCard({ order, onPress }: OrderCardProps) {
       className="bg-white rounded-2xl border border-[#E8E3DE] px-4 py-4 mb-3"
       activeOpacity={0.7}
       onPress={onPress}
+      testID="order-card"
     >
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center flex-1 mr-2">
