@@ -23,6 +23,7 @@ describe("OrderCard", () => {
     const time = screen.getByText("Há 5 min");
     const items = screen.getByText("2x Café, 1x Torta");
     const code = screen.getByText("#AB1020");
+    const card = screen.getByTestId("order-card");
 
     // Assert
     expect(initials).toBeTruthy();
@@ -30,6 +31,7 @@ describe("OrderCard", () => {
     expect(time).toBeTruthy();
     expect(items).toBeTruthy();
     expect(code).toBeTruthy();
+    expect(card).toBeTruthy();
   });
 
   it("exibe o badge de status Pendente", () => {
