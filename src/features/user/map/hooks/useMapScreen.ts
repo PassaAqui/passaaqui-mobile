@@ -7,6 +7,7 @@ import { useLocationTracking } from "@/src/features/user/map/hooks/useLocationTr
 import { useCityEntry } from "@/src/features/user/map/hooks/useCityEntry";
 import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
+import { RouteMode } from "@/src/services/routeService";
 import { useState } from "react";
 
 import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging/useDebugRouteSimulation";
@@ -14,7 +15,9 @@ import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging
 export function useMapScreen() {
   const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing } = useLocation();
   const { gpsActive } = useGpsStatus(lastUpdate);
-  const { touristPois, shopPois } = useNearbyPois(location);
+  const [mapCenter, setMapCenter] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locomotionMode, setLocomotionMode] = useState<RouteMode | null>(null);
+  const { touristPois, shopPois } = useNearbyPois(location, mapCenter, locomotionMode);
   const poi = usePOI(location);
   const navigation = useNavigation(location, mapRef);
   const bounds = useBoundsCheck(location);
@@ -39,6 +42,8 @@ export function useMapScreen() {
 
   return {
     location, mapRef, mapReady, setMapReady, isFollowing, setIsFollowing,
+    mapCenter, setMapCenter,
+    locomotionMode, setLocomotionMode,
     gpsActive,
     touristPois, shopPois,
     checkinReward, setCheckinReward,
