@@ -4,7 +4,7 @@ import type { LocationObject } from "expo-location";
 import MapScreen from "@/src/features/user/map/screens/MapScreen";
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { Marker } from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { poiNearby, storePoi } from "@/src/features/user/map/__tests__/fixtures/map";
 
 jest.mock("react-native-maps", () => {
@@ -145,6 +145,10 @@ const baseMock = {
   gpsActive: true,
   isFollowing: true,
   setIsFollowing: jest.fn(),
+  mapCenter: null,
+  setMapCenter: jest.fn(),
+  locomotionMode: null,
+  setLocomotionMode: jest.fn(),
   setOpenTouristPOIMarker: jest.fn(),
   openTouristPOIMarker: null,
   setOpenShopPOIMarker: jest.fn(),
@@ -306,6 +310,56 @@ describe("MapScreen", () => {
     expect(screen.getByText("Ir até as configurações")).toBeTruthy();
   });
 
+  it("ao arrastar o mapa, chama setMapCenter e setIsFollowing(false)", () => {
+    // Arrange
+    render(<MapScreen />);
+    const region = {
+      latitude: -8.06,
+      longitude: -34.87,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    };
+
+    // Act
+    fireEvent(
+      screen.UNSAFE_getByType(MapView),
+      "regionChangeComplete",
+      region,
+      { isGesture: true }
+    );
+
+    // Assert
+    expect(mockUseMapScreen().setIsFollowing).toHaveBeenCalledWith(false);
+    expect(mockUseMapScreen().setMapCenter).toHaveBeenCalledWith({
+      latitude: -8.06,
+      longitude: -34.87,
+    });
+    // Arrastar o mapa nunca deve alterar o modo de locomoção
+    expect(mockUseMapScreen().setLocomotionMode).not.toHaveBeenCalled();
+  });
+
+  it("não captura o centro do mapa quando o movimento não é um gesto", () => {
+    // Arrange
+    render(<MapScreen />);
+    const region = {
+      latitude: -8.06,
+      longitude: -34.87,
+      latitudeDelta: 0.005,
+      longitudeDelta: 0.005,
+    };
+
+    // Act
+    fireEvent(
+      screen.UNSAFE_getByType(MapView),
+      "regionChangeComplete",
+      region,
+      { isGesture: false }
+    );
+
+    // Assert
+    expect(mockUseMapScreen().setMapCenter).not.toHaveBeenCalled();
+  });
+
   it("abre o TouristSpotPOI e navega ao escolher o modo", () => {
     // Arrange
     mockMapScreen({ openTouristPOIMarker: poiNearby });
@@ -323,5 +377,7 @@ describe("MapScreen", () => {
       "foot-walking",
       1
     );
+    // Selecionar o modo no LocomotionMode atualiza o modo de busca de POIs
+    expect(mockUseMapScreen().setLocomotionMode).toHaveBeenCalledWith("foot-walking");
   });
 });

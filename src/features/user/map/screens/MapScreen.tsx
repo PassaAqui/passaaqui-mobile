@@ -29,6 +29,8 @@ export default function MapScreen() {
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
+    setMapCenter,
+    setLocomotionMode,
     setOpenTouristPOIMarker, openTouristPOIMarker,
     setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
@@ -104,9 +106,10 @@ export default function MapScreen() {
         }}
         style={styles.map}
         onMapReady={() => setMapReady(true)}
-        onRegionChange={(region, details) => {
+        onRegionChangeComplete={(region, details) => {
           if (details.isGesture) {
             setIsFollowing(false);
+            setMapCenter({ latitude: region.latitude, longitude: region.longitude });
           }
         }}
       >
@@ -206,7 +209,10 @@ export default function MapScreen() {
           xpQuantity={openTouristPOIMarker.xpReward ?? 0}
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode, openTouristPOIMarker.id)}
+          onNavigate={(mode) => {
+            setLocomotionMode(mode);
+            handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode, openTouristPOIMarker.id);
+          }}
         />
       )}
 
@@ -220,7 +226,10 @@ export default function MapScreen() {
           starQuantity={openShopPOIMarker.averageRating ?? 0}
           visible={!!openShopPOIMarker}
           onClose={() => setOpenShopPOIMarker(null)}
-          onNavigate={(mode) => handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode, openShopPOIMarker.id)}
+          onNavigate={(mode) => {
+            setLocomotionMode(mode);
+            handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode, openShopPOIMarker.id);
+          }}
         />
       )}
 
