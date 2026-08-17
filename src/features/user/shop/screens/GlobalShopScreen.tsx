@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, Image, Pressable, useWindowDimensions } from "react-native";
+import { ScrollView, View, Text, Image, Pressable } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import * as NavigationBar from "expo-navigation-bar";
 import XpBar from "@/src/features/user/shop/components/XpBar";
@@ -9,6 +9,7 @@ import { useAllProducts } from "@/src/features/user/shop/hooks/products/useAllPr
 import { useAllCategories } from "@/src/features/category/hooks/useAllCategories";
 import { useCategoryProducts } from "@/src/features/user/shop/hooks/categories/useCategoryProducts";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
+import { useResponsiveGrid } from "@/src/features/user/shop/hooks/useResponsiveGrid";
 
 export default function GlobalShopScreen() {
   const router = useRouter();
@@ -29,14 +30,7 @@ export default function GlobalShopScreen() {
   const isLoading = selectedCategoryId === "TODOS" ? isLoadingAll : isLoadingCategory;
 
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
-
-  const PADDING = 16;
-  const GAP = 24;
-  const MIN_CARD_WIDTH = 150;
-
-  const columns = width - PADDING * 2 >= MIN_CARD_WIDTH * 2 + GAP ? 2 : 1;
-  const cardWidth = (width - PADDING * 2 - GAP * (columns - 1)) / columns;
+  const { rows, getItemWidth } = useResponsiveGrid(products, { padding: 16, gap: 24, minItemWidth: 150 });
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
@@ -85,36 +79,40 @@ export default function GlobalShopScreen() {
             </Text>
           )}
 
-          <View className="flex-row flex-wrap gap-6 items-center justify-center">
-            {products?.map((product) => (
-              <Pressable
-                key={product.id}
-                onPress={() => router.push({
-                  pathname: "/user/(private)/shop/product",
-                  params: { id: product.id }
-                })}
-                className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
-                style={{ width: cardWidth }}
-              >
-                <Image className="w-full h-28 border border-gray-300" source={product.images && product.images.length > 0 ? { uri: product.images[0] } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
-                <View className="p-5 gap-3">
-                  <Text className="font-interBold text-lg">{product.name}</Text>
-                  <Text className="font-inter">{product.description}</Text>
+          <View className="gap-6">
+            {rows.map((row, rowIndex) => (
+              <View key={rowIndex} className="flex-row gap-6 justify-center">
+                {row.map((product) => (
+                  <Pressable
+                    key={product.id}
+                    onPress={() => router.push({
+                      pathname: "/user/(private)/shop/product",
+                      params: { id: product.id }
+                    })}
+                    className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
+                    style={{ width: getItemWidth(row) }}
+                  >
+                    <Image className="w-full h-28 border border-gray-300" source={product.images && product.images.length > 0 ? { uri: product.images[0] } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
+                    <View className="p-5 gap-3">
+                      <Text className="font-interBold text-lg">{product.name}</Text>
+                      <Text className="font-inter">{product.description}</Text>
 
-                  <View className="flex-row gap-1 items-center">
-                    <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
-                    <Text className="font-interBold">R$ {product.price.toFixed(2)}</Text>
-                  </View>
+                      <View className="flex-row gap-1 items-center">
+                        <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
+                        <Text className="font-interBold">R$ {product.price.toFixed(2)}</Text>
+                      </View>
 
-                  <View>
-                    <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.maxXp ?? 0} thickness={1} />
-                    <View className="flex-row gap-2 items-center">
-                      <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.maxXp} XP</Text>
-                      <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.maxXp ?? 0} showText={false} />
+                      <View>
+                        <XpBar currentXp={user?.currentXP ?? 0} xpRequired={product.maxXp ?? 0} thickness={1} />
+                        <View className="flex-row gap-2 items-center">
+                          <Text className="font-inter text-sm">{user?.currentXP ?? 0}/{product.maxXp} XP</Text>
+                          <CompleteRequiredXp currentXp={user?.currentXP ?? 0} requiredXp={product.maxXp ?? 0} showText={false} />
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                </View>
-              </Pressable>
+                  </Pressable>
+                ))}
+              </View>
             ))}
           </View>
         </View>
