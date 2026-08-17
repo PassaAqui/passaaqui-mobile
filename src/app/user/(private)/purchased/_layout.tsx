@@ -15,7 +15,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    NavigationBar.setButtonStyleAsync("light");
+    NavigationBar.setButtonStyleAsync("dark");
   }, []);
 
   if (!fontsLoaded) return null;
