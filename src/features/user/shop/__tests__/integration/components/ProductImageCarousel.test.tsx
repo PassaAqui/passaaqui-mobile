@@ -13,9 +13,10 @@ jest.mock("@expo/vector-icons", () => {
 jest.mock("react-native-image-viewing", () => {
   const React = require("react");
   const { View } = require("react-native");
-  return (props: { visible: boolean }) => (
+  const MockImageViewing = (props: { visible: boolean }) => (
     <View testID="image-viewing" visible={props.visible} />
   );
+  return MockImageViewing;
 });
 
 const threeImages = [
