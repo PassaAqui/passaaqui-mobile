@@ -1,14 +1,17 @@
 import { ScrollView, View, Text, Image, Pressable, TextInput } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Header from "@/src/features/user/shop/components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
+import { useReviewMedia } from "@/src/features/user/purchased/hooks/useReviewMedia";
 
 export default function ReviewProductScreen() {
   const insets = useSafeAreaInsets();
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
+  const { photos, videos, maxPhotos, maxVideos, pickPhotos, pickVideos, removePhoto, removeVideo } = useReviewMedia();
 
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -25,7 +28,12 @@ export default function ReviewProductScreen() {
     <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-white">
       <Header />
 
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16, paddingTop: insets.top}} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        bottomOffset={16}
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16, paddingTop: insets.top}}
+        showsVerticalScrollIndicator={false}
+      >
         <View className="p-6 gap-5">
           <View className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white">
             <Image className="w-14 h-14 rounded-xl" source={{ uri: product.img }} />
@@ -51,15 +59,65 @@ export default function ReviewProductScreen() {
 
           <View className="flex-col gap-3 mt-4">
             <Text className="font-interBold text-lg text-black">Adione imagens do produto</Text>
+
+            {photos.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-row gap-3">
+                  {photos.map((photo) => (
+                    <View key={photo.uri} className="relative">
+                      <Image source={{ uri: photo.uri }} className="w-20 h-20 rounded-xl" />
+                      <Pressable
+                        onPress={() => removePhoto(photo.uri)}
+                        className="absolute -top-2 -right-2 bg-white rounded-full p-1 border border-gray-200 active:opacity-70"
+                      >
+                        <Text className="text-red-600 text-sm font-interBold leading-none">✕</Text>
+                      </Pressable>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+
+            {videos.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-row gap-3">
+                  {videos.map((video) => (
+                    <View key={video.uri} className="relative">
+                      <Image source={{ uri: video.uri }} className="w-20 h-20 rounded-xl" />
+                      <View className="absolute inset-0 items-center justify-center">
+                        <Text className="text-white text-lg">▶</Text>
+                      </View>
+                      <Pressable
+                        onPress={() => removeVideo(video.uri)}
+                        className="absolute -top-2 -right-2 bg-white rounded-full p-1 border border-gray-200 active:opacity-70"
+                      >
+                        <Text className="text-red-600 text-sm font-interBold leading-none">✕</Text>
+                      </Pressable>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+
             <View className="flex-row gap-3">
-              <Pressable className="flex-1 border-2 border-dashed border-gray-300 rounded-2xl items-center justify-center py-6 gap-2 active:opacity-40">
-                <Image source={require("@/assets/user/purchased/photo.png")} />
-                <Text className="font-inter text-base text-gray-600">Adicionar foto</Text>
-              </Pressable>
-              <Pressable className="flex-1 border-2 border-dashed border-gray-300 rounded-2xl items-center justify-center py-10 gap-2 active:opacity-40">
-                <Image source={require("@/assets/user/purchased/video.png")} />
-                <Text className="font-inter text-base text-gray-600">Adicionar vídeo</Text>
-              </Pressable>
+              {photos.length < maxPhotos && (
+                <Pressable
+                  onPress={pickPhotos}
+                  className="flex-1 border-2 border-dashed border-gray-300 rounded-2xl items-center justify-center py-6 gap-2 active:opacity-40"
+                >
+                  <Image source={require("@/assets/user/purchased/photo.png")} />
+                  <Text className="font-inter text-base text-gray-600">Adicionar foto</Text>
+                </Pressable>
+              )}
+              {videos.length < maxVideos && (
+                <Pressable
+                  onPress={pickVideos}
+                  className="flex-1 border-2 border-dashed border-gray-300 rounded-2xl items-center justify-center py-10 gap-2 active:opacity-40"
+                >
+                  <Image source={require("@/assets/user/purchased/video.png")} />
+                  <Text className="font-inter text-base text-gray-600">Adicionar vídeo</Text>
+                </Pressable>
+              )}
             </View>
           </View>
 
@@ -80,7 +138,7 @@ export default function ReviewProductScreen() {
             <Text className="text-white font-interBold text-lg text-center">Adicionar avaliação</Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
