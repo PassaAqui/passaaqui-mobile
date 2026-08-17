@@ -14,6 +14,7 @@ export interface RawCategoryProduct {
   maxXp: number | null;
   stock: number;
   image: string | null;
+  images?: string[];
   averageRating: number | null;
   ratingsCount: number | null;
   shopkeeper: { id: number; name: string };
@@ -84,7 +85,12 @@ export async function getCategoryById(id: number, page = 0, size = 20): Promise<
       ...data.products,
       content: data.products.content.map((product) => ({
         ...product,
-        images: product.image ? [product.image] : [],
+        images:
+          product.images && product.images.length > 0
+            ? product.images
+            : product.image
+              ? [product.image]
+              : [],
       })),
     },
   };
