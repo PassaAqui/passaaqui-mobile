@@ -1,4 +1,5 @@
 import { ScrollView, View, Text, Image, Pressable, TextInput } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Header from "@/src/features/user/shop/components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,7 +28,12 @@ export default function ReviewProductScreen() {
     <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-white">
       <Header />
 
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16, paddingTop: insets.top}} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView
+        bottomOffset={16}
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 16, paddingTop: insets.top}}
+        showsVerticalScrollIndicator={false}
+      >
         <View className="p-6 gap-5">
           <View className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white">
             <Image className="w-14 h-14 rounded-xl" source={{ uri: product.img }} />
@@ -132,7 +138,7 @@ export default function ReviewProductScreen() {
             <Text className="text-white font-interBold text-lg text-center">Adicionar avaliação</Text>
           </Pressable>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }
