@@ -6,6 +6,7 @@ import {
 import {
   categories,
   rawCategoryProducts,
+  rawCategoryProductsWithImagesArray,
   categoryProductsWithImages,
   createAxiosError,
 } from "@/src/features/category/__tests__/fixtures/category";
@@ -75,6 +76,18 @@ describe("categoryService", () => {
       // Assert
       const product = result.products.content.find((p) => p.id === 3);
       expect(product).toEqual(categoryProductsWithImages.products.content[1]);
+    });
+
+    it("preserva o array de images quando o backend retorna images em vez de image", async () => {
+      // Arrange
+      mockedApi.get.mockResolvedValueOnce({ data: rawCategoryProductsWithImagesArray });
+
+      // Act
+      const result = await getCategoryById(3);
+
+      // Assert
+      const product = result.products.content.find((p) => p.id === 2);
+      expect(product?.images).toEqual(["https://cdn.example.com/capuccino.jpg"]);
     });
 
     it("usa params default page 0 e size 20 quando só o id é informado", async () => {

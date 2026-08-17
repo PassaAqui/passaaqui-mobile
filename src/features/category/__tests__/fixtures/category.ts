@@ -112,6 +112,38 @@ export const categoryProductsWithImages: CategoryWithProducts = {
   },
 };
 
+export const rawCategoryProductsWithImagesArray: RawCategoryWithProducts = {
+  id: 3,
+  name: "Café",
+  description: "Cafés especiais",
+  products: {
+    content: [
+      {
+        id: 2,
+        name: "Capuccino especial",
+        description: "Capuccino com canela",
+        price: 15.9,
+        maxXp: 20,
+        stock: 8,
+        image: null,
+        images: ["https://cdn.example.com/capuccino.jpg"],
+        averageRating: 4.9,
+        ratingsCount: 60,
+        shopkeeper: { id: 2, name: "Café do Recife" },
+        category: { id: 3, name: "Café" },
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-01-01T00:00:00.000Z",
+      },
+    ],
+    totalElements: 1,
+    totalPages: 1,
+    number: 0,
+    size: 20,
+    first: true,
+    last: true,
+  },
+};
+
 type NormalizedCategoryProduct = CategoryProduct & { image: string | null };
 
 export function createAxiosError(status: number) {
