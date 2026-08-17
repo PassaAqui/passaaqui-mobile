@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProduct, uploadProductImage, CreateProductPayload, CreatedProduct } from "@/src/features/shopkeeper/products/services/productService";
+import { createProduct, uploadProductImage, CreateProductPayload, ProductModel } from "@/src/features/shopkeeper/products/services/productService";
 import { SelectedImage } from "@/src/features/shopkeeper/products/hooks/useCreateProductForm";
 
 interface CreateProductWithImagesInput {
@@ -8,7 +8,7 @@ interface CreateProductWithImagesInput {
 }
 
 export interface CreateProductResult {
-  product: CreatedProduct;
+  product: ProductModel;
   totalImages: number;
   uploadedImages: number;
   failedImages: number;
@@ -33,7 +33,7 @@ async function createProductWithImages({ payload, images }: CreateProductWithIma
    (contém o array de images mais atualizado); senão, mantem o produto original
   */
   const lastFulfilled = [...results].reverse().find(
-    (r): r is PromiseFulfilledResult<CreatedProduct> => r.status === "fulfilled"
+    (r): r is PromiseFulfilledResult<ProductModel> => r.status === "fulfilled"
   );
 
   return {
