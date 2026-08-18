@@ -41,17 +41,19 @@ jest.mock("react-native-keyboard-controller", () => ({
 
 jest.mock("expo-checkbox", () => {
   const { Pressable } = require("react-native");
+  const MockCheckbox = ({
+    value,
+    onValueChange,
+  }: {
+    value?: boolean;
+    onValueChange?: (checked: boolean) => void;
+  }) => (
+    <Pressable testID="terms-checkbox" onPress={() => onValueChange?.(!value)} />
+  );
   return {
     __esModule: true,
-    default: ({
-      value,
-      onValueChange,
-    }: {
-      value?: boolean;
-      onValueChange?: (checked: boolean) => void;
-    }) => (
-      <Pressable testID="terms-checkbox" onPress={() => onValueChange?.(!value)} />
-    ),
+    default: MockCheckbox,
+    Checkbox: MockCheckbox,
   };
 });
 

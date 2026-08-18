@@ -1,5 +1,7 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import { useAuthStore } from "@/src/stores/user/auth/authStore";
+import { useShopkeeperAuthStore } from "@/src/stores/shopkeeper/auth/shopkeeperAuthStore";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -63,7 +65,7 @@ api.interceptors.response.use(
         const newToken = await refreshAccessToken();
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
-      } catch (refreshError) {
+      } catch {
         const isTourist = !!(await SecureStore.getItemAsync("refresh_token"));
         if (isTourist) {
           await useAuthStore.getState().logout();
@@ -114,6 +116,3 @@ api.interceptors.response.use(
   }
 )
 */
-
-import { useAuthStore } from "@/src/stores/user/auth/authStore";
-import { useShopkeeperAuthStore } from "@/src/stores/shopkeeper/auth/shopkeeperAuthStore";

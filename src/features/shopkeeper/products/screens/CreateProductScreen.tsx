@@ -1,7 +1,6 @@
 import { View, Text, TextInput, Pressable, Image, ActivityIndicator, ScrollView } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { CategoryModal } from "@/src/features/shopkeeper/components/CategoryModal";
 import { useCreateProductForm } from "@/src/features/shopkeeper/products/hooks/useCreateProductForm";

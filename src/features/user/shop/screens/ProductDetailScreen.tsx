@@ -1,14 +1,12 @@
 import { ScrollView, View, Image, Text, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
 import StarRating from "@/src/features/user/shop/components/StarRating";
 import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
 import RedemptionAlertModal from "@/src/features/user/shop/components/RedemptionAlertModal";
 import Header from "@/src/features/user/shop/components/Header";
-import { useRouter } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
 import { ProductImageCarousel } from "@/src/features/user/shop/components/ProductImageCarousel";

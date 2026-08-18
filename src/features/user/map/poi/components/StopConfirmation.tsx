@@ -1,4 +1,4 @@
-import { View, Image, Text, Pressable, Modal } from "react-native"
+import { Image, Text, Pressable, Modal } from "react-native"
 
 interface StopConfirmationProp {
   visible: boolean,

@@ -38,7 +38,7 @@ export default function DashboardScreen() {
   const router = useRouter();
 
   const { data: shopkeeper } = useShopkeeperMe();
-  const { data: dashboard, isLoading, isError, error, refetch, isRefetching } = useDashboard();
+  const { data: dashboard, isLoading, isError, refetch, isRefetching } = useDashboard();
 
   if (isLoading) {
     return (

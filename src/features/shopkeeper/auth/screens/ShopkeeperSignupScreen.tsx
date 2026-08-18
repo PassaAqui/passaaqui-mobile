@@ -1,18 +1,16 @@
 import { ImageBackground, View, Text, TextInput, Pressable, Image, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { shopkeeperSignUpSchema } from "@/src/features/shopkeeper/auth/schemas/signUpSchema";
-import { Link } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Checkbox from "expo-checkbox";
+import { Link, useRouter } from "expo-router";
+import { Checkbox } from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 import { CategoryModal, CategoryData } from "@/src/features/shopkeeper/components/CategoryModal";
 import StoreLocationPickerModal, { ExistingPoi } from "@/src/features/shopkeeper/auth/components/StoreLocationPickerModal";
 import { signUpShopkeeper, loginShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
-import { useRouter } from "expo-router";
 import { formatCpfOrCnpj } from "@/src/features/shopkeeper/auth/utils/formatCpfOrCnpj";
 
 const EXISTING_POIS: ExistingPoi[] = [

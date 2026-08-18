@@ -1,6 +1,5 @@
 import { Modal, View, Text, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import MapView, { Marker, MapPressEvent } from "react-native-maps";
 import { MIN_DISTANCE_METERS, distanceInMeters } from "@/src/features/shopkeeper/auth/utils/distanceInMeters";

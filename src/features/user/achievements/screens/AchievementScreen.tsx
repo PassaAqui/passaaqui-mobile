@@ -78,7 +78,7 @@ export default function AchievementScreen() {
                       id={sticker.id}
                       image={sticker.img} 
                       title={sticker.title} 
-                      invertRotate={sticker.id % 2 != 0 && sticker.complete} 
+                      invertRotate={sticker.id % 2 !== 0 && sticker.complete} 
                     />
                   )
                 })}
