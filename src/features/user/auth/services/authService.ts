@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { api } from "@/src/services/api/api";
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 const REFRESH_TOKEN = "refresh_token";
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -76,12 +76,12 @@ export async function  tryRestoreSession(): Promise<boolean> {
   } catch (error) {
     console.log("[restore] erro:", error);
 
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       console.log("[restore] status:", error.response?.status);
       console.log("[restore] body:", error.response?.data);
     }
 
-    if (axios.isAxiosError(error) && (error.response?.status === 400 || error.response?.status === 401)) {
+    if (isAxiosError(error) && (error.response?.status === 400 || error.response?.status === 401)) {
       await logout();
     }
     

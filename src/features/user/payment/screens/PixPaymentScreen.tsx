@@ -20,7 +20,7 @@ export default function PixPaymentScreen() {
 
   useEffect(() => {
     if (fetchedOrder) setOrder(fetchedOrder);
-  }, [fetchedOrder]);
+  }, [fetchedOrder, setOrder]);
 
   const order = needsFetch ? fetchedOrder : storeOrder;
 
