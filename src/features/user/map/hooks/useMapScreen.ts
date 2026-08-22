@@ -7,6 +7,7 @@ import { useLocationTracking } from "@/src/features/user/map/hooks/useLocationTr
 import { useCityEntry } from "@/src/features/user/map/hooks/useCityEntry";
 import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
+import { useAutoFollowDuringNavigation } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
 import { RouteMode } from "@/src/services/routeService";
 import { useState } from "react";
 
@@ -38,6 +39,14 @@ export function useMapScreen() {
       navigation.setStop(false);
       navigation.setRouteCoords([]);
     },
+  });
+
+  const userPosition = currentSimPosition ?? (location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? { latitude: -8.0675, longitude: -34.9167 };
+
+  useAutoFollowDuringNavigation({
+    userPosition,
+    mapRef,
+    isNavigationActive: navigation.stop,
   });
 
   return {
