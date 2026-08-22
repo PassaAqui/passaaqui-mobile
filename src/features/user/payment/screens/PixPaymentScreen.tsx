@@ -1,6 +1,5 @@
 import { ScrollView, View, Image, Text, Pressable, ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import * as ClipBoard from "expo-clipboard";
 import { useRouter, useLocalSearchParams } from "expo-router";
@@ -21,7 +20,7 @@ export default function PixPaymentScreen() {
 
   useEffect(() => {
     if (fetchedOrder) setOrder(fetchedOrder);
-  }, [fetchedOrder]);
+  }, [fetchedOrder, setOrder]);
 
   const order = needsFetch ? fetchedOrder : storeOrder;
 

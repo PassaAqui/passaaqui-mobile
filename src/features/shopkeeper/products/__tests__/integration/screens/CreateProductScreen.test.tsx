@@ -1,5 +1,5 @@
 import { ActivityIndicator } from "react-native";
-import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import CreateProductScreen from "@/src/features/shopkeeper/products/screens/CreateProductScreen";
 import { useCreateProductForm } from "@/src/features/shopkeeper/products/hooks/useCreateProductForm";

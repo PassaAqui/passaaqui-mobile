@@ -10,8 +10,7 @@ import FollowUserButton from "@/src/features/user/map/components/FollowUserButto
 import SwitchDestinationModal from "@/src/features/user/map/components/SwitchDestinationModal";
 import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirmation";
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
 import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
@@ -25,7 +24,6 @@ export default function MapScreen() {
     location,
     loadingRoute,
     mapRef,
-    mapReady,
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
@@ -44,7 +42,7 @@ export default function MapScreen() {
     showSwitchDestinationModal,
     confirmSwitchDestination,
     cancelSwitchDestination,
-    cityToShow, dismissCity, loadingCity,
+    cityToShow, dismissCity,
     checkinReward, setCheckinReward,
     simulating, startSimulation, stopSimulation, currentSimPosition // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
   } = useMapScreen();

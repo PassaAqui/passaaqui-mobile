@@ -1,17 +1,16 @@
 import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import ShopkeeperIcon from "@/src/features/shopkeeper/auth/components/ShopkeeperIcon";
 import { loginShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
-import { useRouter } from "expo-router";
 
 export default function ShopkeeperLoginScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [generalError, setGeneralError] = useState("");
+  const [, setGeneralError] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

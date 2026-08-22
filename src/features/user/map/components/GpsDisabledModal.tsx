@@ -1,9 +1,8 @@
-import { Modal, View, Image, Text, Pressable } from "react-native";
-import { Linking, Platform } from "react-native";
+import { Modal, View, Image, Text, Pressable, Linking, Platform } from "react-native";
 
 export default function GpsDisabledModal() {
   const openGpsSettings = () => {
-    if (Platform.OS == "android") {
+    if (Platform.OS === "android") {
       Linking.openSettings();
     } else {
       Linking.openURL("app-settings");

@@ -47,7 +47,7 @@ export function useCityEntry(location: LocationObject | null) {
 
     markCityAsVisited(city.cityId);
     setCityToShow(city);
-  }, [city]);
+  }, [city, hasVisitedCity, markCityAsVisited, visitedCityIds]);
 
   const dismissCity = () => setCityToShow(null);
 

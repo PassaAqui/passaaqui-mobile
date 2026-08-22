@@ -113,7 +113,6 @@ describe("StoreLocationPickerModal", () => {
 
     // Act
     const title = screen.getByText("Marque a localização da sua loja");
-    const button = screen.getByText("Confirmar localização");
 
     // Assert
     expect(title).toBeTruthy();

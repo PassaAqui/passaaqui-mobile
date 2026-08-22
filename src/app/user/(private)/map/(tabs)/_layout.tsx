@@ -1,6 +1,5 @@
 import { Tabs } from "expo-router";
 import { useFonts } from "expo-font";
-import { useRouter } from "expo-router";
 import { IrishGrover_400Regular } from "@expo-google-fonts/irish-grover";
 import { Itim_400Regular } from "@expo-google-fonts/itim";
 import { Inter_400Regular, Inter_700Bold, Inter_400Regular_Italic } from "@expo-google-fonts/inter"
@@ -13,8 +12,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/src/services/queryClient";
 
 export default function TabLayout() {
-  const router = useRouter();
-
   let [fontsLoaded] = useFonts({
     IrishGrover_400Regular,
     Itim_400Regular,

@@ -11,7 +11,7 @@ export default function ShopkeeperShopScreen() {
   const router = useRouter();
   const { data: user } = useTouristMe();
   const { poiId } = useLocalSearchParams<{ poiId: string }>();
-  const { data: poi, isLoading } = useProductsByPoi(Number(poiId));
+  const { data: poi } = useProductsByPoi(Number(poiId));
 
   const insets = useSafeAreaInsets();
   const { rows, getItemWidth } = useResponsiveGrid(poi?.products, { padding: 16, gap: 24, minItemWidth: 150 });

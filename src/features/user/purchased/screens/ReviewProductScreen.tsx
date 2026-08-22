@@ -1,8 +1,7 @@
 import { ScrollView, View, Text, Image, Pressable, TextInput } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Header from "@/src/features/user/shop/components/Header";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useReviewMedia } from "@/src/features/user/purchased/hooks/useReviewMedia";

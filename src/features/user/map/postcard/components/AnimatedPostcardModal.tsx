@@ -65,7 +65,7 @@ export default function AnimatedPostcardModal({
         }
       });
     }
-  }, [visible]);
+  }, [visible, flipRotation, opacity, scale, translateY]);
 
   const handleFlip = () => {
     if (!canFlip) return;

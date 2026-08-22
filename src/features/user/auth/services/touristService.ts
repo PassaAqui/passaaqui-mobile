@@ -1,5 +1,5 @@
 import { api } from "@/src/services/api/api"
-import axios from "axios";
+import { isAxiosError } from "axios";
 
 export interface TouristProfile {
   id: number;
@@ -12,7 +12,7 @@ export async function getTouristMe(): Promise<TouristProfile> {
     const { data } = await api.get("/tourists/me");
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       console.log("[getTouristMe ERROR] - status:", error.response?.status);
       console.log("[getTouristMe ERROR] - body:", error.response?.data);
     }

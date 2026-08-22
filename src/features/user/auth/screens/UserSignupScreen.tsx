@@ -1,11 +1,10 @@
 import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { signUpSchema } from "@/src/features/user/auth/schemas/signUpSchema";
 import { Link, useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Checkbox from "expo-checkbox";
+import { Checkbox } from "expo-checkbox";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
 import { singUp } from "@/src/features/user/auth/services/authService";
 import { formatCpf } from "@/src/features/user/auth/utils/formatCpf";

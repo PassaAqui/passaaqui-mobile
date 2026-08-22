@@ -1,6 +1,5 @@
 import { ScrollView, View, Image, Text, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useOrderStore } from "@/src/stores/user/payment/orderStore";
 

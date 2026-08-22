@@ -43,7 +43,7 @@ export default function RootLayout() {
     } else if (restored.shopkeeper) {
       router.replace("/shopkeeper/(private)/(tabs)");
     }
-  }, [checking, fontsLoaded, restored]);
+  }, [checking, fontsLoaded, restored, router]);
 
   if (!fontsLoaded || checking) return null;
 

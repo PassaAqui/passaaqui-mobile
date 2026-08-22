@@ -3,9 +3,8 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useOrderById } from "@/src/features/shopkeeper/orders/hooks/useOrderById";
-import { formatRelativeTime } from "@/src/features/shopkeeper/orders/utils/orderMapper";
+import { formatRelativeTime, StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 import { resolveDetailStatus, resolveDetailStatusConfig } from "@/src/features/shopkeeper/orders/utils/orderDetailStatusAdapter";
-import { StatusType } from "@/src/features/shopkeeper/orders/utils/orderMapper";
 
 const STATUS_STEPS: { key: StatusType; icon: string; label: string }[] = [
   { key: "Pendente",  icon: "hourglass", label: "Aguardando Pagamento" },

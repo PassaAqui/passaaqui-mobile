@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { api } from "@/src/services/api/api";
 import { useShopkeeperAuthStore } from "@/src/stores/shopkeeper/auth/shopkeeperAuthStore";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 const REFRESH_TOKEN = "shopkeeper_refresh_token";
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -56,7 +56,7 @@ export async function tryRestoreShopkeeperSession(): Promise<boolean> {
     await SecureStore.setItemAsync(REFRESH_TOKEN, data.refresh_token);
     return true;
   } catch (error) {
-    if (axios.isAxiosError(error) && (error.response?.status === 400 || error.response?.status === 401)) {
+    if (isAxiosError(error) && (error.response?.status === 400 || error.response?.status === 401)) {
       await useShopkeeperAuthStore.getState().logout();
     }
     return false;

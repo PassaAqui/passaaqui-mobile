@@ -1,4 +1,4 @@
-import { View, Image, Text, Pressable, Modal, ActivityIndicator } from "react-native";
+import { Image, Text, Pressable, Modal, ActivityIndicator } from "react-native";
 
 interface DeleteProductModalProps {
   visible: boolean;
@@ -17,7 +17,7 @@ export default function DeleteProductModal({ visible, productName, isDeleting, o
           <Text className="font-itim text-3xl text-red-500">ATENÇÃO!</Text>
 
           <Text className="text-center font-itim text-lg">
-            Você tem certeza que deseja excluir{"\n"}"{productName}"? Essa ação não pode ser desfeita.
+            Você tem certeza que deseja excluir{"\n"}{"\u201C"}{productName}{"\u201D"}? Essa ação não pode ser desfeita.
           </Text>
 
           <Pressable

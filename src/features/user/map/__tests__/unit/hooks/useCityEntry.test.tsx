@@ -1,7 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { LocationObject } from "expo-location";
 import { useCityEntry } from "@/src/features/user/map/hooks/useCityEntry";
 import { getCityData } from "@/src/features/user/map/postcard/services/postcardService";
