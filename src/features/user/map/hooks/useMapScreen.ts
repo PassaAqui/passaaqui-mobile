@@ -41,7 +41,7 @@ export function useMapScreen() {
     },
   });
 
-  const userPosition = currentSimPosition ?? (location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? { latitude: -8.0675, longitude: -34.9167 };
+  const userPosition = currentSimPosition ?? (!__DEV__ && location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? { latitude: -8.0675, longitude: -34.9167 };
 
   useAutoFollowDuringNavigation({
     userPosition,
