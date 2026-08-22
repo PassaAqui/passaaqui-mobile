@@ -4,7 +4,7 @@ import { getCurrentPositionAsync, LocationAccuracy } from 'expo-location';
 
 export function useGpsStatus(lastUpdate: number) {
   const [gpsActive, setGpsActive] = useState(true);
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /*
     Sempre que recebo uma nova atualização do lastUpdate (ou seja, o GPS está emitindo),
