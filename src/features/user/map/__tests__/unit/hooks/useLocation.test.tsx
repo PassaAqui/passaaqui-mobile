@@ -113,7 +113,7 @@ describe("useLocation", () => {
     expect(mapRefMock.animateToRegion).toHaveBeenCalledWith(devRegion);
   });
 
-  it("não chama animateCamera no callback mesmo com isFollowing true (closure stale do código)", async () => {
+  it("chama animateCamera com coordenadas reais quando isFollowing é true (fix: ref evita stale closure)", async () => {
     // Arrange
     const mapRefMock = { animateToRegion: jest.fn(), animateCamera: jest.fn() };
 
@@ -124,10 +124,13 @@ describe("useLocation", () => {
     act(() => watchCallback?.(fakeLocation));
 
     // Assert
-    // O callback captura `isFollowing` no efeito de mount (deps `[]`), então a
-    // mudança posterior via setIsFollowing nunca chega até ele — comportamento
-    // atual do código (bug de closure stale, candidato do item 17).
-    expect(mapRefMock.animateCamera).not.toHaveBeenCalled();
+    // Com o fix usando useRef, o callback agora lê o valor atualizado de isFollowing
+    // e usa as coordenadas reais do response.coords
+    // Em ambiente de teste (__DEV__ = true), auto-follow não dispara, só isFollowingRef
+    expect(mapRefMock.animateCamera).toHaveBeenCalledTimes(1);
+    expect(mapRefMock.animateCamera).toHaveBeenCalledWith({
+      center: { latitude: -8.0675, longitude: -34.9167 },
+    });
   });
 
   it("no unmount, remove a subscription do watch", async () => {

@@ -14,7 +14,7 @@ import { useState } from "react";
 import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging/useDebugRouteSimulation";
 
 export function useMapScreen() {
-  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing } = useLocation();
+  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow } = useLocation();
   const { gpsActive } = useGpsStatus(lastUpdate);
   const [mapCenter, setMapCenter] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locomotionMode, setLocomotionMode] = useState<RouteMode | null>(null);
@@ -50,7 +50,7 @@ export function useMapScreen() {
   });
 
   return {
-    location, mapRef, mapReady, setMapReady, isFollowing, setIsFollowing,
+    location, mapRef, mapReady, setMapReady, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow,
     mapCenter, setMapCenter,
     locomotionMode, setLocomotionMode,
     gpsActive,
