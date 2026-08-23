@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import MapView from "react-native-maps";
 
-interface UseAutoFollowDuringNavigationProps {
+export interface UseAutoFollowDuringNavigationProps {
   userPosition: { latitude: number; longitude: number } | null;
   mapRef: React.RefObject<MapView | null>;
   isNavigationActive: boolean;
