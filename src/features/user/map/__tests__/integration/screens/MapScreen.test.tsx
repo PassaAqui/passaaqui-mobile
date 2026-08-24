@@ -145,6 +145,8 @@ const baseMock = {
   gpsActive: true,
   isFollowing: true,
   setIsFollowing: jest.fn(),
+  enableAutoFollow: jest.fn(),
+  disableAutoFollow: jest.fn(),
   mapCenter: null,
   setMapCenter: jest.fn(),
   locomotionMode: null,
@@ -232,7 +234,7 @@ describe("MapScreen", () => {
     expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });
 
-  it("chama setIsFollowing(true) ao pressionar SEGUIR", () => {
+  it("chama enableAutoFollow ao pressionar SEGUIR", () => {
     // Arrange
     mockMapScreen({ isFollowing: false, stop: false });
     render(<MapScreen />);
@@ -241,7 +243,7 @@ describe("MapScreen", () => {
     fireEvent.press(screen.getByText("SEGUIR"));
 
     // Assert
-    expect(mockUseMapScreen().setIsFollowing).toHaveBeenCalledWith(true);
+    expect(mockUseMapScreen().enableAutoFollow).toHaveBeenCalledTimes(1);
   });
 
   it("mostra o botão PARAR com stop true e abre a confirmação ao pressionar", () => {
@@ -310,7 +312,7 @@ describe("MapScreen", () => {
     expect(screen.getByText("Ir até as configurações")).toBeTruthy();
   });
 
-  it("ao arrastar o mapa, chama setMapCenter e setIsFollowing(false)", () => {
+  it("ao arrastar o mapa, chama setMapCenter e disableAutoFollow", () => {
     // Arrange
     render(<MapScreen />);
     const region = {
@@ -329,7 +331,7 @@ describe("MapScreen", () => {
     );
 
     // Assert
-    expect(mockUseMapScreen().setIsFollowing).toHaveBeenCalledWith(false);
+    expect(mockUseMapScreen().disableAutoFollow).toHaveBeenCalledTimes(1);
     expect(mockUseMapScreen().setMapCenter).toHaveBeenCalledWith({
       latitude: -8.06,
       longitude: -34.87,

@@ -1,14 +1,20 @@
 import { useRef, useState } from "react";
-import { updateRouteLocation } from "@/src/services/routeService";
+import { updateRouteLocation, calculateAccumulatedDistance } from "@/src/services/routeService";
 
 interface Coordinate {
   latitude: number;
   longitude: number;
 }
 
-export function useDebugRouteSimulation(routeCoords: Coordinate[]) {
+interface UseDebugRouteSimulationParams {
+  routeCoords: Coordinate[];
+  onSimulationEnd?: (simulatedDistanceKm: number) => void;
+}
+
+export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDebugRouteSimulationParams) {
   const [simulating, setSimulating] = useState(false);
-  const [currentSimPosition, setCurrentSimPosition] = useState<Coordinate | null>(null); // <- novo
+  const [currentSimPosition, setCurrentSimPosition] = useState<Coordinate | null>(null);
+  const [simulatedDistanceKm, setSimulatedDistanceKm] = useState<number | null>(null);
   const indexRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -16,6 +22,7 @@ export function useDebugRouteSimulation(routeCoords: Coordinate[]) {
     if (!routeCoords.length) return;
     indexRef.current = 0;
     setSimulating(true);
+    setSimulatedDistanceKm(null);
 
     intervalRef.current = setInterval(async () => {
       const point = routeCoords[indexRef.current];
@@ -24,7 +31,7 @@ export function useDebugRouteSimulation(routeCoords: Coordinate[]) {
         return;
       }
 
-      setCurrentSimPosition(point); // <- atualiza a posição visual
+      setCurrentSimPosition(point);
 
       console.log(`[SIM] enviando ponto ${indexRef.current}/${routeCoords.length}`, point);
       try {
@@ -41,7 +48,12 @@ export function useDebugRouteSimulation(routeCoords: Coordinate[]) {
     if (intervalRef.current) clearInterval(intervalRef.current);
     setSimulating(false);
     setCurrentSimPosition(null);
+    // Calcular distância total simulada ao finalizar
+    const totalDistance = routeCoords.length > 1 ? calculateAccumulatedDistance(routeCoords) : 0;
+    setSimulatedDistanceKm(totalDistance);
+    // Trigger callback for DEV checkin
+    onSimulationEnd?.(totalDistance);
   }
 
-  return { simulating, startSimulation, stopSimulation, currentSimPosition };
+  return { simulating, startSimulation, stopSimulation, currentSimPosition, simulatedDistanceKm };
 }

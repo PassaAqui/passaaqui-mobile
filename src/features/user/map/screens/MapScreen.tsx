@@ -27,6 +27,8 @@ export default function MapScreen() {
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
+    enableAutoFollow,
+    disableAutoFollow,
     setMapCenter,
     setLocomotionMode,
     setOpenTouristPOIMarker, openTouristPOIMarker,
@@ -57,7 +59,7 @@ export default function MapScreen() {
 
 
   const handleFollow = () => {
-    setIsFollowing(true);
+    enableAutoFollow();
 
     if (location) {
       mapRef.current?.animateToRegion({
@@ -106,7 +108,7 @@ export default function MapScreen() {
         onMapReady={() => setMapReady(true)}
         onRegionChangeComplete={(region, details) => {
           if (details.isGesture) {
-            setIsFollowing(false);
+            disableAutoFollow();
             setMapCenter({ latitude: region.latitude, longitude: region.longitude });
           }
         }}

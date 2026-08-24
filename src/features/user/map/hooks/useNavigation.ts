@@ -16,6 +16,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
   const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
   const [showSwitchDestinationModal, setShowSwitchDestinationModal] = useState<boolean>(false);
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null);
+  const [plannedDistanceKm, setPlannedDistanceKm] = useState<number | null>(null);
 
   const startRouteSession = useStartRouteSession();
   const direction = useDirection();
@@ -28,7 +29,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
         const { data } = await currentSession.refetch();
         if (data?.status === "ACTIVE" && data.destination) {
           setStop(true);
-          const { coordinates } = await getDirection({
+          const { coordinates, distance } = await getDirection({
             mode: data.destination.mode,
             startLatitude: data.destination.startLatitude,
             startLongitude: data.destination.startLongitude,
@@ -37,6 +38,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
             poiId: data.destination.poiId,
           });
           setRouteCoords(coordinates);
+          setPlannedDistanceKm(parseFloat(distance));
         }
       } catch { }
     }
@@ -59,7 +61,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
         poiId,
       });
 
-      const { coordinates } = await direction.mutateAsync({
+      const { coordinates, distance } = await direction.mutateAsync({
         mode,
         startLatitude: origin.latitude,
         startLongitude: origin.longitude,
@@ -69,6 +71,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
       });
 
       setRouteCoords(coordinates);
+      setPlannedDistanceKm(parseFloat(distance));
 
       mapRef.current?.fitToCoordinates(coordinates, {
         edgePadding: { top: 80, right: 40, bottom: 80, left: 40 },
@@ -136,6 +139,8 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
     confirmSwitchDestination,
     cancelSwitchDestination,
     handleNavigation,
-    handleStopNavigation
+    handleStopNavigation,
+    currentPoiId: currentSession.data?.destination?.poiId ?? null,
+    plannedDistanceKm,
   };
 }

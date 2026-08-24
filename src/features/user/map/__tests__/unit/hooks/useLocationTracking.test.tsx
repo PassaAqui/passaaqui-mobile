@@ -11,6 +11,7 @@ jest.mock("@/src/features/user/map/hooks/useRouteSession", () => ({
 
 jest.mock("@/src/services/routeService", () => ({
   startRouteSession: jest.fn(),
+  haversineDistance: jest.fn((c1, c2) => 0.01),
 }));
 
 const mockedUseUpdateRouteLocation =

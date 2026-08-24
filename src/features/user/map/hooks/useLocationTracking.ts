@@ -1,12 +1,21 @@
 import { useEffect, useRef } from "react";
 import { useUpdateRouteLocation } from "@/src/features/user/map/hooks/useRouteSession";
-import { startRouteSession } from "@/src/services/routeService";
+import { startRouteSession, haversineDistance } from "@/src/services/routeService";
 import { AxiosError } from "axios";
 import { LocationObject } from "expo-location";
+
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
 
 export function useLocationTracking(location: LocationObject | null, active: boolean, paused: boolean = false) { // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o parâmetro 'paused'
   const updateLocation = useUpdateRouteLocation();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const accumulatedDistanceRef = useRef(0);
+  const lastPositionRef = useRef<Coordinate | null>(null);
+
+  const getAccumulatedDistance = () => accumulatedDistanceRef.current;
 
   useEffect(() => {
     if (!active || paused) { // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o '|| paused'
@@ -17,12 +26,28 @@ export function useLocationTracking(location: LocationObject | null, active: boo
     intervalRef.current = setInterval(async () => {
       if (!location) return;
 
-      const coords = {
+      const coords: Coordinate = {
         //latitude: location.coords.latitude,
         //longitude: location.coords.longitude
 
         latitude: -8.0675,
         longitude: -34.9167
+      }
+
+      // Acumular distância real (PROD) - usa GPS real quando disponível
+      if (!__DEV__ && location?.coords && lastPositionRef.current) {
+        const realCoords: Coordinate = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
+        accumulatedDistanceRef.current += haversineDistance(lastPositionRef.current, realCoords);
+        lastPositionRef.current = realCoords;
+      } else if (__DEV__) {
+        // Em DEV, usa coords fixos para simulação
+        if (lastPositionRef.current) {
+          accumulatedDistanceRef.current += haversineDistance(lastPositionRef.current, coords);
+        }
+        lastPositionRef.current = coords;
       }
 
       try {
@@ -49,5 +74,7 @@ export function useLocationTracking(location: LocationObject | null, active: boo
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [active, paused]); // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o 'paused'
+  }, [active, paused, location]); // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o 'paused'
+
+  return { getAccumulatedDistance };
 }

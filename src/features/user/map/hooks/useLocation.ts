@@ -31,6 +31,22 @@ export function useLocation() {
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [initialPosition, setInitialPosition] = useState<boolean>(false);
+  const hasUserManuallyDisabledFollow = useRef(false);
+  const isFollowingRef = useRef(isFollowing);
+
+  useEffect(() => {
+    isFollowingRef.current = isFollowing;
+  }, [isFollowing]);
+
+  const enableAutoFollow = () => {
+    hasUserManuallyDisabledFollow.current = false;
+    setIsFollowing(true);
+  };
+
+  const disableAutoFollow = () => {
+    hasUserManuallyDisabledFollow.current = true;
+    setIsFollowing(false);
+  };
 
   useEffect(() => {
     if (mapReady && mapRef.current && !location) {
@@ -89,7 +105,7 @@ export function useLocation() {
           return;
         }
   
-        subscription = await watchPositionAsync({
+subscription = await watchPositionAsync({
           accuracy: LocationAccuracy.High,
           timeInterval: 1000,
           distanceInterval: 2
@@ -97,33 +113,31 @@ export function useLocation() {
           setLocation(response);
           setLastUpdate(Date.now());
 
-          if (isFollowing) {
+          const userLat = response.coords.latitude;
+          const userLng = response.coords.longitude;
+
+          if (!hasUserManuallyDisabledFollow.current && !__DEV__) {
             mapRef.current?.animateCamera({
               center: {
-                //latitude: response.coords.latitude,
-                //longitude: response.coords.longitude
-
-                /*
-                ===================
-                VALORES DE PAULISTA
-                ===================
-                latitude: -7.94009,
-                longitude: -34.8723,
-                */
-               /*
-                 Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
-               */
-                latitude: -8.0675, /* Centro de recife (Marco Zero) */
-                longitude: -34.9167,
+                latitude: userLat,
+                longitude: userLng,
               },
-              //zoom: 19
             });
           }
-        });  
+
+          if (isFollowingRef.current) {
+            mapRef.current?.animateCamera({
+              center: {
+                latitude: userLat,
+                longitude: userLng,
+              },
+            });
+          }
+});
       }
-  
+
       getLocation();
-  
+
       return () => {
         subscription?.remove();
       }
@@ -134,6 +148,8 @@ export function useLocation() {
       mapRef,
       mapReady, setMapReady,
       lastUpdate,
-      isFollowing, setIsFollowing
+      isFollowing, setIsFollowing,
+      enableAutoFollow,
+      disableAutoFollow,
     }
 }
