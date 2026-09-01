@@ -17,7 +17,10 @@
     "test:integration:watch": "jest --selectProjects integration --watch",
     "test:coverage": "jest --coverage",
     "test:unit:coverage": "jest --selectProjects unit --coverage",
-    "test:integration:coverage": "jest --selectProjects integration --coverage"
+    "test:integration:coverage": "jest --selectProjects integration --coverage",
+    "test:e2e": "maestro test src/e2e",
+    "test:e2e:tourist": "maestro test src/e2e/tourist",
+    "test:e2e:shopkeeper": "maestro test src/e2e/shopkeeper"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
