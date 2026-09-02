@@ -6,7 +6,8 @@ import {
   watchPositionAsync,
   LocationAccuracy
 } from "expo-location";
-import MapView from "react-native-maps";
+import { Camera, type CameraRef, type MapRef } from "@maplibre/maplibre-react-native";
+import { MARCO_ZERO_RECIFE, toLngLat } from "@/src/constants/user/map/coordinates";
 
 async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -24,9 +25,9 @@ async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): 
   return false;
 }
 
-export function useLocation() {
+export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
   const [location, setLocation] = useState<LocationObject | null>(null);
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<MapRef>(null);
   const [mapReady, setMapReady] = useState<boolean>(false);
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
@@ -49,37 +50,19 @@ export function useLocation() {
   };
 
   useEffect(() => {
-    if (mapReady && mapRef.current && !location) {
-      mapRef.current.animateToRegion({
-        latitude: -8.0675, /* Centro de recife (Marco Zero) */
-        longitude: -34.9167,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
+    if (mapReady && !location) {
+      cameraRef.current?.jumpTo({
+        center: toLngLat(MARCO_ZERO_RECIFE),
+        zoom: 15,
       });
     }
   }, [mapReady, location]);
 
   useEffect(() => {
-    if (location && mapReady && !initialPosition && !isFollowing && mapRef.current) {
-      mapRef.current.animateToRegion({
-        //latitude: response.coords.latitude,
-        //longitude: response.coords.longitude
-
-        /*
-          Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
-        */
-
-       /*
-        ===================
-        VALORES DE PAULISTA
-        ===================
-        latitude: -7.94009,
-        longitude: -34.8723,
-        */
-        latitude: -8.0675, /* Centro de recife (Marco Zero) */
-        longitude: -34.9167,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
+    if (location && mapReady && !initialPosition && !isFollowing) {
+      cameraRef.current?.jumpTo({
+        center: toLngLat(MARCO_ZERO_RECIFE),
+        zoom: 15,
       });
       setInitialPosition(true);
     }
@@ -117,20 +100,14 @@ subscription = await watchPositionAsync({
           const userLng = response.coords.longitude;
 
           if (!hasUserManuallyDisabledFollow.current && !__DEV__) {
-            mapRef.current?.animateCamera({
-              center: {
-                latitude: userLat,
-                longitude: userLng,
-              },
+            cameraRef.current?.easeTo({
+              center: toLngLat({ latitude: userLat, longitude: userLng }),
             });
           }
 
           if (isFollowingRef.current) {
-            mapRef.current?.animateCamera({
-              center: {
-                latitude: userLat,
-                longitude: userLng,
-              },
+            cameraRef.current?.easeTo({
+              center: toLngLat({ latitude: userLat, longitude: userLng }),
             });
           }
 });

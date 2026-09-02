@@ -1,46 +1,54 @@
 import { act, renderHook } from "@testing-library/react-native";
 import type { RefObject } from "react";
-import MapView from "react-native-maps";
+import type { CameraRef } from "@maplibre/maplibre-react-native";
 import { useAutoFollowDuringNavigation, UseAutoFollowDuringNavigationProps } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
 
-jest.mock("react-native-maps", () => {
+jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
   const { View } = require("react-native");
-  const MapView = React.forwardRef(
+  const Map = React.forwardRef(
     ({ children, ...props }: any, _ref: unknown) => (
       <View {...props}>{children}</View>
     )
   );
-  MapView.displayName = "MapView";
+  Map.displayName = "Map";
   return {
     __esModule: true,
-    default: MapView,
+    Map,
+    Camera: React.forwardRef(
+      ({ children, ...props }: any, _ref: unknown) => (
+        <View {...props}>{children}</View>
+      )
+    ),
+    Marker: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    GeoJSONSource: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    Layer: ({ children, ...props }: any) => <View {...props}>{children}</View>,
   };
 });
 
-const animateCamera = jest.fn();
-const mapRef = {
-  current: { animateCamera },
-} as unknown as RefObject<MapView | null>;
+const easeTo = jest.fn();
+const cameraRef = {
+  current: { easeTo },
+} as unknown as RefObject<CameraRef | null>;
 
 describe("useAutoFollowDuringNavigation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("anima câmera quando navegação ativa, posição e mapRef existem", () => {
+  it("anima câmera quando navegação ativa, posição e cameraRef existem", () => {
     const userPosition = { latitude: -8.06, longitude: -34.87 };
     renderHook(() =>
       useAutoFollowDuringNavigation({
         userPosition,
-        mapRef,
+        cameraRef,
         isNavigationActive: true,
       })
     );
 
-    expect(animateCamera).toHaveBeenCalledTimes(1);
-    expect(animateCamera).toHaveBeenCalledWith({
-      center: { latitude: -8.06, longitude: -34.87 },
+    expect(easeTo).toHaveBeenCalledTimes(1);
+    expect(easeTo).toHaveBeenCalledWith({
+      center: [-34.87, -8.06],
     });
   });
 
@@ -49,39 +57,39 @@ describe("useAutoFollowDuringNavigation", () => {
     renderHook(() =>
       useAutoFollowDuringNavigation({
         userPosition,
-        mapRef,
+        cameraRef,
         isNavigationActive: false,
       })
     );
 
-    expect(animateCamera).not.toHaveBeenCalled();
+    expect(easeTo).not.toHaveBeenCalled();
   });
 
   it("não anima quando userPosition é null", () => {
     renderHook(() =>
       useAutoFollowDuringNavigation({
         userPosition: null,
-        mapRef,
+        cameraRef,
         isNavigationActive: true,
       })
     );
 
-    expect(animateCamera).not.toHaveBeenCalled();
+    expect(easeTo).not.toHaveBeenCalled();
   });
 
-  it("não anima quando mapRef.current é null", () => {
+  it("não anima quando cameraRef.current é null", () => {
     const userPosition = { latitude: -8.06, longitude: -34.87 };
-    const nullMapRef = { current: null } as unknown as RefObject<MapView | null>;
+    const nullCameraRef = { current: null } as unknown as RefObject<CameraRef | null>;
 
     renderHook(() =>
       useAutoFollowDuringNavigation({
         userPosition,
-        mapRef: nullMapRef,
+        cameraRef: nullCameraRef,
         isNavigationActive: true,
       })
     );
 
-    expect(animateCamera).not.toHaveBeenCalled();
+    expect(easeTo).not.toHaveBeenCalled();
   });
 
   it("atualiza animação quando userPosition muda", () => {
@@ -89,19 +97,19 @@ describe("useAutoFollowDuringNavigation", () => {
       ({ userPosition }: { userPosition: UseAutoFollowDuringNavigationProps['userPosition'] }) =>
         useAutoFollowDuringNavigation({
           userPosition,
-          mapRef,
+          cameraRef,
           isNavigationActive: true,
         }),
       { initialProps: { userPosition: { latitude: -8.06, longitude: -34.87 } } }
     );
 
-    expect(animateCamera).toHaveBeenCalledTimes(1);
+    expect(easeTo).toHaveBeenCalledTimes(1);
 
     rerender({ userPosition: { latitude: -8.07, longitude: -34.88 } });
 
-    expect(animateCamera).toHaveBeenCalledTimes(2);
-    expect(animateCamera).toHaveBeenLastCalledWith({
-      center: { latitude: -8.07, longitude: -34.88 },
+    expect(easeTo).toHaveBeenCalledTimes(2);
+    expect(easeTo).toHaveBeenLastCalledWith({
+      center: [-34.88, -8.07],
     });
   });
 
@@ -110,16 +118,16 @@ describe("useAutoFollowDuringNavigation", () => {
       ({ isNavigationActive }: { isNavigationActive: boolean }) =>
         useAutoFollowDuringNavigation({
           userPosition: { latitude: -8.06, longitude: -34.87 },
-          mapRef,
+          cameraRef,
           isNavigationActive,
         }),
       { initialProps: { isNavigationActive: true } }
     );
 
-    expect(animateCamera).toHaveBeenCalledTimes(1);
+    expect(easeTo).toHaveBeenCalledTimes(1);
 
     rerender({ isNavigationActive: false });
 
-    expect(animateCamera).toHaveBeenCalledTimes(1);
+    expect(easeTo).toHaveBeenCalledTimes(1);
   });
 });

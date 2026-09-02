@@ -1,8 +1,10 @@
 import { Modal, View, Text, Pressable } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
-import MapView, { Marker, MapPressEvent } from "react-native-maps";
+import { Map, Camera, Marker } from "@maplibre/maplibre-react-native";
+import type { NativeSyntheticEvent } from "react-native";
 import { MIN_DISTANCE_METERS, distanceInMeters } from "@/src/features/shopkeeper/auth/utils/distanceInMeters";
+import { MARCO_ZERO_RECIFE, fromLngLat, toLngLat, type LatLng } from "@/src/constants/user/map/coordinates";
 
 export interface ExistingPoi {
   id: number;
@@ -22,11 +24,12 @@ interface StoreLocationPickerModalProps {
 export default function StoreLocationPickerModal({ visible, existingPois, initialLocation, onConfirm, onClose }: StoreLocationPickerModalProps) {
   const insets = useSafeAreaInsets();
   
-  const [pin, setPin] = useState<{ latitude: number; longitude: number } | null>(initialLocation ?? null);
+  const [pin, setPin] = useState<LatLng | null>(initialLocation ?? null);
   const [blocked, setBlocked] = useState(false);
 
-  const handleMapPress = (event: MapPressEvent) => {
-    const coordinate = event.nativeEvent.coordinate;
+  const handleMapPress = (event: NativeSyntheticEvent<{ lngLat: [number, number] }>) => {
+    // MapLibre retorna lngLat como [longitude, latitude]
+    const coordinate = fromLngLat(event.nativeEvent.lngLat);
     console.log("[StoreLocationPickerModal] coordenada marcada:", coordinate);
 
     const tooClose = existingPois.some(
@@ -54,32 +57,51 @@ export default function StoreLocationPickerModal({ visible, existingPois, initia
           </Pressable>
         </View>
 
-        <MapView
+        <Map
+          mapStyle="https://demotiles.maplibre.org/style.json"
           style={{ flex: 1 }}
-          initialRegion={{
-            latitude: initialLocation?.latitude ?? -8.0675,
-            longitude: initialLocation?.longitude ?? -34.9167,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
           onPress={handleMapPress}
         >
+          <Camera
+            initialViewState={{
+              center: toLngLat(initialLocation ?? MARCO_ZERO_RECIFE),
+              zoom: 14,
+            }}
+          />
+
           {existingPois.map((poi) => (
             <Marker
               key={poi.id}
-              coordinate={{ latitude: poi.latitude, longitude: poi.longitude }}
-              title={poi.name}
-              pinColor="gray"
-            />
+              id={`existing-poi-${poi.id}`}
+              lngLat={toLngLat({ latitude: poi.latitude, longitude: poi.longitude })}
+            >
+              <View style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: "gray",
+                borderWidth: 2,
+                borderColor: "white",
+              }} />
+            </Marker>
           ))}
 
           {pin && (
             <Marker
-              coordinate={pin}
-              pinColor={blocked ? "red" : "#EAAA6A"}
-            />
+              id="selected-pin"
+              lngLat={toLngLat(pin)}
+            >
+              <View style={{
+                width: 24,
+                height: 24,
+                borderRadius: 12,
+                backgroundColor: blocked ? "red" : "#EAAA6A",
+                borderWidth: 2,
+                borderColor: "white",
+              }} />
+            </Marker>
           )}
-        </MapView>
+        </Map>
 
         {blocked && (
           <Text className="text-red-500 text-center font-itim p-2">

@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import type { RefObject } from "react";
-import type MapView from "react-native-maps";
+import type { CameraRef, MapRef } from "@maplibre/maplibre-react-native";
 import type { LocationObject } from "expo-location";
 import { useNavigation } from "@/src/features/user/map/hooks/useNavigation";
 import {
@@ -23,6 +23,29 @@ jest.mock("@/src/services/routeService", () => ({
   getDirection: jest.fn(),
 }));
 
+jest.mock("@maplibre/maplibre-react-native", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  const Map = React.forwardRef(
+    ({ children, ...props }: any, _ref: unknown) => (
+      <View {...props}>{children}</View>
+    )
+  );
+  Map.displayName = "Map";
+  return {
+    __esModule: true,
+    Map,
+    Camera: React.forwardRef(
+      ({ children, ...props }: any, _ref: unknown) => (
+        <View {...props}>{children}</View>
+      )
+    ),
+    Marker: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    GeoJSONSource: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    Layer: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+  };
+});
+
 const mockedUseStartRouteSession =
   useStartRouteSession as jest.MockedFunction<typeof useStartRouteSession>;
 const mockedUseDirection = useDirection as jest.MockedFunction<typeof useDirection>;
@@ -37,19 +60,22 @@ const coordinates = [
   { latitude: -8.0589, longitude: -34.8681 },
 ];
 
-// O hook recebe (location, mapRef), mas as coordenadas de origem da navegação
-// são fixas em dev (-8.0675 / -34.9167) — o location não é lido.
+// O hook recebe (location, mapRef, cameraRef), mas as coordenadas de origem da navegação
+// são fixas em dev (MARCO_ZERO_RECIFE) — o location não é lido.
 const fakeLocation = {
   coords: { latitude: -8.0675, longitude: -34.9167 },
 } as LocationObject;
 
-// Referências aos mocks do mapRef (evitam acesso a `mapRef.current` que o tipo
-// marca como `MapView | null`).
-const fitToCoordinates = jest.fn();
-const animateToRegion = jest.fn();
+// Referências aos mocks do mapRef
 const mapRef = {
-  current: { fitToCoordinates, animateToRegion },
-} as unknown as RefObject<MapView | null>;
+  current: {},
+} as unknown as RefObject<MapRef | null>;
+
+// Referência ao mock do cameraRef (MapLibre usa fitBounds em vez de fitToCoordinates)
+const fitBounds = jest.fn();
+const cameraRef = {
+  current: { fitBounds },
+} as unknown as RefObject<CameraRef | null>;
 
 describe("useNavigation", () => {
   let consoleLogSpy: jest.SpyInstance;
@@ -79,7 +105,7 @@ describe("useNavigation", () => {
   });
 
   function renderNavigation() {
-    return renderHook(() => useNavigation(fakeLocation, mapRef));
+    return renderHook(() => useNavigation(fakeLocation, mapRef, cameraRef));
   }
 
   it("restaura sessão ativa e traça a rota salva", async () => {
@@ -135,7 +161,7 @@ describe("useNavigation", () => {
     expect(mockedGetDirection).not.toHaveBeenCalled();
   });
 
-  it("sem navegação em andamento, traça a rota e ajusta o mapa", async () => {
+  it("sem navegação em andamento, traça a rota e ajusta o mapa via cameraRef", async () => {
     // Arrange
     const startMutateAsync = jest.fn().mockResolvedValue(routeSession);
     const directionMutateAsync = jest.fn().mockResolvedValue({
@@ -175,10 +201,11 @@ describe("useNavigation", () => {
       endLongitude: destination.longitude,
       poiId: 5,
     });
-    expect(fitToCoordinates).toHaveBeenCalledWith(coordinates, {
-      edgePadding: { top: 80, right: 40, bottom: 80, left: 40 },
-      animated: true,
-    });
+    // MapLibre: fitToCoordinates é substituído por cameraRef.fitBounds com bounds [west, south, east, north]
+    expect(fitBounds).toHaveBeenCalledWith(
+      [-34.8699, -8.0608, -34.8681, -8.0589],
+      { padding: { top: 80, right: 40, bottom: 80, left: 40 } }
+    );
   });
 
   it("com navegação em andamento, abre o modal de troca de destino", async () => {

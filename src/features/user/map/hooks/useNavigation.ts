@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import MapView from "react-native-maps";
+import { type CameraRef, type MapRef } from "@maplibre/maplibre-react-native";
 import { useStartRouteSession, useDirection, useEndRouteSession, useCurrentRouteSession } from "@/src/features/user/map/hooks/useRouteSession";
 import { RouteMode, getDirection } from "@/src/services/routeService";
 import { LocationObject } from "expo-location";
+import { MARCO_ZERO_RECIFE, calculateBounds } from "@/src/constants/user/map/coordinates";
 
 interface PendingNavigation {
   destination: { latitude: number; longitude: number };
@@ -10,7 +11,7 @@ interface PendingNavigation {
   poiId?: number;
 }
 
-export function useNavigation(location: LocationObject | null, mapRef: React.RefObject<MapView | null>) {
+export function useNavigation(location: LocationObject | null, mapRef: React.RefObject<MapRef | null>, cameraRef: React.RefObject<CameraRef | null>) {
   const [routeCoords, setRouteCoords] = useState<{ latitude: number; longitude: number }[]>([]);
   const [stop, setStop] = useState<boolean>(false);
   const [showStopConfirmation, setShowStopConfirmation] = useState<boolean>(false);
@@ -46,13 +47,7 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
   }, []);
 
   async function executeNavigation(destination: { latitude: number; longitude: number }, mode: RouteMode, poiId?: number) {
-    const origin = {
-      //latitude: location?.coords.latitude,
-      //longitude: location?.coords.longitude
-
-      latitude: -8.0675,
-      longitude: -34.9167,
-    };
+    const origin = MARCO_ZERO_RECIFE;
 
     try {
       await startRouteSession.mutateAsync({
@@ -73,10 +68,8 @@ export function useNavigation(location: LocationObject | null, mapRef: React.Ref
       setRouteCoords(coordinates);
       setPlannedDistanceKm(parseFloat(distance));
 
-      mapRef.current?.fitToCoordinates(coordinates, {
-        edgePadding: { top: 80, right: 40, bottom: 80, left: 40 },
-        animated: true,
-      });
+      const bounds = calculateBounds(coordinates);
+      cameraRef.current?.fitBounds(bounds, { padding: { top: 80, right: 40, bottom: 80, left: 40 } });
     } catch (error) {
       console.log(`[useNavigation ERROR]: Erro ao traçar a rota ${error}`);
     } finally {

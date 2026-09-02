@@ -8,25 +8,32 @@ interface TestTreeNode {
   parent: TestTreeNode | null;
 }
 
-jest.mock("react-native-maps", () => {
+jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
   const { View } = require("react-native");
-  const MapView = React.forwardRef(
+  const Map = React.forwardRef(
     ({ children, ...props }: any, _ref: unknown) => (
       <View testID="mapview" {...props}>
         {children}
       </View>
     )
   );
-  MapView.displayName = "MapView";
+  Map.displayName = "Map";
   return {
     __esModule: true,
-    default: MapView,
+    Map,
+    Camera: React.forwardRef(
+      ({ children, ...props }: any, _ref: unknown) => (
+        <View {...props}>{children}</View>
+      )
+    ),
     Marker: ({ children, ...props }: any) => (
       <View testID="marker" {...props}>
         {children}
       </View>
     ),
+    GeoJSONSource: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    Layer: ({ children, ...props }: any) => <View {...props}>{children}</View>,
   };
 });
 
@@ -124,8 +131,9 @@ describe("StoreLocationPickerModal", () => {
     renderModal({ existingPois: [existingShopPoi] });
 
     // Act
+    // MapLibre onPress retorna nativeEvent.lngLat como [lng, lat]
     fireEvent(screen.getByTestId("mapview"), "press", {
-      nativeEvent: { coordinate: FAR_LOCATION },
+      nativeEvent: { lngLat: [FAR_LOCATION.longitude, FAR_LOCATION.latitude] },
     });
 
     // Assert
@@ -139,7 +147,7 @@ describe("StoreLocationPickerModal", () => {
 
     // Act
     fireEvent(screen.getByTestId("mapview"), "press", {
-      nativeEvent: { coordinate: NEAR_LOCATION },
+      nativeEvent: { lngLat: [NEAR_LOCATION.longitude, NEAR_LOCATION.latitude] },
     });
 
     // Assert
@@ -163,7 +171,7 @@ describe("StoreLocationPickerModal", () => {
     // Arrange
     renderModal({ existingPois: [existingShopPoi] });
     fireEvent(screen.getByTestId("mapview"), "press", {
-      nativeEvent: { coordinate: NEAR_LOCATION },
+      nativeEvent: { lngLat: [NEAR_LOCATION.longitude, NEAR_LOCATION.latitude] },
     });
 
     // Act

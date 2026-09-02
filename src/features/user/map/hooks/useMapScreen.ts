@@ -9,19 +9,22 @@ import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
 import { useAutoFollowDuringNavigation } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
 import { RouteMode } from "@/src/services/routeService";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { type CameraRef } from "@maplibre/maplibre-react-native";
+import { MARCO_ZERO_RECIFE } from "@/src/constants/user/map/coordinates";
 
 import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging/useDebugRouteSimulation";
 import { checkinAtPoi } from "@/src/services/routeService";
 
 export function useMapScreen() {
-  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow } = useLocation();
+  const cameraRef = useRef<CameraRef>(null);
+  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow } = useLocation(cameraRef);
   const { gpsActive } = useGpsStatus(lastUpdate);
   const [mapCenter, setMapCenter] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locomotionMode, setLocomotionMode] = useState<RouteMode | null>(null);
   const { touristPois, shopPois } = useNearbyPois(location, mapCenter, locomotionMode);
   const poi = usePOI(location);
-  const navigation = useNavigation(location, mapRef);
+  const navigation = useNavigation(location, mapRef, cameraRef);
   const bounds = useBoundsCheck(location);
   const cityEntry = useCityEntry(location);
   const [checkinReward, setCheckinReward] = useState<{ xp: number } | null>(null);
@@ -71,16 +74,16 @@ export function useMapScreen() {
     },
   });
 
-  const userPosition = currentSimPosition ?? (!__DEV__ && location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? { latitude: -8.0675, longitude: -34.9167 };
+  const userPosition = currentSimPosition ?? (!__DEV__ && location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? MARCO_ZERO_RECIFE;
 
   useAutoFollowDuringNavigation({
     userPosition,
-    mapRef,
+    cameraRef,
     isNavigationActive: navigation.stop,
   });
 
   return {
-    location, mapRef, mapReady, setMapReady, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow,
+    location, mapRef, cameraRef, mapReady, setMapReady, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow,
     mapCenter, setMapCenter,
     locomotionMode, setLocomotionMode,
     gpsActive,
