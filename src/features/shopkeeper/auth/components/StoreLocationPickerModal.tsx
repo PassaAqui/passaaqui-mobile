@@ -21,6 +21,9 @@ interface StoreLocationPickerModalProps {
   onClose: () => void;
 }
 
+const MAPTILER_API_KEY = process.env.EXPO_PUBLIC_MAPTILER_API_KEY;
+const MAP_STYLE_URL = `https://api.maptiler.com/maps/01a08c63-b260-733f-8081-77da900e16c0/style.json?key=${MAPTILER_API_KEY}`;
+
 export default function StoreLocationPickerModal({ visible, existingPois, initialLocation, onConfirm, onClose }: StoreLocationPickerModalProps) {
   const insets = useSafeAreaInsets();
   
@@ -58,7 +61,7 @@ export default function StoreLocationPickerModal({ visible, existingPois, initia
         </View>
 
         <Map
-          mapStyle="https://demotiles.maplibre.org/style.json"
+          mapStyle={MAP_STYLE_URL}
           style={{ flex: 1 }}
           onPress={handleMapPress}
         >

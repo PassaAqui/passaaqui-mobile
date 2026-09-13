@@ -17,8 +17,8 @@ import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRe
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { MARCO_ZERO_RECIFE, toLngLat, fromLngLat } from "@/src/constants/user/map/coordinates";
 
-// TODO: trocar pela URL do seu provedor de tiles (MapTiler, Stadia, etc.) quando tiver API key
-const MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+const MAPTILER_API_KEY = process.env.EXPO_PUBLIC_MAPTILER_API_KEY;
+const MAP_STYLE_URL = `https://api.maptiler.com/maps/01a08c63-b260-733f-8081-77da900e16c0/style.json?key=${MAPTILER_API_KEY}`;
 
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
@@ -106,7 +106,8 @@ export default function MapScreen() {
           ref={cameraRef}
           initialViewState={{
             center: toLngLat(MARCO_ZERO_RECIFE),
-            zoom: 15,
+            pitch: 60,
+            zoom: 40,
           }}
         />
 
