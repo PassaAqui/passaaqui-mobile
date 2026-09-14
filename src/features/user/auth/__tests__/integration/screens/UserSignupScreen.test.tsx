@@ -30,6 +30,13 @@ jest.mock("react-native-keyboard-controller", () => ({
   ),
 }));
 
+jest.mock("@expo/vector-icons", () => {
+  const { Text } = require("react-native");
+  return {
+    Ionicons: () => <Text>icon</Text>,
+  };
+});
+
 const mockedSingUp = singUp as jest.MockedFunction<typeof singUp>;
 const mockedReplace = jest.fn();
 const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
