@@ -5,11 +5,14 @@ import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
 import { logout } from "@/src/features/user/auth/services/authService";
 import { useRouter } from "expo-router";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
 export default function SettingScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const { data: tourist } = useTouristMe();
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark")
@@ -61,8 +64,8 @@ export default function SettingScreen() {
           </View>
 
           <View>
-            <Text className="font-itim text-center text-2xl">David Cleyton</Text>
-            <Text className="font-itim text-center text-lg opacity-65">davidcleyton101@gmail.com</Text>
+            <Text className="font-itim text-center text-2xl">{tourist?.name}</Text>
+            <Text className="font-itim text-center text-lg opacity-65">{tourist?.email}</Text>
           </View>
         </View>
 
