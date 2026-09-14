@@ -213,7 +213,7 @@ export default function MapScreen() {
 
       {openTouristPOIMarker && (
         <TouristSpotPOI
-          img={require("@/assets/user/map/tmp/no-image.png")}
+          img={ (!!openTouristPOIMarker.image) ? openTouristPOIMarker.image : require("@/assets/user/map/tmp/no-image.png")}
           title={openTouristPOIMarker.name}
           description={openTouristPOIMarker.description ?? ""}
           distance={openTouristPOIMarker.distanceLabel}
