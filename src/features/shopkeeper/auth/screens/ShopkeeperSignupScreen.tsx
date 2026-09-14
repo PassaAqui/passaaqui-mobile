@@ -25,7 +25,7 @@ function FieldError({ children }: { children?: string }) {
   return <Text className="font-itim text-sm text-red-300 mt-1">{children}</Text>;
 }
 
-function InputWithIcon({ icon, ...props }: React.ComponentProps<typeof TextInput> & { icon: keyof typeof Ionicons.glyphMap }) {
+function InputWithIcon({ icon, trailing, ...props }: React.ComponentProps<typeof TextInput> & { icon: keyof typeof Ionicons.glyphMap; trailing?: React.ReactNode }) {
   return (
     <View className="flex-row items-center bg-white rounded-xl px-4 border border-transparent focus:border-[#EAAA6A]">
       <Ionicons name={icon} size={18} color="#9CA3AF" />
@@ -34,6 +34,7 @@ function InputWithIcon({ icon, ...props }: React.ComponentProps<typeof TextInput
         placeholderTextColor="#9CA3AF"
         className="flex-1 py-4 px-3 text-black"
       />
+      {trailing}
     </View>
   );
 }
@@ -48,6 +49,8 @@ export default function ShopkeeperSignupScreen() {
   const [documentId, setDocumentId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [description, setDescription] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
   const [street, setStreet] = useState("");
@@ -366,13 +369,18 @@ export default function ShopkeeperSignupScreen() {
                   <Text className="text-white/90 font-itim text-base mb-1">Senha</Text>
                   <InputWithIcon
                     icon="lock-closed-outline"
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
                     value={password}
                     onChangeText={(text) => {
                       setPassword(text);
                       if (error.password) setError((prev) => ({ ...prev, password: "" }));
                     }}
                     placeholder="Digite sua senha"
+                    trailing={
+                      <Pressable onPress={() => setShowPassword(prev => !prev)} hitSlop={8}>
+                        <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                      </Pressable>
+                    }
                   />
                   <FieldError>{error.password}</FieldError>
                 </View>
@@ -381,13 +389,18 @@ export default function ShopkeeperSignupScreen() {
                   <Text className="text-white/90 font-itim text-base mb-1">Confirmar senha</Text>
                   <InputWithIcon
                     icon="lock-closed-outline"
-                    secureTextEntry
+                    secureTextEntry={!showConfirmPassword}
                     value={confirmPassword}
                     onChangeText={(text) => {
                       setConfirmPassword(text);
                       if (error.confirmPassword) setError((prev) => ({ ...prev, confirmPassword: "" }));
                     }}
                     placeholder="Confirme sua senha"
+                    trailing={
+                      <Pressable onPress={() => setShowConfirmPassword(prev => !prev)} hitSlop={8}>
+                        <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                      </Pressable>
+                    }
                   />
                   <FieldError>{error.confirmPassword}</FieldError>
                 </View>
