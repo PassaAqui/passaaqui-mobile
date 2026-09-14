@@ -19,14 +19,17 @@ jest.mock("@maplibre/maplibre-react-native", () => {
     )
   );
   Map.displayName = "Map";
+  const Camera = React.forwardRef(
+    ({ children, ...props }: any, _ref: unknown) => (
+      <View {...props}>{children}</View>
+    )
+  );
+  Camera.displayName = "Camera";
+
   return {
     __esModule: true,
     Map,
-    Camera: React.forwardRef(
-      ({ children, ...props }: any, _ref: unknown) => (
-        <View {...props}>{children}</View>
-      )
-    ),
+    Camera,
     Marker: ({ children, ...props }: any) => (
       <View testID="marker" {...props}>
         {children}
