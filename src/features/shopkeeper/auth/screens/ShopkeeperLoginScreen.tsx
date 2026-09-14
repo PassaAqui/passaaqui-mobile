@@ -66,7 +66,8 @@ export default function ShopkeeperLoginScreen() {
                   }
                 }}
                 placeholder="Digite seu email"
-                className="bg-white rounded-lg p-4"
+                placeholderTextColor="#9CA3AF"
+                className="bg-white rounded-lg p-4 text-black"
               />
               {error.email && (
                 <Text className="font-itim text-base text-red-300">{error.email}</Text>
@@ -83,7 +84,8 @@ export default function ShopkeeperLoginScreen() {
                   }
                 }}
                 placeholder="Digite sua senha"
-                className="bg-white rounded-lg p-4"
+                placeholderTextColor="#9CA3AF"
+                className="bg-white rounded-lg p-4 text-black"
               />
               {error.password && (
                 <Text className="font-itim text-base text-red-300">{error.password}</Text>
