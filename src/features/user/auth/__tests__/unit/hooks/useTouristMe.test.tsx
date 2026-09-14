@@ -17,6 +17,7 @@ const mockedGetTouristMe = getTouristMe as jest.MockedFunction<typeof getTourist
 const validTouristProfile: TouristProfile = {
   id: 1,
   name: "Turista Teste",
+  email: "turistateste@email.com",
   currentXP: 120,
 };
 

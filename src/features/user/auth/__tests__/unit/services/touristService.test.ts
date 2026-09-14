@@ -17,6 +17,7 @@ const mockedApi = api as jest.Mocked<typeof api>;
 const validTouristProfile: TouristProfile = {
   id: 1,
   name: "Turista Teste",
+  email: "turistateste@email.com",
   currentXP: 120,
 };
 
