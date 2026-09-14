@@ -4,6 +4,7 @@ import { isAxiosError } from "axios";
 export interface TouristProfile {
   id: number;
   name: string,
+  email: string,
   currentXP: number
 }
 
