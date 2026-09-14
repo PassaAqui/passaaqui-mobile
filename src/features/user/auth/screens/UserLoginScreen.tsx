@@ -3,6 +3,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
 import { login } from "@/src/features/user/auth/services/authService";
 
@@ -12,6 +13,7 @@ export default function UserLoginScreen() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState({
     email: "",
@@ -74,25 +76,32 @@ export default function UserLoginScreen() {
                 }
               }}
               placeholder="Digite seu email"
-              className="bg-white rounded-lg p-4"
+              placeholderTextColor="#9CA3AF"
+              className="bg-white rounded-lg p-4 text-black"
             />
             {error.email && (
               <Text className="font-itim text-base text-red-300">{error.email}</Text>
             )}
                   
             <Text className="text-white font-itim">Senha</Text>
-            <TextInput
-              secureTextEntry
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (error.password) {
-                  setError(prev => ({ ...prev, password: "" }));
-                }
-              }}
-              placeholder="Digite sua senha"
-              className="bg-white rounded-lg p-4"
-            />
+            <View className="flex-row items-center bg-white rounded-lg">
+              <TextInput
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  if (error.password) {
+                    setError(prev => ({ ...prev, password: "" }));
+                  }
+                }}
+                placeholder="Digite sua senha"
+                placeholderTextColor="#9CA3AF"
+                className="flex-1 p-4 pr-2 text-black"
+              />
+              <Pressable onPress={() => setShowPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
+                <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+              </Pressable>
+            </View>
             {error.password && (
               <Text className="font-itim text-base text-red-300">{error.password}</Text>
             )}

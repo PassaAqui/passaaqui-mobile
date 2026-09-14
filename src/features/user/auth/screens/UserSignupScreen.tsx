@@ -5,6 +5,7 @@ import { signUpSchema } from "@/src/features/user/auth/schemas/signUpSchema";
 import { Link, useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Checkbox } from "expo-checkbox";
+import { Ionicons } from "@expo/vector-icons";
 import UserIcon from "@/src/features/user/auth/components/UserIcon";
 import { singUp } from "@/src/features/user/auth/services/authService";
 import { formatCpf } from "@/src/features/user/auth/utils/formatCpf";
@@ -21,6 +22,8 @@ export default function UserSignupScreen() {
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isChecked, setChecked] = useState(false);
   const [error, setError] = useState({
     name: "", email: "", cpf: "", password: "", confirmPassword: "", terms: ""
@@ -85,8 +88,9 @@ export default function UserSignupScreen() {
               <TextInput
                 value={name}
                 onChangeText={(text) => { setName(text); if (error.name) setError(prev => ({ ...prev, name: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="Digite seu nome"
+                placeholderTextColor="#9CA3AF"
               />
               {error.name && <Text className="font-itim text-base text-red-300">{error.name}</Text>}
 
@@ -97,8 +101,9 @@ export default function UserSignupScreen() {
                 autoCorrect={false}
                 value={email}
                 onChangeText={(text) => { setEmail(text); if (error.email) setError(prev => ({ ...prev, email: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="Digite seu email aqui"
+                placeholderTextColor="#9CA3AF"
               />
               {error.email && <Text className="font-itim text-base text-red-300">{error.email}</Text>}
 
@@ -107,29 +112,42 @@ export default function UserSignupScreen() {
                 keyboardType="numeric"
                 value={cpf}
                 onChangeText={(text) => { setCpf(formatCpf(text)); if (error.cpf) setError(prev => ({ ...prev, cpf: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="___.___.___-__"
+                placeholderTextColor="#9CA3AF"
               />
               {error.cpf && <Text className="font-itim text-base text-red-300">{error.cpf}</Text>}
 
               <Text className="text-white font-itim text-lg">Senha</Text>
-              <TextInput
-                secureTextEntry
-                value={password}
-                onChangeText={(text) => { setPassword(text); if (error.password) setError(prev => ({ ...prev, password: "" })); }}
-                className="bg-white rounded-lg p-4"
-                placeholder="Digite sua senha"
-              />
+              <View className="flex-row items-center bg-white rounded-lg">
+                <TextInput
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={(text) => { setPassword(text); if (error.password) setError(prev => ({ ...prev, password: "" })); }}
+                  className="flex-1 p-4 pr-2 text-black"
+                  placeholder="Digite sua senha"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Pressable onPress={() => setShowPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
+                  <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+              </View>
               {error.password && <Text className="font-itim text-base text-red-300">{error.password}</Text>}
 
               <Text className="text-white font-itim text-lg">Confirmar senha</Text>
-              <TextInput
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={(text) => { setConfirmPassword(text); if (error.confirmPassword) setError(prev => ({ ...prev, confirmPassword: "" })); }}
-                className="bg-white rounded-lg p-4"
-                placeholder="Confirme sua senha"
-              />
+              <View className="flex-row items-center bg-white rounded-lg">
+                <TextInput
+                  secureTextEntry={!showConfirmPassword}
+                  value={confirmPassword}
+                  onChangeText={(text) => { setConfirmPassword(text); if (error.confirmPassword) setError(prev => ({ ...prev, confirmPassword: "" })); }}
+                  className="flex-1 p-4 pr-2 text-black"
+                  placeholder="Confirme sua senha"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Pressable onPress={() => setShowConfirmPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
+                  <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+              </View>
               {error.confirmPassword && <Text className="font-itim text-base text-red-300">{error.confirmPassword}</Text>}
 
               <View className="flex-row items-center gap-2">
