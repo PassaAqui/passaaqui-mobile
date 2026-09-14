@@ -1,7 +1,7 @@
 import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import { Map, Camera, Marker, GeoJSONSource, Layer, type ViewStateChangeEvent } from "@maplibre/maplibre-react-native";
+import type { NativeSyntheticEvent } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { mapStyle } from "@/src/constants/user/map/map";
 import OutsideRegionModal from "@/src/features/user/map/components/OutsideRegionModal";
 import TouristSpotPOI from "@/src/features/user/map/poi/components/TouristSpotPOI";
 import ShopkeeperPOI from "@/src/features/user/map/poi/components/ShopkeeperPOI";
@@ -15,14 +15,19 @@ import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModa
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
 import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-/* latitude: -8.0675
-longitude: -34.9167 */ // Meio de Recife (Marco Zero)
+import { MARCO_ZERO_RECIFE, toLngLat, fromLngLat } from "@/src/constants/user/map/coordinates";
+import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
+
+const MAPTILER_API_KEY = process.env.EXPO_PUBLIC_MAPTILER_API_KEY;
+const MAP_STYLE_URL = `https://api.maptiler.com/maps/01a08c63-b260-733f-8081-77da900e16c0/style.json?key=${MAPTILER_API_KEY}`;
+
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
 
   const {
     location,
     loadingRoute,
+    cameraRef,
     mapRef,
     setMapReady,
     gpsActive,
@@ -52,27 +57,16 @@ export default function MapScreen() {
   const { data: user } = useTouristMe();
 
   // Apenas em dev pra testar o checkin
-  const userMarkerCoordinate = currentSimPosition ?? {
-    latitude: -8.0675,
-    longitude: -34.9167,
-  };
+  const userMarkerCoordinate = currentSimPosition ?? MARCO_ZERO_RECIFE;
 
 
   const handleFollow = () => {
     enableAutoFollow();
 
     if (location) {
-      mapRef.current?.animateToRegion({
-          //latitude: response.coords.latitude,
-          //longitude: response.coords.longitude
-
-          /*
-            Valores fixos apenas em dev, quando for fazer deploy usar as coordenadas reais do usuário
-          */
-          latitude: -8.0675,
-          longitude: -34.9167,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
+      cameraRef.current?.easeTo({
+        center: toLngLat(MARCO_ZERO_RECIFE),
+        zoom: 15,
       });
     }
   };
@@ -95,91 +89,108 @@ export default function MapScreen() {
         </View>
       )}
 
-      <MapView
+      <Map
         ref={mapRef}
-        customMapStyle={mapStyle}
-        initialRegion={{
-          latitude: -8.0675, /* Centro de recife (Marco Zero) */
-          longitude: -34.9167,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        }}
+        mapStyle={MAP_STYLE_URL}
         style={styles.map}
-        onMapReady={() => setMapReady(true)}
-        onRegionChangeComplete={(region, details) => {
-          if (details.isGesture) {
+        onDidFinishLoadingMap={() => setMapReady(true)}
+        onRegionDidChange={(event: NativeSyntheticEvent<ViewStateChangeEvent>) => {
+          if (event.nativeEvent.userInteraction) {
+            const { center } = event.nativeEvent;
+            const coord = fromLngLat(center); // center vem como [lng, lat]
             disableAutoFollow();
-            setMapCenter({ latitude: region.latitude, longitude: region.longitude });
+            setMapCenter(coord);
           }
         }}
       >
+        <Camera
+          ref={cameraRef}
+          initialViewState={{
+            center: toLngLat(MARCO_ZERO_RECIFE),
+            pitch: 60,
+            zoom: 40,
+          }}
+        />
+
         {location && (
           <>
             <Marker
-            coordinate={userMarkerCoordinate}
-            /*
-              coordinate={{
-                latitude: -8.0675, // Centro de recife (Marco Zero) 
-                longitude: -34.9167,
-                /* PAULISTA
-                latitude: -7.94009,
-                longitude: -34.8723
-                
-                //latitude: -8.2832, Caruaru
-                //longitude: -35.9736
-              }}
-              */
-              icon={require("@/assets/user/map/user-pin.png")}
-            />
+              id="user-marker"
+              lngLat={toLngLat(userMarkerCoordinate)}
+            >
+              <Image
+                source={require("@/assets/user/map/user-pin.png")}
+                style={{ width: 32, height: 32 }}
+              />
+            </Marker>
 
             {touristPois.map(touristPoi => (
               <Marker
                 key={touristPoi.id}
-                coordinate={{
-                  latitude: touristPoi.latitude,
-                  longitude: touristPoi.longitude
-                }}
-                title={touristPoi.name}
-                testID={`tourist-poi-${touristPoi.id}`}
-                accessibilityLabel={`tourist-poi-${touristPoi.id}`}
+                id={`tourist-poi-${touristPoi.id}`}
+                lngLat={toLngLat({ latitude: touristPoi.latitude, longitude: touristPoi.longitude })}
                 onPress={() => {
                   setOpenTouristPOIMarker(touristPoi);
                   setOpenPOIMarker(touristPoi);
                 }}
-                icon={require("@/assets/user/map/poi/touristPOI.png")}
-              />
+              >
+                <Image
+                  source={require("@/assets/user/map/poi/touristPOI.png")}
+                  style={{ width: 32, height: 32 }}
+                />
+              </Marker>
             ))}
 
             {shopPois.map(shopPoi => (
               <Marker
                 key={shopPoi.id}
-                coordinate={{
-                  latitude: shopPoi.latitude,
-                  longitude: shopPoi.longitude
-                }}
-                title={shopPoi.name}
-                testID={`shopkeeper-poi-${shopPoi.id}`}
-                accessibilityLabel={`shopkeeper-poi-${shopPoi.id}`}
+                id={`shopkeeper-poi-${shopPoi.id}`}
+                lngLat={toLngLat({ latitude: shopPoi.latitude, longitude: shopPoi.longitude })}
                 onPress={() => {
                   setOpenShopPOIMarker(shopPoi);
                   setOpenPOIMarker(shopPoi);
                 }}
-                icon={require("@/assets/user/map/shopkeeper-pin.png")}
-              />
+              >
+                <Image
+                  source={require("@/assets/user/map/shopkeeper-pin.png")}
+                  style={{ width: 32, height: 32 }}
+                />
+              </Marker>
             ))}
 
             {routeCoords.length > 0 && stop && (
-              <Polyline
-                coordinates={routeCoords}
-                strokeColor="#EAAA6A"
-                strokeWidth={6}
-              />
+              <GeoJSONSource
+                id="route-source"
+                data={{
+                  type: "FeatureCollection",
+                  features: [
+                    {
+                      type: "Feature",
+                      properties: {},
+                      geometry: {
+                        type: "LineString",
+                        coordinates: routeCoords.map(toLngLat), // Conversão: LatLng[] → [lng, lat][]
+                      },
+                    },
+                  ],
+                }}
+              >
+                <Layer
+                  id="route-line"
+                  type="line"
+                  source="route-source"
+                  paint={{
+                    "line-color": "#EAAA6A",
+                    "line-width": 6,
+                  }}
+                />
+              </GeoJSONSource>
             )}
           </>
         )}
-      </MapView>
+      </Map>
 
-      {__DEV__ && stop && (
+      {isSimulatingEnable && stop && (
         <Pressable
           onPress={simulating ? stopSimulation : startSimulation}
           className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
@@ -202,7 +213,7 @@ export default function MapScreen() {
 
       {openTouristPOIMarker && (
         <TouristSpotPOI
-          img={require("@/assets/user/map/tmp/no-image.png")}
+          img={ (!!openTouristPOIMarker.image) ? openTouristPOIMarker.image : require("@/assets/user/map/tmp/no-image.png")}
           title={openTouristPOIMarker.name}
           description={openTouristPOIMarker.description ?? ""}
           distance={openTouristPOIMarker.distanceLabel}

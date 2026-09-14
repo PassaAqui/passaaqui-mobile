@@ -14,7 +14,7 @@ appId: ${APP_ID}
 # Marco Zero), e os setLocation intermediários passarão a exercitar
 # de fato o cálculo de raio/distância do backend.
 
-# Este fluxo substitui o botão __DEV__ "Simular rota" (startSimulation/
+# Este fluxo substitui o botão "Simular rota" (startSimulation/
 # stopSimulation): o botão é uma ferramenta manual de debug e não vai para
 # produção. O setLocation injeta coordenadas de GPS no emulador/simulador,
 # exercitando o caminho de produção (watcher de localização, useMapScreen,

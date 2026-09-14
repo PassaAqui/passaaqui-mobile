@@ -1,27 +1,25 @@
 import { useEffect } from "react";
-import MapView from "react-native-maps";
+import { type CameraRef } from "@maplibre/maplibre-react-native";
+import { toLngLat } from "@/src/constants/user/map/coordinates";
 
 export interface UseAutoFollowDuringNavigationProps {
   userPosition: { latitude: number; longitude: number } | null;
-  mapRef: React.RefObject<MapView | null>;
+  cameraRef: React.RefObject<CameraRef | null>;
   isNavigationActive: boolean;
 }
 
 export function useAutoFollowDuringNavigation({
   userPosition,
-  mapRef,
+  cameraRef,
   isNavigationActive,
 }: UseAutoFollowDuringNavigationProps) {
   useEffect(() => {
-    if (!isNavigationActive || !userPosition || !mapRef.current) {
+    if (!isNavigationActive || !userPosition || !cameraRef.current) {
       return;
     }
 
-    mapRef.current.animateCamera({
-      center: {
-        latitude: userPosition.latitude,
-        longitude: userPosition.longitude,
-      },
+    cameraRef.current.easeTo({
+      center: toLngLat(userPosition),
     });
-  }, [userPosition, isNavigationActive, mapRef]);
+  }, [userPosition, isNavigationActive, cameraRef]);
 }

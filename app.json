@@ -1,11 +1,13 @@
 {
   "expo": {
     "name": "PassaAqui",
-    "slug": "passa-aqui",
+    "slug": "passaaqui",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo/logoOFC.png",
-    "scheme": ["passaaqui"],
+    "scheme": [
+      "passaaqui"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -19,7 +21,11 @@
         "monochromeImage": "./assets/logo/logoOFC.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.passaaqui"
     },
     "web": {
       "output": "static",
@@ -43,11 +49,19 @@
       "expo-font",
       "expo-web-browser",
       "expo-secure-store",
-      "expo-image-picker"
+      "expo-image-picker",
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7c7dd443-a47c-408b-bc16-f3cdc8e8b92e"
+      }
+    },
+    "owner": "williamdev45"
   }
 }
