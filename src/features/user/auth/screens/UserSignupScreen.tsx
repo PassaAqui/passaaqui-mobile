@@ -88,8 +88,9 @@ export default function UserSignupScreen() {
               <TextInput
                 value={name}
                 onChangeText={(text) => { setName(text); if (error.name) setError(prev => ({ ...prev, name: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="Digite seu nome"
+                placeholderTextColor="#9CA3AF"
               />
               {error.name && <Text className="font-itim text-base text-red-300">{error.name}</Text>}
 
@@ -100,8 +101,9 @@ export default function UserSignupScreen() {
                 autoCorrect={false}
                 value={email}
                 onChangeText={(text) => { setEmail(text); if (error.email) setError(prev => ({ ...prev, email: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="Digite seu email aqui"
+                placeholderTextColor="#9CA3AF"
               />
               {error.email && <Text className="font-itim text-base text-red-300">{error.email}</Text>}
 
@@ -110,8 +112,9 @@ export default function UserSignupScreen() {
                 keyboardType="numeric"
                 value={cpf}
                 onChangeText={(text) => { setCpf(formatCpf(text)); if (error.cpf) setError(prev => ({ ...prev, cpf: "" })); }}
-                className="bg-white rounded-lg p-4"
+                className="bg-white rounded-lg p-4 text-black"
                 placeholder="___.___.___-__"
+                placeholderTextColor="#9CA3AF"
               />
               {error.cpf && <Text className="font-itim text-base text-red-300">{error.cpf}</Text>}
 
@@ -121,8 +124,9 @@ export default function UserSignupScreen() {
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={(text) => { setPassword(text); if (error.password) setError(prev => ({ ...prev, password: "" })); }}
-                  className="flex-1 p-4 pr-2"
+                  className="flex-1 p-4 pr-2 text-black"
                   placeholder="Digite sua senha"
+                  placeholderTextColor="#9CA3AF"
                 />
                 <Pressable onPress={() => setShowPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
                   <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
@@ -136,8 +140,9 @@ export default function UserSignupScreen() {
                   secureTextEntry={!showConfirmPassword}
                   value={confirmPassword}
                   onChangeText={(text) => { setConfirmPassword(text); if (error.confirmPassword) setError(prev => ({ ...prev, confirmPassword: "" })); }}
-                  className="flex-1 p-4 pr-2"
+                  className="flex-1 p-4 pr-2 text-black"
                   placeholder="Confirme sua senha"
+                  placeholderTextColor="#9CA3AF"
                 />
                 <Pressable onPress={() => setShowConfirmPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
                   <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />

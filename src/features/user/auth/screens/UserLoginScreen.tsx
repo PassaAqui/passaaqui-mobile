@@ -76,7 +76,8 @@ export default function UserLoginScreen() {
                 }
               }}
               placeholder="Digite seu email"
-              className="bg-white rounded-lg p-4"
+              placeholderTextColor="#9CA3AF"
+              className="bg-white rounded-lg p-4 text-black"
             />
             {error.email && (
               <Text className="font-itim text-base text-red-300">{error.email}</Text>
@@ -94,7 +95,8 @@ export default function UserLoginScreen() {
                   }
                 }}
                 placeholder="Digite sua senha"
-                className="flex-1 p-4 pr-2"
+                placeholderTextColor="#9CA3AF"
+                className="flex-1 p-4 pr-2 text-black"
               />
               <Pressable onPress={() => setShowPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
                 <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
