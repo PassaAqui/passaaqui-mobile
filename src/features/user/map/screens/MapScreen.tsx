@@ -16,6 +16,7 @@ import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/A
 import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { MARCO_ZERO_RECIFE, toLngLat, fromLngLat } from "@/src/constants/user/map/coordinates";
+import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
 const MAPTILER_API_KEY = process.env.EXPO_PUBLIC_MAPTILER_API_KEY;
 const MAP_STYLE_URL = `https://api.maptiler.com/maps/01a08c63-b260-733f-8081-77da900e16c0/style.json?key=${MAPTILER_API_KEY}`;
@@ -135,7 +136,7 @@ export default function MapScreen() {
               >
                 <Image
                   source={require("@/assets/user/map/poi/touristPOI.png")}
-                  style={{ width: 28, height: 28 }}
+                  style={{ width: 32, height: 32 }}
                 />
               </Marker>
             ))}
@@ -152,7 +153,7 @@ export default function MapScreen() {
               >
                 <Image
                   source={require("@/assets/user/map/shopkeeper-pin.png")}
-                  style={{ width: 28, height: 28 }}
+                  style={{ width: 32, height: 32 }}
                 />
               </Marker>
             ))}
@@ -189,7 +190,7 @@ export default function MapScreen() {
         )}
       </Map>
 
-      {__DEV__ && stop && (
+      {isSimulatingEnable && stop && (
         <Pressable
           onPress={simulating ? stopSimulation : startSimulation}
           className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"

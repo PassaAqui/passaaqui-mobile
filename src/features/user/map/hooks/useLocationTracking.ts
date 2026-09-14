@@ -3,6 +3,7 @@ import { useUpdateRouteLocation } from "@/src/features/user/map/hooks/useRouteSe
 import { startRouteSession, haversineDistance } from "@/src/services/routeService";
 import { AxiosError } from "axios";
 import { LocationObject } from "expo-location";
+import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
 interface Coordinate {
   latitude: number;
@@ -35,14 +36,14 @@ export function useLocationTracking(location: LocationObject | null, active: boo
       }
 
       // Acumular distância real (PROD) - usa GPS real quando disponível
-      if (!__DEV__ && location?.coords && lastPositionRef.current) {
+      if (!isSimulatingEnable && location?.coords && lastPositionRef.current) {
         const realCoords: Coordinate = {
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
         };
         accumulatedDistanceRef.current += haversineDistance(lastPositionRef.current, realCoords);
         lastPositionRef.current = realCoords;
-      } else if (__DEV__) {
+      } else if (isSimulatingEnable) {
         // Em DEV, usa coords fixos para simulação
         if (lastPositionRef.current) {
           accumulatedDistanceRef.current += haversineDistance(lastPositionRef.current, coords);

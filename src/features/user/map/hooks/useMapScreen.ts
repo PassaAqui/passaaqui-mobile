@@ -12,6 +12,7 @@ import { RouteMode } from "@/src/services/routeService";
 import { useState, useRef } from "react";
 import { type CameraRef } from "@maplibre/maplibre-react-native";
 import { MARCO_ZERO_RECIFE } from "@/src/constants/user/map/coordinates";
+import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
 import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging/useDebugRouteSimulation";
 import { checkinAtPoi } from "@/src/services/routeService";
@@ -74,7 +75,7 @@ export function useMapScreen() {
     },
   });
 
-  const userPosition = currentSimPosition ?? (!__DEV__ && location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? MARCO_ZERO_RECIFE;
+  const userPosition = currentSimPosition ?? (!isSimulatingEnable && location?.coords ? { latitude: location.coords.latitude, longitude: location.coords.longitude } : null) ?? MARCO_ZERO_RECIFE;
 
   useAutoFollowDuringNavigation({
     userPosition,

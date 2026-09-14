@@ -8,6 +8,7 @@ import {
 } from "expo-location";
 import { Camera, type CameraRef, type MapRef } from "@maplibre/maplibre-react-native";
 import { MARCO_ZERO_RECIFE, toLngLat } from "@/src/constants/user/map/coordinates";
+import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
 async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -99,7 +100,7 @@ subscription = await watchPositionAsync({
           const userLat = response.coords.latitude;
           const userLng = response.coords.longitude;
 
-          if (!hasUserManuallyDisabledFollow.current && !__DEV__) {
+          if (!hasUserManuallyDisabledFollow.current && !isSimulatingEnable) {
             cameraRef.current?.easeTo({
               center: toLngLat({ latitude: userLat, longitude: userLng }),
             });

@@ -16,6 +16,10 @@ jest.mock("expo-location", () => ({
   LocationAccuracy: { Balanced: 3, High: 5 },
 }));
 
+jest.mock("@/src/constants/user/map/simulation", () => ({
+  isSimulatingEnable: true,
+}));
+
 jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
   const { View } = require("react-native");
