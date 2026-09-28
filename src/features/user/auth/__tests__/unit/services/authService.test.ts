@@ -3,6 +3,7 @@ import axios from "axios";
 import { api } from "@/src/services/api/api";
 import { useAuthStore } from "@/src/stores/user/auth/authStore";
 import { useVisitedCitiesStore } from "@/src/stores/user/map/visitedCitiesStore";
+import { useSimulationAlertStore } from "@/src/stores/user/map/simulationAlertStore";
 import {
   login,
   logout,
@@ -32,11 +33,17 @@ jest.mock("@/src/stores/user/map/visitedCitiesStore", () => ({
     getState: jest.fn(),
   },
 }));
+jest.mock("@/src/stores/user/map/simulationAlertStore", () => ({
+  useSimulationAlertStore: {
+    getState: jest.fn(),
+  },
+}));
 
 const mockedSecureStore = SecureStore as jest.Mocked<typeof SecureStore>;
 const mockedApi = api as jest.Mocked<typeof api>;
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedVisitedCitiesReset = jest.fn();
+const mockedSimulationAlertReset = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -46,6 +53,10 @@ beforeEach(() => {
 
   (useVisitedCitiesStore.getState as jest.Mock).mockReturnValue({
     reset: mockedVisitedCitiesReset,
+  });
+
+  (useSimulationAlertStore.getState as jest.Mock).mockReturnValue({
+    reset: mockedSimulationAlertReset,
   });
 
   mockedSecureStore.setItemAsync.mockResolvedValue(undefined);
@@ -131,6 +142,7 @@ describe("authService", () => {
       });
       expect(mockedSecureStore.deleteItemAsync).toHaveBeenCalledWith(REFRESH_TOKEN_KEY);
       expect(mockedVisitedCitiesReset).toHaveBeenCalled();
+      expect(mockedSimulationAlertReset).toHaveBeenCalled();
       expect(useAuthStore.getState().accessToken).toBeNull();
     });
 
