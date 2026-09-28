@@ -5,6 +5,7 @@ import { useNavigation } from "@/src/features/user/map/hooks/useNavigation";
 import { useGpsStatus } from "@/src/features/user/map/hooks/useGpsStatus";
 import { useLocationTracking } from "@/src/features/user/map/hooks/useLocationTracking";
 import { useCityEntry } from "@/src/features/user/map/hooks/useCityEntry";
+import { useSimulationAlert } from "@/src/features/user/map/hooks/useSimulationAlert";
 import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
 import { useAutoFollowDuringNavigation } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
@@ -28,6 +29,7 @@ export function useMapScreen() {
   const navigation = useNavigation(location, mapRef, cameraRef);
   const bounds = useBoundsCheck(location);
   const cityEntry = useCityEntry(location);
+  const simulationAlert = useSimulationAlert();
   const [checkinReward, setCheckinReward] = useState<{ xp: number } | null>(null);
 
   // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha e o import
@@ -94,6 +96,7 @@ export function useMapScreen() {
     ...poi,
     ...navigation,
     ...bounds,
-    ...cityEntry
+    ...cityEntry,
+    ...simulationAlert
   };
 }

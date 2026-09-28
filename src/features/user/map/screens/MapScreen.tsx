@@ -12,6 +12,7 @@ import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirm
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
+import SimulationAlertModal from "@/src/features/user/map/components/SimulationAlertModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
 import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
@@ -51,7 +52,8 @@ export default function MapScreen() {
     cancelSwitchDestination,
     cityToShow, dismissCity,
     checkinReward, setCheckinReward,
-    simulating, startSimulation, stopSimulation, currentSimPosition // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
+    simulating, startSimulation, stopSimulation, currentSimPosition, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
+    shouldShowSimulationAlert, acknowledgeSimulationAlert
   } = useMapScreen();
 
   const { data: user } = useTouristMe();
@@ -200,14 +202,14 @@ export default function MapScreen() {
       )}
 
       <AnimatedPostcardModal
-        visible={!!cityToShow}
+        visible={!!cityToShow && !shouldShowSimulationAlert}
         onClose={dismissCity}
         cityImage={cityToShow?.cityImage ?? "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtw1VcVbFpdwzwS_EnyK5YHMkTqcyLZwmBZ_f8Pj70vw&s=10"}
         cityName={cityToShow?.cityName ?? ""}
         chronicle={cityToShow?.chronicle ?? "Recife nasceu entre rios, pontes e o mar, aprendendo desde cedo a conviver com diferentes povos e culturas. Suas ruas guardam lembranças da ocupação holandesa, das lutas pela liberdade e do crescimento de uma cidade que nunca deixou de se reinventar"}
       />
 
-      {showAlertModal && (
+      {showAlertModal && !shouldShowSimulationAlert && (
         <OutsideRegionModal visible={showAlertModal} onClose={() => setShowAlertModal(false)} />
       )}
 
@@ -272,7 +274,7 @@ export default function MapScreen() {
         />
       )}
 
-      {!gpsActive && (
+      {!gpsActive && !shouldShowSimulationAlert && (
         <GpsDisabledModal />
       )}
 
@@ -281,6 +283,13 @@ export default function MapScreen() {
           visible={!!checkinReward}
           xpEarned={checkinReward?.xp ?? 0}
           onClose={() => setCheckinReward(null)}
+        />
+      )}
+
+      {shouldShowSimulationAlert && (
+        <SimulationAlertModal
+          visible={shouldShowSimulationAlert}
+          onClose={acknowledgeSimulationAlert}
         />
       )}
     </SafeAreaView>

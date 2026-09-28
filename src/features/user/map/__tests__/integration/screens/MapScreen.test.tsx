@@ -188,6 +188,8 @@ const baseMock = {
   startSimulation: jest.fn(),
   stopSimulation: jest.fn(),
   currentSimPosition: null,
+  shouldShowSimulationAlert: false,
+  acknowledgeSimulationAlert: jest.fn(),
 };
 
 describe("MapScreen", () => {
@@ -311,6 +313,58 @@ describe("MapScreen", () => {
 
     // Assert
     expect(screen.getByText("Ir até as configurações")).toBeTruthy();
+  });
+
+  it("renderiza o SimulationAlertModal e chama acknowledgeSimulationAlert ao pressionar Entendido", () => {
+    // Arrange
+    mockMapScreen({ shouldShowSimulationAlert: true });
+    render(<MapScreen />);
+
+    // Act
+    fireEvent.press(screen.getByText("Entendido"));
+
+    // Assert
+    expect(screen.getByText(/Simular rota/)).toBeTruthy();
+    expect(mockUseMapScreen().acknowledgeSimulationAlert).toHaveBeenCalledTimes(1);
+  });
+
+  it("não renderiza o SimulationAlertModal quando o alerta já foi acknowledged", () => {
+    // Arrange
+    mockMapScreen({ shouldShowSimulationAlert: false });
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.queryByText(/Simular rota/)).toBeNull();
+  });
+
+  it("não renderiza o postal da cidade enquanto o SimulationAlertModal estiver aberto", () => {
+    // Arrange
+    mockMapScreen({
+      shouldShowSimulationAlert: true,
+      cityToShow: {
+        cityId: 9,
+        cityName: "Recife",
+        chronicle: "A Veneza brasileira",
+        cityImage: "https://cdn.example.com/recife.jpg",
+      },
+    });
+
+    // Act
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.queryByText("✕")).toBeNull();
+    expect(screen.queryAllByText("Recife")).toHaveLength(0);
+  });
+
+  it("não renderiza o OutsideRegionModal nem o GpsDisabledModal enquanto o alerta estiver aberto", () => {
+    // Arrange
+    mockMapScreen({ shouldShowSimulationAlert: true, showAlertModal: true, gpsActive: false });
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.queryByText(/Parece que você está longe de Recife/)).toBeNull();
+    expect(screen.queryByText("Ir até as configurações")).toBeNull();
   });
 
   it("ao arrastar o mapa, chama setMapCenter e disableAutoFollow", () => {
