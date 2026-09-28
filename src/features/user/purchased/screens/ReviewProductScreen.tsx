@@ -2,9 +2,13 @@ import { ScrollView, View, Text, Image, Pressable, TextInput } from "react-nativ
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import Header from "@/src/features/user/shop/components/Header";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useReviewMedia } from "@/src/features/user/purchased/hooks/useReviewMedia";
+import { usePurchasedProducts } from "@/src/features/user/purchased/hooks/usePurchasedProducts";
+import { formatDateBR } from "@/src/features/user/purchased/utils/formatDate";
+
+const NO_IMAGE = require("@/assets/user/map/tmp/no-image.png");
 
 export default function ReviewProductScreen() {
   const insets = useSafeAreaInsets();
@@ -12,16 +16,15 @@ export default function ReviewProductScreen() {
   const [comment, setComment] = useState<string>("");
   const { photos, videos, maxPhotos, maxVideos, pickPhotos, pickVideos, removePhoto, removeVideo } = useReviewMedia();
 
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
 
-  // Substituir por uma função pra pegar os dados do produto do ID acima quando conectar com o backend
-  const product = {
-    id: id,
-    title: "Tapioca Clássica",
-    pedido: "#A3F92",
-    validade: "20/04/2026",
-    img: "https://static.thenounproject.com/png/3674270-200.png",
-  }
+  const { data } = usePurchasedProducts();
+  const product = useMemo(
+    () => [...(data?.unredeemed ?? []), ...(data?.redeemed ?? [])].find((item) => item.orderId === orderId),
+    [data, orderId]
+  );
+
+  if (!product) return null;
 
   return (
     <SafeAreaView edges={["top", "bottom"]} className="flex-1 bg-white">
@@ -35,11 +38,16 @@ export default function ReviewProductScreen() {
       >
         <View className="p-6 gap-5">
           <View className="flex-row items-center border border-gray-200 rounded-2xl p-3 gap-3 bg-white">
-            <Image className="w-14 h-14 rounded-xl" source={{ uri: product.img }} />
+            <Image
+              className="w-14 h-14 rounded-xl"
+              source={product.imageUrl ? { uri: product.imageUrl } : NO_IMAGE}
+            />
             <View className="flex-1">
-              <Text className="font-interBold text-base text-black">{product.title}</Text>
-              <Text className="font-inter text-sm text-gray-500">{product.pedido}</Text>
-              <Text className="font-interBold text-sm text-[#E07B00]">{product.validade}</Text>
+              <Text className="font-interBold text-base text-black">{product.productName}</Text>
+              <Text className="font-inter text-sm text-gray-500">Pedido {product.orderId}</Text>
+              {!!product.expirationDate && (
+                <Text className="font-interBold text-sm text-[#E07B00]">Válido até {formatDateBR(product.expirationDate)}</Text>
+              )}
             </View>
           </View>
 
