@@ -1,25 +1,17 @@
 import { Modal, View, Text, Image, Pressable, ScrollView } from "react-native";
+import { Achievement } from "@/src/features/user/achievements/services/achievementService";
+import { formatDateBR } from "@/src/features/user/purchased/utils/formatDate";
+
+const NO_IMAGE = require("@/assets/user/achievements/without-sticker.png");
+const EMPTY_FIELD = "—";
 
 interface StickerDetailProps {
-  id: number,
+  achievement: Achievement,
   visible?: boolean,
   onClose?: () => void
 }
 
-// Implementar uma função pra buscar o Sticker com esse ID pra pegar os detalhes gerais dele
-
-const product = {
-  id: 1,
-  complete: true,
-  img: "https://www.gov.br/turismo/pt-br/assuntos/noticias/historia-e-natureza-no-passeio-pelo-rio-timbo-em-paulista-pe/29.08.22_PaulistsPECarlosQueiroz.jpg/@@images/812978df-6147-41ad-98fa-533fc4145042.jpeg",
-  title: "Rio Timbó",
-  description: "\"Uma iguaria digna da realeza, feita com a goma mais pura de Pernambuco e recheio de tradição.\"",
-  origin: "Mercado São José",
-  date: "01/01/2026",
-  poi: "??????" // consultar quem fez o protótipo dessa tela oq é esse atributo
-}
-
-export default function StickerDetail({ id, visible, onClose }: StickerDetailProps) {
+export default function StickerDetail({ achievement, visible, onClose }: StickerDetailProps) {
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
       <Pressable onPress={onClose} className="flex-1 bg-black/25 items-center justify-center px-6">
@@ -28,24 +20,24 @@ export default function StickerDetail({ id, visible, onClose }: StickerDetailPro
             <Pressable onPress={onClose} className="pt-3 pl-3 self-start active:opacity-30">
               <Text className="font-inter text-lg text-start">← Voltar</Text>
             </Pressable>
-            <Image className="bg-gray-200 w-full h-56 my-4" resizeMode="cover" source={{ uri: product.img }} />
+            <Image className="bg-gray-200 w-full h-56 my-4" resizeMode="cover" source={achievement.photoUrl ? { uri: achievement.photoUrl } : NO_IMAGE} />
 
             <View className="w-full px-6 pb-6 gap-4 items-center">
-              <Text className="font-interBold text-3xl text-center" adjustsFontSizeToFit>{product.title}</Text>
-              <Text className="font-interItalic text-center w-5/6 text-black/65">{product.description}</Text>
+              <Text className="font-interBold text-3xl text-center" adjustsFontSizeToFit>{achievement.name}</Text>
+              <Text className="font-interItalic text-center w-5/6 text-black/65">{achievement.description}</Text>
 
               <View className="flex flex-col border-2 border-dashed w-full p-4 border-gray-400/80 rounded-lg my-5">
                 <View className="flex-row">
                   <Text className="flex-1">Origem:</Text>
-                  <Text>{product.origin}</Text>
+                  <Text>{achievement.location ?? EMPTY_FIELD}</Text>
                 </View>
                 <View className="flex-row">
                   <Text className="flex-1">Data:</Text>
-                  <Text>{product.date}</Text>
+                  <Text>{formatDateBR(achievement.unlockedAt) || EMPTY_FIELD}</Text>
                 </View>
                 <View className="flex-row">
                   <Text className="flex-1">POI:</Text>
-                  <Text>{product.poi}</Text>
+                  <Text>{achievement.poiName ?? EMPTY_FIELD}</Text>
                 </View>
               </View>
             </View>
