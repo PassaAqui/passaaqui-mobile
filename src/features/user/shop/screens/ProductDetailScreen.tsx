@@ -10,6 +10,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
 import { ProductImageCarousel } from "@/src/features/user/shop/components/ProductImageCarousel";
+import { ProductRatingsPreview } from "@/src/features/user/shop/components/ProductRatingsPreview";
 
 const discount = 5.00;
 
@@ -115,12 +116,14 @@ export default function ProductDetailScreen() {
             </Pressable>
 
             <Text className={`text-sm text-center ${canRescue ? 'opacity-55' : 'text-red-500'} font-inter`}>
-              {canRescue 
+              {canRescue
                 ? `Ao resgatar, ${product.maxXp} XP serão debitados do seu saldo`
                 : `Você precisa de mais ${Number(product.maxXp) - (user?.currentXP ?? 0)} XP para resgatar esse item`
               }
             </Text>
           </View>
+
+          <ProductRatingsPreview productId={product.id} />
         </View>
       </ScrollView>
 

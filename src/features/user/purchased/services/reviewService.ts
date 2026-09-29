@@ -21,7 +21,7 @@ export interface ProductReview {
   createdAt: string;
 }
 
-interface ProductReviewRaw {
+export interface ProductReviewRaw {
   id: number;
   product_id: number;
   product_name: string;
@@ -62,7 +62,7 @@ function getMediaMimeType(name: string, kind: ReviewMedia["type"]): string {
   }
 }
 
-function normalizeProductReview(raw: ProductReviewRaw): ProductReview {
+export function normalizeProductReview(raw: ProductReviewRaw): ProductReview {
   return {
     id: raw.id,
     productId: raw.product_id,

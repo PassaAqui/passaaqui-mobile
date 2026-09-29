@@ -103,6 +103,7 @@ describe("useCreateReview", () => {
       ["poi-products"],
       ["category-products"],
       ["purchased-products"],
+      ["product-ratings"],
     ];
     for (const key of expectedKeys) {
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: key });

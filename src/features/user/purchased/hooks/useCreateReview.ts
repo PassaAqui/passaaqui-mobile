@@ -12,6 +12,7 @@ export function useCreateReview() {
       queryClient.invalidateQueries({ queryKey: ["poi-products"] });
       queryClient.invalidateQueries({ queryKey: ["category-products"] });
       queryClient.invalidateQueries({ queryKey: ["purchased-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product-ratings"] });
     },
   });
 }
