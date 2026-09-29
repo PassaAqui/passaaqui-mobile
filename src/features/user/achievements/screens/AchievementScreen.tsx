@@ -1,35 +1,29 @@
-import { ScrollView, View, Text, Pressable, Image } from "react-native";
+import { ScrollView, View, Text, Pressable, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as NavigationBar from "expo-navigation-bar";
+import { Ionicons } from "@expo/vector-icons";
 import WithoutSticker from "@/src/features/user/achievements/components/WithoutSticker";
 import CompleteSticker from "@/src/features/user/achievements/components/CompleteSticker";
+import { useAchievements } from "@/src/features/user/achievements/hooks/useAchievements";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
 const filters: string[] = ["Tudo", "Gastronomia", "Cultura", "Passeios"];
-const currentXp = 2450;
-
-// Temporario enquanto o back n ta pronto
-const stickers = [
-  {id: 1, complete: true, img: "https://www.gov.br/turismo/pt-br/assuntos/noticias/historia-e-natureza-no-passeio-pelo-rio-timbo-em-paulista-pe/29.08.22_PaulistsPECarlosQueiroz.jpg/@@images/812978df-6147-41ad-98fa-533fc4145042.jpeg", title: "Rio Timbó"},
-  {id: 2, complete: false},
-  {id: 3, complete: false},
-  {id: 4, complete: false},
-  {id: 5, complete: false},
-  {id: 6, complete: false},
-  {id: 7, complete: false},
-  {id: 8, complete: false},
-  {id: 9, complete: false}
-]
 
 export default function AchievementScreen() {
   const insets = useSafeAreaInsets();
 
   const [selectFilter, setSelectFilter] = useState<string>("Tudo");
 
+  const { data: achievements, isLoading, isError, refetch } = useAchievements();
+  const { data: tourist } = useTouristMe();
+
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark");
   })
+
+  const currentXp = tourist?.currentXP ?? 0;
 
   return (
     <View className="flex-1 bg-[#F4F1EA]">
@@ -66,23 +60,40 @@ export default function AchievementScreen() {
 
           <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: insets.bottom + 16 }} showsVerticalScrollIndicator={false}>
             <View className="items-center justify-center px-6 py-4 gap-8">
-              <View className="w-full flex-row flex-wrap gap-5 items-center justify-center">
-                {stickers.map((sticker) => {
-                  if (!sticker.img || !sticker.title) {
-                    return <WithoutSticker key={sticker.id} />
-                  }
+              {isLoading ? (
+                <View className="items-center py-16">
+                  <ActivityIndicator testID="achievements-loading" color="#8A6A3D" />
+                </View>
+              ) : isError ? (
+                <View className="items-center py-16">
+                  <Ionicons name="alert-circle-outline" size={48} color="#C9C2B4" />
+                  <Text className="font-inter text-[#8A8A8A] mt-3 text-center">Não foi possível carregar as conquistas</Text>
+                  <Pressable onPress={() => refetch()} className="mt-3 active:opacity-50">
+                    <Text className="font-inter text-[#8A6A3D] text-sm">Tentar novamente</Text>
+                  </Pressable>
+                </View>
+              ) : (achievements ?? []).length === 0 ? (
+                <View className="items-center py-16">
+                  <Ionicons name="ribbon-outline" size={48} color="#C9C2B4" />
+                  <Text className="font-inter text-[#8A8A8A] mt-3 text-center">Nenhuma conquista disponível</Text>
+                </View>
+              ) : (
+                <View className="w-full flex-row flex-wrap gap-5 items-center justify-center">
+                  {(achievements ?? []).map((achievement) => {
+                    if (!achievement.unlocked) {
+                      return <WithoutSticker key={achievement.achievementId} title={achievement.name} description={achievement.description} />
+                    }
 
-                  return (
-                    <CompleteSticker 
-                      key={sticker.id} 
-                      id={sticker.id}
-                      image={sticker.img} 
-                      title={sticker.title} 
-                      invertRotate={sticker.id % 2 !== 0 && sticker.complete} 
-                    />
-                  )
-                })}
-              </View>
+                    return (
+                      <CompleteSticker
+                        key={achievement.achievementId}
+                        achievement={achievement}
+                        invertRotate={achievement.achievementId % 2 !== 0}
+                      />
+                    )
+                  })}
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>
