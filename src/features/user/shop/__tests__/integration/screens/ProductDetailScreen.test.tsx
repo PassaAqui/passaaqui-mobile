@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProductDetailScreen from "@/src/features/user/shop/screens/ProductDetailScreen";
@@ -41,6 +40,13 @@ jest.mock("@/src/features/user/shop/components/ProductImageCarousel", () => {
   const { View } = require("react-native");
   return {
     ProductImageCarousel: () => <View testID="carousel" />,
+  };
+});
+
+jest.mock("@/src/features/user/shop/components/ProductRatingsPreview", () => {
+  const { View } = require("react-native");
+  return {
+    ProductRatingsPreview: () => <View testID="product-ratings-preview" />,
   };
 });
 
