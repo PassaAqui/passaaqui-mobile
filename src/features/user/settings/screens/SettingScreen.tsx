@@ -1,4 +1,5 @@
-import { ScrollView, View, Text, Pressable, Image, Alert } from "react-native"
+import { ScrollView, View, Text, Pressable, Image, Alert } from "react-native";
+import SettingsHeader from "@/src/features/user/settings/components/SettingsHeader";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -46,17 +47,7 @@ export default function SettingScreen() {
       <StatusBar style="dark" />
       <View className="flex-1 items-center h-screen p-10 pt-32 bg-[#F0F0F0]">
 
-        <View className="absolute top-0 left-0 right-0 items-center justify-center p-10 z-10 flex-row">
-          <Pressable className="absolute left-7 active:opacity-35">
-            <Image source={require("@/assets/user/settings/back.png")} />
-          </Pressable>
-          <Text className="font-irishGrover text-black text-3xl">Perfil</Text>
-        </View>
-
-
-
-
-        
+        <SettingsHeader title="Perfil" />
 
         <View className="items-center justify-center mb-14 gap-4">
           <View className="mb-7">
@@ -78,15 +69,11 @@ export default function SettingScreen() {
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
 
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
+              <Pressable onPress={() => router.push("/user/(private)/settings/travel-history")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
                 <Text className="font-itim text-lg opacity-75">Ver histórico de viagens</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
 
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
-                <Text className="font-itim text-lg opacity-75">Ver transações</Text>
-                <Image source={require("@/assets/user/settings/go.png")} />
-              </Pressable>
             </View>
           </View>
 

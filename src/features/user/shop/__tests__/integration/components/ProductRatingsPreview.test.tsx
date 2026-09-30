@@ -83,7 +83,7 @@ describe("ProductRatingsSection", () => {
 
     // Assert
     expect(mockPush).toHaveBeenCalledWith({
-      pathname: "/user/(private)/product-ratings",
+      pathname: "/user/(private)/shop/product-ratings",
       params: { id: 10 },
     });
   });
