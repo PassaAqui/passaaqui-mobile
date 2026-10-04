@@ -64,7 +64,7 @@ export default function SettingScreen() {
           <View className="bg-white p-5 gap-4 rounded-lg">
             <Text className="font-itim text-xl">Informações da conta</Text>
             <View className="gap-1">
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
+              <Pressable onPress={() => router.push("/user/(private)/settings/edit-profile")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
                 <Text className="font-itim text-lg opacity-75">Editar perfil</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
