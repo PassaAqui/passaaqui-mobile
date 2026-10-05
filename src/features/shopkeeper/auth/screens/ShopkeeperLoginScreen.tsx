@@ -11,7 +11,7 @@ export default function ShopkeeperLoginScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [, setGeneralError] = useState("");
+  const [generalError, setGeneralError] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,6 +66,9 @@ export default function ShopkeeperLoginScreen() {
                   if (error.email) {
                       setError(prev => ({ ...prev, email: "" }));
                   }
+                  if (generalError) {
+                      setGeneralError("");
+                  }
                 }}
                 placeholder="Digite seu email"
                 placeholderTextColor="#9CA3AF"
@@ -85,6 +88,9 @@ export default function ShopkeeperLoginScreen() {
                     if (error.password) {
                       setError(prev => ({ ...prev, password: "" }));
                     }
+                    if (generalError) {
+                      setGeneralError("");
+                    }
                   }}
                   placeholder="Digite sua senha"
                   placeholderTextColor="#9CA3AF"
@@ -98,7 +104,11 @@ export default function ShopkeeperLoginScreen() {
                 <Text className="font-itim text-base text-red-300">{error.password}</Text>
               )}
 
-              <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
+              {generalError && (
+                <Text className="font-itim text-base text-red-300 text-center">{generalError}</Text>
+              )}
+
+              <Pressable onPress={handleSubmit} disabled={loading} className="bg-[#EAAA6a] p-4 mt-4 items-center justify-center rounded-xl active:opacity-70">
                 {loading
                   ? <ActivityIndicator color="#fff" />
                   : <Text className="font-itim text-lg">Entrar</Text>
