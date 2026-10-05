@@ -7,16 +7,23 @@ import { Ionicons } from "@expo/vector-icons";
 import WithoutSticker from "@/src/features/user/achievements/components/WithoutSticker";
 import CompleteSticker from "@/src/features/user/achievements/components/CompleteSticker";
 import { useAchievements } from "@/src/features/user/achievements/hooks/useAchievements";
+import { useAchievementCategories } from "@/src/features/user/achievements/hooks/useAchievementCategories";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 
-const filters: string[] = ["Tudo", "Gastronomia", "Cultura", "Passeios"];
+// A API devolve "TUDO" como a categoria que representa todas as conquistas.
+// O valor serve só para comparar com o chip selecionado: quando ele é o
+// escolhido, nenhum filtro é enviado, para a API devolver a lista inteira.
+const ALL_CATEGORY_VALUE = "TUDO";
 
 export default function AchievementScreen() {
   const insets = useSafeAreaInsets();
 
-  const [selectFilter, setSelectFilter] = useState<string>("Tudo");
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATEGORY_VALUE);
 
-  const { data: achievements, isLoading, isError, refetch } = useAchievements();
+  const { data: categories } = useAchievementCategories();
+  const { data: achievements, isLoading, isError, refetch } = useAchievements(
+    selectedCategory === ALL_CATEGORY_VALUE ? undefined : selectedCategory
+  );
   const { data: tourist } = useTouristMe();
 
   useEffect(() => {
@@ -45,13 +52,14 @@ export default function AchievementScreen() {
 
             <View className="w-full">
               <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row" contentContainerClassName="flex-row gap-2">
-                {filters.map((filter) => (
+                {categories?.map((category) => (
                   <Pressable
-                    key={filter}
-                    onPress={() => setSelectFilter(filter)}
-                    className={`${selectFilter === filter ? 'bg-[#D8D2C5]' : 'bg-[#E5DFD3]'} p-2 px-5 rounded-xl min-w-1/4 items-center justify-center`}
+                    key={category.value}
+                    testID={`category-chip-${category.value}`}
+                    onPress={() => setSelectedCategory(category.value)}
+                    className={`${selectedCategory === category.value ? 'bg-[#D8D2C5]' : 'bg-[#E5DFD3]'} p-2 px-5 rounded-xl min-w-1/4 items-center justify-center`}
                   >
-                    <Text className="text-black font-interBold">{filter}</Text>  
+                    <Text className="text-black font-interBold">{category.label}</Text>  
                   </Pressable>
                 ))}
               </ScrollView>

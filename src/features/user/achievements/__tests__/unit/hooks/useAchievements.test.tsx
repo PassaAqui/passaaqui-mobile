@@ -35,14 +35,15 @@ describe("useAchievements", () => {
     client.clear();
   });
 
-  function renderUseAchievements() {
+  function renderUseAchievements(category?: string) {
     const wrapper = ({ children }: PropsWithChildren) => (
       <QueryClientProvider client={client}>{children}</QueryClientProvider>
     );
 
-    const { unmount: unmountFn, ...rest } = renderHook(() => useAchievements(), {
-      wrapper,
-    });
+    const { unmount: unmountFn, ...rest } = renderHook(
+      () => useAchievements(category),
+      { wrapper }
+    );
     unmount = unmountFn;
 
     return rest;
@@ -60,6 +61,47 @@ describe("useAchievements", () => {
     expect(result.current.data).toEqual(achievements);
   });
 
+  it("chama o service sem categoria quando nenhum filtro é informado", async () => {
+    // Arrange
+    mockedGetAchievements.mockResolvedValueOnce(achievements);
+
+    // Act
+    renderUseAchievements();
+
+    // Assert
+    await waitFor(() => expect(mockedGetAchievements).toHaveBeenCalledWith(undefined));
+  });
+
+  it("repassa a categoria para o service e a usa na query key", async () => {
+    // Arrange
+    mockedGetAchievements.mockResolvedValueOnce(achievements);
+
+    // Act
+    renderUseAchievements("SABORES_DA_MATA");
+
+    // Assert
+    await waitFor(() =>
+      expect(mockedGetAchievements).toHaveBeenCalledWith("SABORES_DA_MATA")
+    );
+    expect(client.getQueryData(["achievements", "SABORES_DA_MATA"])).toEqual(
+      achievements
+    );
+  });
+
+  it("usa a query key ['achievements', null] quando não há categoria", async () => {
+    // Arrange
+    mockedGetAchievements.mockResolvedValueOnce(achievements);
+
+    // Act
+    renderUseAchievements();
+
+    // Assert
+    await waitFor(() => {
+      expect(client.getQueryState(["achievements", null])?.status).toBe("success");
+    });
+    expect(client.getQueryData(["achievements", null])).toEqual(achievements);
+  });
+
   it("expõe o erro quando o service falha", async () => {
     // Arrange
     const error = createAxiosError(500);
@@ -71,19 +113,5 @@ describe("useAchievements", () => {
     // Assert
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toBe(error);
-  });
-
-  it("grava as conquistas no cache com a query key ['achievements']", async () => {
-    // Arrange
-    mockedGetAchievements.mockResolvedValueOnce(achievements);
-
-    // Act
-    renderUseAchievements();
-    await waitFor(() => {
-      expect(client.getQueryState(["achievements"])?.status).toBe("success");
-    });
-
-    // Assert
-    expect(client.getQueryData(["achievements"])).toEqual(achievements);
   });
 });

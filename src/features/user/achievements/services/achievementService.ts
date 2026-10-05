@@ -47,8 +47,22 @@ function normalizeAchievement(raw: AchievementRaw): Achievement {
   };
 }
 
-export async function getAchievements(): Promise<Achievement[]> {
-  const { data } = await api.get<AchievementRaw[]>("/achievements");
+export interface AchievementCategory {
+  value: string;
+  label: string;
+  description: string;
+}
+
+export async function getAchievements(category?: string): Promise<Achievement[]> {
+  const { data } = await api.get<AchievementRaw[]>("/achievements", {
+    params: category ? { category } : undefined,
+  });
 
   return data.map(normalizeAchievement);
+}
+
+export async function getAchievementCategories(): Promise<AchievementCategory[]> {
+  const { data } = await api.get<AchievementCategory[]>("/achievements/categories");
+
+  return data;
 }
