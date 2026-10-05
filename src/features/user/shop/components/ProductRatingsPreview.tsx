@@ -22,7 +22,7 @@ export function ProductRatingsPreview({ productId }: Props) {
   const remainingPhotos = photoItems.length - stripPhotos.length;
 
   const goToAll = () => router.push({
-    pathname: "/user/(private)/product-ratings",
+    pathname: "/user/(private)/shop/product-ratings",
     params: { id: productId }
   });
 
