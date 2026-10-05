@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { logoutShopkeeper } from "@/src/features/shopkeeper/auth/services/shopkeeperAuthService";
 import { useShopkeeperMe } from "@/src/features/shopkeeper/auth/hooks/useShopkeeperMe";
+import { getShopkeeperStoreImageUrl } from "@/src/features/shopkeeper/settings/utils/shopkeeperStoreImage";
 
 export default function ShopkeeperSettingScreen() {
   const insets = useSafeAreaInsets();
@@ -36,20 +37,23 @@ export default function ShopkeeperSettingScreen() {
     );
   };
 
+  const storeImageUrl = getShopkeeperStoreImageUrl(shopkeeper);
+
   return (
     <ScrollView>
       <StatusBar style="dark" />
-      <View className="flex-1 items-center h-screen p-10 pt-32 bg-[#F0F0F0]">
+      <View className="flex-1 items-center p-10 pt-32 bg-[#F0F0F0]">
         <View className="absolute top-0 left-0 right-0 items-center justify-center p-10 z-10 flex-row">
-          <Pressable className="absolute left-7 active:opacity-35">
-            <Image source={require("@/assets/user/settings/back.png")} />
-          </Pressable>
           <Text className="font-irishGrover text-black text-3xl">Perfil</Text>
         </View>
 
         <View className="items-center justify-center mb-14 gap-4">
           <View className="mb-1">
-            <Image className="w-40 h-40 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
+            <Image
+              testID="shopkeeper-settings-image"
+              className="w-40 h-40 rounded-full"
+              source={storeImageUrl ? { uri: storeImageUrl } : require("@/assets/logo/logoOFC.png")}
+            />
           </View>
 
           <View>
@@ -62,42 +66,23 @@ export default function ShopkeeperSettingScreen() {
           <View className="bg-white p-5 gap-4 rounded-lg">
             <Text className="font-itim text-xl">Informações da conta</Text>
             <View className="gap-1">
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
+              <Pressable onPress={() => router.push("/shopkeeper/(private)/settings/edit-shopkeeper-profile")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
                 <Text className="font-itim text-lg opacity-75">Editar perfil da loja</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
 
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
+              <Pressable onPress={() => router.push("/shopkeeper/(private)/(tabs)/orders")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
                 <Text className="font-itim text-lg opacity-75">Ver histórico de pedidos</Text>
-                <Image source={require("@/assets/user/settings/go.png")} />
-              </Pressable>
-
-              <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
-                <Text className="font-itim text-lg opacity-75">Ver transações</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
             </View>
           </View>
-
-          <View className="bg-white p-5 gap-3 rounded-lg">
-            <Text className="font-itim text-xl">Preferências</Text>
-            <Pressable className="flex-row items-center justify-between active:opacity-30 min-h-10">
-              <Text className="font-itim text-lg opacity-75">Modo escuro</Text>
-              <Image source={require("@/assets/user/settings/go.png")} />
-            </Pressable>
-
-          </View>
         </View>
 
-        {/* <View style={{ bottom: insets.bottom - 8 }}  className="absolute bottom-0 left-0 flex-row items-center gap-1 p-10">
-          <Image className="w-7 h-7" source={require("@/assets/user/settings/trash.png")} />
-          <Text className="text-red-800 font-itim text-lg">Excluir conta</Text>
-        </View> */}
         <Pressable
           onPress={handleLogout}
           disabled={loggingOut}
-          style={{ bottom: insets.bottom - 8 }}
-          className="absolute bottom-0 left-0 flex-row items-center gap-2 p-10 active:opacity-50"
+          className="self-start mt-12 flex-row items-center gap-2 py-2 active:opacity-50"
         >
           <Image className="w-6 h-6" source={require("@/assets/user/settings/logout2.png")} />
           <Text className="text-red-600 font-itim text-lg">{loggingOut ? "Saindo..." : "Sair da conta"}</Text>
