@@ -3,9 +3,12 @@ import AchievementScreen from "@/src/features/user/achievements/screens/Achievem
 import CompleteSticker from "@/src/features/user/achievements/components/CompleteSticker";
 import WithoutSticker from "@/src/features/user/achievements/components/WithoutSticker";
 import { useAchievements } from "@/src/features/user/achievements/hooks/useAchievements";
+import { useAchievementCategories } from "@/src/features/user/achievements/hooks/useAchievementCategories";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import {
+  achievementCategories,
   achievements,
+  emptyAchievementCategories,
   emptyAchievements,
 } from "@/src/features/user/achievements/__tests__/fixtures/achievement";
 
@@ -40,6 +43,10 @@ jest.mock("@/src/features/user/achievements/hooks/useAchievements", () => ({
   useAchievements: jest.fn(),
 }));
 
+jest.mock("@/src/features/user/achievements/hooks/useAchievementCategories", () => ({
+  useAchievementCategories: jest.fn(),
+}));
+
 jest.mock("@/src/features/user/auth/hooks/useTouristMe", () => ({
   useTouristMe: jest.fn(),
 }));
@@ -47,6 +54,8 @@ jest.mock("@/src/features/user/auth/hooks/useTouristMe", () => ({
 const mockedUseAchievements = useAchievements as jest.MockedFunction<
   typeof useAchievements
 >;
+const mockedUseAchievementCategories =
+  useAchievementCategories as jest.MockedFunction<typeof useAchievementCategories>;
 const mockedUseTouristMe = useTouristMe as jest.MockedFunction<typeof useTouristMe>;
 
 function mockAchievementsQuery(
@@ -61,10 +70,22 @@ function mockAchievementsQuery(
   } as unknown as ReturnType<typeof useAchievements>);
 }
 
+function mockCategoriesQuery(
+  overrides: Partial<ReturnType<typeof useAchievementCategories>> = {}
+) {
+  mockedUseAchievementCategories.mockReturnValue({
+    data: achievementCategories,
+    isLoading: false,
+    isError: false,
+    ...overrides,
+  } as unknown as ReturnType<typeof useAchievementCategories>);
+}
+
 describe("AchievementScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockAchievementsQuery();
+    mockCategoriesQuery();
     mockedUseTouristMe.mockReturnValue({
       data: { id: 1, name: "Turista Teste", email: "t@t.com", currentXP: 2450 },
     } as unknown as ReturnType<typeof useTouristMe>);
@@ -157,14 +178,82 @@ describe("AchievementScreen", () => {
     expect(screen.getByText("Nenhuma conquista disponível")).toBeTruthy();
   });
 
-  it("mantém os chips de categoria hardcoded", () => {
+  it("renderiza um chip por categoria retornada pela API", () => {
     // Act
     render(<AchievementScreen />);
 
     // Assert
     expect(screen.getByText("Tudo")).toBeTruthy();
-    expect(screen.getByText("Gastronomia")).toBeTruthy();
-    expect(screen.getByText("Cultura")).toBeTruthy();
-    expect(screen.getByText("Passeios")).toBeTruthy();
+    expect(screen.getByText("Sabores da Mata")).toBeTruthy();
+    expect(screen.getByText("Raízes do Brasil")).toBeTruthy();
+    // Só as categorias da API viram chip: nenhum filtro antigo permanece.
+    expect(achievementCategories).toHaveLength(3);
+    expect(screen.queryAllByTestId(/^category-chip-/)).toHaveLength(3);
+  });
+
+  it("começa na categoria TUDO e busca as conquistas sem filtro", () => {
+    // Act
+    render(<AchievementScreen />);
+
+    // Assert
+    expect(mockedUseAchievements).toHaveBeenCalledWith(undefined);
+    expect(
+      screen.getByTestId("category-chip-TUDO").props.className
+    ).toContain("bg-[#D8D2C5]");
+  });
+
+  it("busca as conquistas da categoria ao tocar no chip", () => {
+    // Arrange
+    render(<AchievementScreen />);
+    mockedUseAchievements.mockClear();
+
+    // Act
+    fireEvent.press(screen.getByTestId("category-chip-SABORES_DA_MATA"));
+
+    // Assert
+    expect(mockedUseAchievements).toHaveBeenCalledWith("SABORES_DA_MATA");
+    expect(
+      screen.getByTestId("category-chip-SABORES_DA_MATA").props.className
+    ).toContain("bg-[#D8D2C5]");
+    expect(
+      screen.getByTestId("category-chip-TUDO").props.className
+    ).toContain("bg-[#E5DFD3]");
+  });
+
+  it("volta para a listagem completa ao tocar na categoria TUDO", () => {
+    // Arrange
+    render(<AchievementScreen />);
+    fireEvent.press(screen.getByTestId("category-chip-RAIZES_DO_BRASIL"));
+    mockedUseAchievements.mockClear();
+
+    // Act
+    fireEvent.press(screen.getByTestId("category-chip-TUDO"));
+
+    // Assert
+    expect(mockedUseAchievements).toHaveBeenCalledWith(undefined);
+  });
+
+  it("mantém a listagem de conquistas visível enquanto as categorias carregam", () => {
+    // Arrange
+    mockCategoriesQuery({ data: undefined, isLoading: true });
+
+    // Act
+    render(<AchievementScreen />);
+
+    // Assert
+    expect(screen.queryByTestId("category-chip-TUDO")).toBeNull();
+    expect(screen.UNSAFE_getAllByType(CompleteSticker)).toHaveLength(1);
+  });
+
+  it("não mostra chips quando a API não retorna categorias", () => {
+    // Arrange
+    mockCategoriesQuery({ data: emptyAchievementCategories });
+
+    // Act
+    render(<AchievementScreen />);
+
+    // Assert
+    expect(screen.queryByTestId("category-chip-TUDO")).toBeNull();
+    expect(screen.UNSAFE_getAllByType(CompleteSticker)).toHaveLength(1);
   });
 });

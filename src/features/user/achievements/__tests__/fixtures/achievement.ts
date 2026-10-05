@@ -1,5 +1,6 @@
 import type {
   Achievement,
+  AchievementCategory,
   AchievementRaw,
 } from "@/src/features/user/achievements/services/achievementService";
 
@@ -70,6 +71,32 @@ export const achievementsRaw: AchievementRaw[] = [unlockedAchievementRaw, locked
 export const achievements: Achievement[] = [unlockedAchievement, lockedAchievement];
 
 export const emptyAchievements: Achievement[] = [];
+
+export const allCategory: AchievementCategory = {
+  value: "TUDO",
+  label: "Tudo",
+  description: "Conquistas gerais, sem categoria específica",
+};
+
+export const flavorsCategory: AchievementCategory = {
+  value: "SABORES_DA_MATA",
+  label: "Sabores da Mata",
+  description: "Visitar restaurantes, lanchonetes e bares; provar pratos típicos",
+};
+
+export const rootsCategory: AchievementCategory = {
+  value: "RAIZES_DO_BRASIL",
+  label: "Raízes do Brasil",
+  description: "Museus, teatros, igrejas históricas, patrimônio e eventos culturais",
+};
+
+export const achievementCategories: AchievementCategory[] = [
+  allCategory,
+  flavorsCategory,
+  rootsCategory,
+];
+
+export const emptyAchievementCategories: AchievementCategory[] = [];
 
 export function createAxiosError(status: number) {
   const error = new Error("Request failed") as Error & {

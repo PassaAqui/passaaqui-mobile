@@ -1,6 +1,10 @@
 import { api } from "@/src/services/api/api";
-import { getAchievements } from "@/src/features/user/achievements/services/achievementService";
 import {
+  getAchievementCategories,
+  getAchievements,
+} from "@/src/features/user/achievements/services/achievementService";
+import {
+  achievementCategories,
   achievements,
   achievementsRaw,
   createAxiosError,
@@ -20,7 +24,7 @@ beforeEach(() => {
 
 describe("achievementService", () => {
   describe("getAchievements", () => {
-    it("busca as conquistas em /achievements", async () => {
+    it("busca as conquistas em /achievements sem filtro quando não há categoria", async () => {
       // Arrange
       mockedApi.get.mockResolvedValueOnce({ data: achievementsRaw });
 
@@ -28,8 +32,21 @@ describe("achievementService", () => {
       const result = await getAchievements();
 
       // Assert
-      expect(mockedApi.get).toHaveBeenCalledWith("/achievements");
+      expect(mockedApi.get).toHaveBeenCalledWith("/achievements", { params: undefined });
       expect(result).toEqual(achievements);
+    });
+
+    it("envia a categoria como query param quando informada", async () => {
+      // Arrange
+      mockedApi.get.mockResolvedValueOnce({ data: achievementsRaw });
+
+      // Act
+      await getAchievements("SABORES_DA_MATA");
+
+      // Assert
+      expect(mockedApi.get).toHaveBeenCalledWith("/achievements", {
+        params: { category: "SABORES_DA_MATA" },
+      });
     });
 
     it("normaliza as chaves snake_case da API para camelCase", async () => {
@@ -88,6 +105,44 @@ describe("achievementService", () => {
 
       // Act / Assert
       await expect(getAchievements()).rejects.toBe(error);
+    });
+  });
+
+  describe("getAchievementCategories", () => {
+    it("busca as categorias em /achievements/categories", async () => {
+      // Arrange
+      mockedApi.get.mockResolvedValueOnce({ data: achievementCategories });
+
+      // Act
+      const result = await getAchievementCategories();
+
+      // Assert
+      expect(mockedApi.get).toHaveBeenCalledWith("/achievements/categories");
+      expect(result).toEqual(achievementCategories);
+    });
+
+    it("devolve a lista como vem da API, sem normalizar as chaves", async () => {
+      // Arrange
+      mockedApi.get.mockResolvedValueOnce({ data: achievementCategories });
+
+      // Act
+      const result = await getAchievementCategories();
+
+      // Assert
+      expect(result[0]).toEqual({
+        value: "TUDO",
+        label: "Tudo",
+        description: "Conquistas gerais, sem categoria específica",
+      });
+    });
+
+    it("propaga o erro quando a requisição falha", async () => {
+      // Arrange
+      const error = createAxiosError(500);
+      mockedApi.get.mockRejectedValueOnce(error);
+
+      // Act / Assert
+      await expect(getAchievementCategories()).rejects.toBe(error);
     });
   });
 });
