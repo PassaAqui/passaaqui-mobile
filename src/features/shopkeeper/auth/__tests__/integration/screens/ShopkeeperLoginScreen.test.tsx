@@ -128,11 +128,7 @@ describe("ShopkeeperLoginScreen", () => {
     expect(mockedReplace).not.toHaveBeenCalled();
   });
 
-  // Divergência do roadmap (registrada): o código define `generalError`
-  // ("Email ou senha incorretos.") no `catch`, mas **não o renderiza no JSX**
-  // (ShopkeeperLoginScreen.tsx não exibe `generalError` na árvore). O teste
-  // reflete o comportamento real: login chamado, sem navegação, sem erro visível.
-  it("chama login e não navega quando o login falha (generalError não é renderizado)", async () => {
+  it("mostra erro e não navega quando as credenciais são inválidas", async () => {
     // Arrange
     mockedLoginShopkeeper.mockRejectedValueOnce(new Error("credenciais inválidas"));
     render(<ShopkeeperLoginScreen />);
@@ -149,7 +145,7 @@ describe("ShopkeeperLoginScreen", () => {
       })
     );
     expect(mockedReplace).not.toHaveBeenCalled();
-    expect(screen.queryByText("Email ou senha incorretos.")).toBeNull();
+    expect(screen.getByText("Email ou senha incorretos.")).toBeTruthy();
   });
 
   it("mostra o indicador de loading enquanto o login está pendente", async () => {
