@@ -1,0 +1,31 @@
+appId: ${APP_ID}
+---
+
+- assertVisible: "Continuar como comerciante"
+- tapOn: "Continuar como comerciante"
+
+- assertVisible: "Criar uma conta"
+- scrollUntilVisible:
+    element:
+      text: "Login"
+    direction: DOWN
+    timeout: 20000
+- tapOn: "Login"
+
+- assertVisible: "Entrar na conta do seu estabelecimento"
+- tapOn: "Digite seu email"
+- inputText: "lojista2@email.com"
+- hideKeyboard
+
+- tapOn: "Digite sua senha"
+- inputText: "Senha@123"
+- hideKeyboard
+
+- tapOn: "Entrar"
+
+# Redireciona para /shopkeeper/(private)/(tabs) (dashboard).
+# "Pedidos recentes" é o título fixo do dashboard carregado; o timeout cobre
+# o tempo de busca do /dashboard no backend de teste.
+- extendedWaitUntil:
+    visible: "Pedidos recentes"
+    timeout: 20000

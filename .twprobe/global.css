@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 248 245 242;
+  --card: 255 255 255;
+  --foreground: 45 45 45;
+  --muted-foreground: 138 138 138;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 20 16 12;
+    --card: 31 25 19;
+    --foreground: 245 239 232;
+    --muted-foreground: 168 162 154;
+  }
+}

@@ -1,0 +1,99 @@
+import { ScrollView, View, Text, Pressable, Image, Alert } from "react-native";
+import SettingsHeader from "@/src/features/user/settings/components/SettingsHeader";
+import { useEffect, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import * as NavigationBar from "expo-navigation-bar";
+import { logout } from "@/src/features/user/auth/services/authService";
+import { useRouter } from "expo-router";
+import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
+import { getTouristAvatarUrl } from "@/src/features/user/settings/utils/touristAvatar";
+
+export default function SettingScreen() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const { data: tourist } = useTouristMe();
+
+  useEffect(() => {
+    NavigationBar.setButtonStyleAsync("dark")
+  })
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Sair da conta",
+      "Tem certeza que deseja sair?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Sair",
+          style: "destructive",
+          onPress: async () => {
+            setLoggingOut(true);
+            try {
+              await logout();
+              router.replace("/");
+            } finally {
+              setLoggingOut(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const avatarUrl = getTouristAvatarUrl(tourist);
+
+  return (
+    <ScrollView>
+      <StatusBar style="dark" />
+      <View className="flex-1 items-center  p-10 pt-32 bg-[#F0F0F0]">
+
+        <SettingsHeader title="Perfil" />
+
+        <View className="items-center justify-center mb-14 gap-4">
+          <View className="mb-7">
+            <Image
+              testID="settings-avatar"
+              className="w-40 h-40 rounded-full"
+              source={avatarUrl ? { uri: avatarUrl } : require("@/assets/logo/logoOFC.png")}
+            />
+          </View>
+
+          <View>
+            <Text className="font-itim text-center text-2xl">{tourist?.name}</Text>
+            <Text className="font-itim text-center text-lg opacity-65">{tourist?.email}</Text>
+          </View>
+        </View>
+
+        <View className="gap-10 w-full">
+          <View className="bg-white p-5 gap-4 rounded-lg">
+            <Text className="font-itim text-xl">Informações da conta</Text>
+            <View className="gap-1">
+              <Pressable onPress={() => router.push("/user/(private)/settings/edit-profile")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
+                <Text className="font-itim text-lg opacity-75">Editar perfil</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
+
+              <Pressable onPress={() => router.push("/user/(private)/settings/travel-history")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
+                <Text className="font-itim text-lg opacity-75">Ver histórico de viagens</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
+
+            </View>
+          </View>
+        </View>
+
+        <Pressable
+          onPress={handleLogout}
+          disabled={loggingOut}
+          className="self-start mt-12 flex-row items-center gap-2 py-2 active:opacity-50"
+        >
+          <Image className="w-6 h-6" source={require("@/assets/user/settings/logout2.png")} />
+          <Text className="text-red-600 font-itim text-lg">{loggingOut ? "Saindo..." : "Sair da conta"}</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
+  )
+}

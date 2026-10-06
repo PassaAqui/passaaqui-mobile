@@ -1,0 +1,52 @@
+appId: ${APP_ID}
+---
+# ATENÇÃO — SEED NECESSÁRIO NO BACKEND DE TESTE:
+#   Produto retornado por GET /products (loja global) com:
+#     - maxXp BAIXO (ex.: 5), menor que o currentXP do turista de teste
+#       (turista@email.com), para que canRescue seja true e o botão
+#       "Resgatar" fique habilitado;
+#     - name fixo (ex.: "Produto E2E (Loja)") para o assertVisible do texto;
+#     - stock > 0 e price definido.
+#   O card do produto possui testID="global-shop-product" (GlobalShopScreen).
+
+- runFlow:
+    file: ../auth/tourist-login.yaml
+
+- runFlow:
+    when:
+      visible: "Toque no cartão para virar"
+    commands:
+      - tapOn: "✕"
+
+- assertVisible: "Loja"
+- tapOn: "Loja"
+
+- extendedWaitUntil:
+    visible: "Loja global"
+    timeout: 20000
+
+- scrollUntilVisible:
+    element:
+      text: "Produto E2E"
+    direction: DOWN
+    timeout: 20000
+
+- assertVisible: "Produto E2E"
+- tapOn:
+    text: "Produto E2E"
+
+- scrollUntilVisible:
+    element:
+      text: "Resgatar"
+    direction: DOWN
+    timeout: 20000
+
+- tapOn: "Resgatar"
+
+- extendedWaitUntil:
+    visible: "RESUMO DO PEDIDO"
+    timeout: 20000
+
+- assertVisible: "Produto E2E"
+- assertVisible: "PIX"
+- assertVisible: "Pagar com PIX"

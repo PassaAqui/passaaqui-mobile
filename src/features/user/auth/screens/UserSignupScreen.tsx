@@ -1,0 +1,186 @@
+import { ImageBackground, View, Text, TextInput, Pressable, ActivityIndicator } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useState } from "react";
+import { signUpSchema } from "@/src/features/user/auth/schemas/signUpSchema";
+import { Link, useRouter } from "expo-router";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { Checkbox } from "expo-checkbox";
+import { Ionicons } from "@expo/vector-icons";
+import UserIcon from "@/src/features/user/auth/components/UserIcon";
+import { singUp } from "@/src/features/user/auth/services/authService";
+import { formatCpf } from "@/src/features/user/auth/utils/formatCpf";
+
+export default function UserSignupScreen() {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generalError, setGeneralError] = useState<string>("");
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isChecked, setChecked] = useState(false);
+  const [error, setError] = useState({
+    name: "", email: "", cpf: "", password: "", confirmPassword: "", terms: ""
+  });
+
+  const handleSubmit = async () => {
+    const result = signUpSchema.safeParse({ name, email, cpf, password, confirmPassword, terms: isChecked });
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      setError({
+        name: fieldErrors.name?.[0] ?? "",
+        email: fieldErrors.email?.[0] ?? "",
+        cpf: fieldErrors.cpf?.[0] ?? "",
+        password: fieldErrors.password?.[0] ?? "",
+        confirmPassword: fieldErrors.confirmPassword?.[0] ?? "",
+        terms: fieldErrors.terms?.[0] ?? "",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setGeneralError("");
+
+    try {
+      await singUp({
+        name: result.data.name,
+        email: result.data.email,
+        cpf: result.data.cpf,
+        password: result.data.password,
+        confirm_password: result.data.confirmPassword
+      })
+
+      router.replace("/user/(private)/map/(tabs)");
+    } catch(err) {
+      setGeneralError("Erro ao criar conta. Tente novamente");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ImageBackground
+      source={{ uri: "https://www.voelivre.com.br/wp-content/uploads/2025/03/adobestock_515087389Reduzi.jpg" }}
+      className="flex-1"
+      resizeMode="cover"
+    >
+      <SafeAreaView edges={["top", "bottom"]} className="flex-1">
+        <View className="bg-black/40 inset-0 absolute" />
+        <KeyboardAwareScrollView bottomOffset={16} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }} >
+          <View className="justify-center items-center min-h-screen p-9 w-full">
+            <View className="flex-col justify-center items-center gap-3">
+              <UserIcon />
+              <Text className="text-white text-3xl font-irishGrover text-center" adjustsFontSizeToFit numberOfLines={1}>
+                Criar uma conta
+              </Text>
+            </View>
+
+            <View className="w-full gap-2">
+              <Text className="text-white font-itim text-lg">Nome</Text>
+              <TextInput
+                value={name}
+                onChangeText={(text) => { setName(text); if (error.name) setError(prev => ({ ...prev, name: "" })); }}
+                className="bg-white rounded-lg p-4 text-black"
+                placeholder="Digite seu nome"
+                placeholderTextColor="#9CA3AF"
+              />
+              {error.name && <Text className="font-itim text-base text-red-300">{error.name}</Text>}
+
+              <Text className="text-white font-itim text-lg">Email</Text>
+              <TextInput
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                value={email}
+                onChangeText={(text) => { setEmail(text); if (error.email) setError(prev => ({ ...prev, email: "" })); }}
+                className="bg-white rounded-lg p-4 text-black"
+                placeholder="Digite seu email aqui"
+                placeholderTextColor="#9CA3AF"
+              />
+              {error.email && <Text className="font-itim text-base text-red-300">{error.email}</Text>}
+
+              <Text className="text-white font-itim text-lg">CPF</Text>
+              <TextInput
+                keyboardType="numeric"
+                value={cpf}
+                onChangeText={(text) => { setCpf(formatCpf(text)); if (error.cpf) setError(prev => ({ ...prev, cpf: "" })); }}
+                className="bg-white rounded-lg p-4 text-black"
+                placeholder="___.___.___-__"
+                placeholderTextColor="#9CA3AF"
+              />
+              {error.cpf && <Text className="font-itim text-base text-red-300">{error.cpf}</Text>}
+
+              <Text className="text-white font-itim text-lg">Senha</Text>
+              <View className="flex-row items-center bg-white rounded-lg">
+                <TextInput
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={(text) => { setPassword(text); if (error.password) setError(prev => ({ ...prev, password: "" })); }}
+                  className="flex-1 p-4 pr-2 text-black"
+                  placeholder="Digite sua senha"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Pressable onPress={() => setShowPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
+                  <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+              </View>
+              {error.password && <Text className="font-itim text-base text-red-300">{error.password}</Text>}
+
+              <Text className="text-white font-itim text-lg">Confirmar senha</Text>
+              <View className="flex-row items-center bg-white rounded-lg">
+                <TextInput
+                  secureTextEntry={!showConfirmPassword}
+                  value={confirmPassword}
+                  onChangeText={(text) => { setConfirmPassword(text); if (error.confirmPassword) setError(prev => ({ ...prev, confirmPassword: "" })); }}
+                  className="flex-1 p-4 pr-2 text-black"
+                  placeholder="Confirme sua senha"
+                  placeholderTextColor="#9CA3AF"
+                />
+                <Pressable onPress={() => setShowConfirmPassword(prev => !prev)} className="p-4 pl-2" hitSlop={8}>
+                  <Ionicons name={showConfirmPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+              </View>
+              {error.confirmPassword && <Text className="font-itim text-base text-red-300">{error.confirmPassword}</Text>}
+
+              <View className="flex-row items-center gap-2">
+                <Checkbox
+                  testID="terms-checkbox"
+                  value={isChecked}
+                  onValueChange={(state) => { setChecked(state); if (error.terms) setError(prev => ({ ...prev, terms: "" })); }}
+                  color={isChecked ? "#2463EB" : undefined}
+                  className="border-red-500"
+                />
+                <Text className={`text-sm font-roboto ${error.terms ? "text-red-300" : "text-white"}`}>
+                  Li e aceito os <Text className="text-cyan-500 font-itim">Termos de Uso</Text> e a <Text className="text-cyan-500 font-itim">Política de Privacidade</Text>.
+                </Text>
+              </View>
+
+              {generalError && (
+                <Text className="font-itim text-base text-red-300 text-center">{generalError}</Text>
+              )}
+
+              <Pressable onPress={handleSubmit} className="bg-[#EAAA6a] p-4 items-center justify-center rounded-xl active:opacity-70">
+                {loading
+                  ? <ActivityIndicator color="#fff" />
+                  : <Text>Cadastrar</Text>
+                }
+              </Pressable>
+
+              <Text className="font-itim text-lg text-white text-center">
+                Já possui uma conta? Faça o <Link href={"/user/(public)/auth/user-login"} className="text-cyan-500">Login</Link>
+              </Text>
+            </View>
+          </View>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
+    </ImageBackground>
+  );
+}

@@ -1,0 +1,13 @@
+import { Pressable, Text } from "react-native"
+
+interface StopButtonProp {
+  onConfirmate: () => void;
+}
+
+export default function StopButton({ onConfirmate }: StopButtonProp) {
+  return (
+    <Pressable onPress={() => onConfirmate()} className="w-1/4 bg-red-500 rounded-lg py-1 items-center justify-center active:opacity-25">
+      <Text className="font-itim text-lg text-white text-center" adjustsFontSizeToFit numberOfLines={1}>PARAR</Text>
+    </Pressable>
+  )
+}

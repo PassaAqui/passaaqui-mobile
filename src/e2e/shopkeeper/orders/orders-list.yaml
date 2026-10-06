@@ -1,0 +1,29 @@
+appId: ${APP_ID}
+---
+- runFlow:
+    file: ../auth/shopkeeper-login.yaml
+
+- tapOn: "Pedidos"
+
+- extendedWaitUntil:
+    visible: "Todos os pedidos"
+    timeout: 20000
+
+- assertVisible: "Pendentes"
+- assertVisible: "Concluídos"
+- assertVisible: "Pedidos mais recentes"
+
+- extendedWaitUntil:
+    visible:
+      id: "order-card"
+    timeout: 20000
+
+- tapOn:
+    id: "order-card"
+    index: 0
+
+- extendedWaitUntil:
+    visible: "Item do pedido"
+    timeout: 20000
+
+- assertVisible: "Pedido"

@@ -1,11 +1,13 @@
 {
   "expo": {
-    "name": "v1",
-    "slug": "v1",
+    "name": "PassaAqui",
+    "slug": "passaaqui",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "v1",
+    "icon": "./assets/logo/logoOFC.png",
+    "scheme": [
+      "passaaqui"
+    ],
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -14,16 +16,20 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/logo/logoOFC.png",
+        "backgroundImage": "./assets/logo/logoOFC.png",
+        "monochromeImage": "./assets/logo/logoOFC.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.passaaqui"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./assets/logo/logoOFC.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -31,7 +37,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/logo/logoOFC.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -41,11 +47,21 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-secure-store",
+      "expo-image-picker",
+      "@maplibre/maplibre-react-native"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7c7dd443-a47c-408b-bc16-f3cdc8e8b92e"
+      }
+    },
+    "owner": "williamdev45"
   }
 }

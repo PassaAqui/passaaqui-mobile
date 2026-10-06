@@ -1,0 +1,58 @@
+appId: ${APP_ID}
+---
+# ATENÇÃO — SEED NECESSÁRIO NO BACKEND DE TESTE:
+#   O checkout (GET /orders/checkout) deve retornar, para o produto E2E
+#   (produto seed da loja, maxXp baixo → "Produto E2E (Loja)"):
+#     - pix: string FIXA e curta o suficiente para assertVisible por texto
+#       (ex.: "00020126580014BR.GOV.BCB.PIX0136e2e000201" — o tapOn/assert
+#       do Maestro casa texto exato; copiar o valor real do seed tratado);
+#     - qrCodeBase64: base64 válida (renderiza o QR na tela PIX);
+#     - pixExpiresAt: no FUTURO (≥ 10 min a frente do horário do teste),
+#       caso contrário a tela marca o pedido como expirado e o botão
+#       "Copiar código PIX" fica desabilitado (PedidoExpirado);
+#     - status: "AWAITING_PAYMENT" inicialmente;
+#     - shopkeeperName/productName coerentes com os asserts abaixo.
+#   ⚠️ CONFIRMAÇÃO DEPENDE DO WS: a tela só sai de "Aguardando pagamento"
+#   quando o backend emite o evento STOMP de status `PAID` no tópico
+#   /topic/orders/{orderId} (o useOrderSocket escuta esse tópico). O seed/
+#   backend de teste precisa disparar esse evento depois do checkout —
+#   sem isso o fluxo permanece parado em "Aguardando pagamento" e o
+#   assertVisible "Pagamento confirmado!" falha por timeout.
+#   Se o seed tiver pickupCode (ex.: "AB1020"), assertar após a confirmação.
+
+- runFlow:
+    file: ../shop/global-shop-rescue.yaml
+
+# Perfil turista autenticado no fluxo da loja → chega direto no resumo.
+
+- tapOn: "Pagar com PIX"
+
+- extendedWaitUntil:
+    visible: "Aguardando pagamento"
+    timeout: 20000
+
+- assertVisible: "Finalize o PIX para confirmar seu pedido"
+
+# Se o QR Code presente, a imagem não expõe texto — assert do texto do código PIX
+# (valor exato do seed). O texto `order.pix` renderiza dentro de um container.
+- assertVisible: "Copie o código abaixo para pagar no app do seu banco:"
+- assertVisible: "Copiar código PIX"
+
+- tapOn: "Copiar código PIX"
+- assertVisible: "Copiado"
+
+# Backend emite WS PAID → useOrderSocket (router.replace) vai para a
+# confirmação. Timeout maior para o gatilho do backend.
+- extendedWaitUntil:
+    visible: "Pagamento confirmado!"
+    timeout: 30000
+
+- assertVisible: "PIX processado com sucesso"
+- assertVisible: "RESUMO DO PEDIDO"
+
+# Código de retirada — só se o seed retornar pickupCode preenchido.
+- runFlow:
+    when:
+      visible: "Código de retirada:"
+    commands:
+      - assertVisible: "AB1020"

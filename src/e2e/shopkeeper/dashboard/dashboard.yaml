@@ -1,0 +1,15 @@
+appId: ${APP_ID}
+---
+- runFlow:
+    file: ../auth/shopkeeper-login.yaml
+
+- assertVisible: "PassaAqui"
+- assertVisible: "Pedidos hoje"
+- assertVisible: "Receita hoje"
+- assertVisible: "Produtos ativos"
+- assertVisible: "Pedidos pendentes"
+
+- assertVisible: "Vendas da semana"
+
+- assertVisible: "Pedidos recentes"
+- assertVisible: "Ver todos"
