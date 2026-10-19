@@ -4,6 +4,9 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      screens: {
+        xs: "360px",
+      },
       fontFamily: {
         irishGrover: ["IrishGrover_400Regular"],
         itim: ["Itim_400Regular"],
