@@ -15,7 +15,7 @@ export default function CompleteSticker({ achievement, invertRotate }: CompleteS
 
   return (
     <>
-      <Pressable testID="sticker-card" onPress={() => setShowStickerDetailModal(true)} className={`gap-2 border border-gray-400 rounded-xl items-center justify-center overflow-hidden h-48 w-[47%] pb-6 active:opacity-55 ${invertRotate ? '-rotate-2' : 'rotate-2'}`}>
+      <Pressable testID="sticker-card" onPress={() => setShowStickerDetailModal(true)} className={`gap-2 border border-gray-400 rounded-xl items-center justify-center overflow-hidden h-60 w-full xs:w-[47%] max-w-[240px] pb-6 active:opacity-55 ${invertRotate ? '-rotate-2' : 'rotate-2'}`}>
         <Image testID="sticker-image" className="bg-gray-400 w-full h-40" source={achievement.photoUrl ? { uri: achievement.photoUrl } : NO_IMAGE} />
         <Text className="font-interBold text-lg text-center">{achievement.name}</Text>
       </Pressable>

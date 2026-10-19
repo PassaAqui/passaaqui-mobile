@@ -86,7 +86,7 @@ export default function AchievementScreen() {
                   <Text className="font-inter text-[#8A8A8A] mt-3 text-center">Nenhuma conquista disponível</Text>
                 </View>
               ) : (
-                <View className="w-full flex-row flex-wrap gap-5 items-center justify-center">
+                <View className="w-full flex-row flex-wrap gap-4 items-center justify-center">
                   {(achievements ?? []).map((achievement) => {
                     if (!achievement.unlocked) {
                       return <WithoutSticker key={achievement.achievementId} title={achievement.name} description={achievement.description} />
