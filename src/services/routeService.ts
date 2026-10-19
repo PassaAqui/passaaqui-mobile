@@ -58,6 +58,49 @@ export interface CheckinResult {
   motivo_bloqueio: string | null;
 }
 
+/**
+ * Contrato real devolvido pelo backend no POST /pois/{id}/checkin e no push
+ * WebSocket `checkin-result`. O backend padronizou esses campos em inglês;
+ * `normalizeCheckinResult` mantém o contrato interno do app estável.
+ */
+export interface CheckinApiResponse {
+  xp_granted?: number;
+  calculation?: {
+    distance_km: number;
+    displacement_factor: number;
+    recent_visits: number;
+    invisibility_factor: number;
+    raw_xp: number;
+    final_xp: number;
+  } | null;
+  applied_rules?: {
+    anti_farming_active: boolean;
+    invalid_gps: boolean;
+  };
+  block_reason?: string | null;
+}
+
+export function normalizeCheckinResult(data: CheckinApiResponse): CheckinResult {
+  return {
+    xp_concedido: data.xp_granted ?? 0,
+    calculo: data.calculation
+      ? {
+          distancia_km: data.calculation.distance_km,
+          fator_deslocamento: data.calculation.displacement_factor,
+          visitas_recentes: data.calculation.recent_visits,
+          fator_invisibilidade: data.calculation.invisibility_factor,
+          xp_bruto: data.calculation.raw_xp,
+          xp_final: data.calculation.final_xp,
+        }
+      : null,
+    regras_aplicadas: {
+      anti_farming_ativo: data.applied_rules?.anti_farming_active ?? false,
+      gps_invalido: data.applied_rules?.invalid_gps ?? false,
+    },
+    motivo_bloqueio: data.block_reason ?? null,
+  };
+}
+
 export type RouteMode = "driving-car" | "foot-walking" | "cycling-regular";
 
 export async function startRouteSession(payload?: StartRoutePayload): Promise<RouteSession> {
@@ -79,8 +122,8 @@ export async function updateRouteLocation(payload: Coordinate): Promise<void> {
 }
 
 export async function checkinAtPoi(poiId: number, distanceKm?: number): Promise<CheckinResult> {
-  const { data } = await api.post(`/pois/${poiId}/checkin`, { distanceKm });
-  return data;
+  const { data } = await api.post<CheckinApiResponse>(`/pois/${poiId}/checkin`, { distanceKm });
+  return normalizeCheckinResult(data);
 }
 
 function toRad(deg: number): number {

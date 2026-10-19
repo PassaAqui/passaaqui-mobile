@@ -68,6 +68,55 @@ export const directionResponse = {
   ],
 };
 
+// Rotas sintéticas usadas nos testes de progresso (traçado reto e "U" com
+// trechos paralelos próximos).
+export const straightRouteCoords = [
+  { latitude: -8.0675, longitude: -34.9167 },
+  { latitude: -8.0675, longitude: -34.9067 },
+  { latitude: -8.0675, longitude: -34.8967 },
+];
+
+export const uTurnRouteCoords = [
+  { latitude: -8.0, longitude: -34.9 },
+  { latitude: -8.0, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.9 },
+];
+
+export const checkinApiResponse = {
+  xp_granted: 50,
+  calculation: {
+    distance_km: 1.2,
+    displacement_factor: 3,
+    recent_visits: 0,
+    invisibility_factor: 100,
+    raw_xp: 300,
+    final_xp: 50,
+  },
+  applied_rules: {
+    anti_farming_active: false,
+    invalid_gps: false,
+  },
+  block_reason: null,
+};
+
+export const checkinResult = {
+  xp_concedido: 50,
+  calculo: {
+    distancia_km: 1.2,
+    fator_deslocamento: 3,
+    visitas_recentes: 0,
+    fator_invisibilidade: 100,
+    xp_bruto: 300,
+    xp_final: 50,
+  },
+  regras_aplicadas: {
+    anti_farming_ativo: false,
+    gps_invalido: false,
+  },
+  motivo_bloqueio: null,
+};
+
 export const routeSession: RouteSession = {
   status: "ACTIVE",
   destination: {

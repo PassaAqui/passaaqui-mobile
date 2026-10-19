@@ -4,11 +4,22 @@ import type { PropsWithChildren } from "react";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
 import { connectStomp, disconnectStomp } from "@/src/services/socket/stompClient";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
+import {
+  checkinApiResponse,
+  checkinResult,
+} from "@/src/features/user/map/__tests__/fixtures/map";
 
 jest.mock("@/src/services/socket/stompClient", () => ({
   connectStomp: jest.fn(),
   disconnectStomp: jest.fn(),
 }));
+
+// O useRouteSocket passou a importar o routeService (que importa a api e,
+// por consequência, o authStore/AsyncStorage). O jest.setup.ts não cobre
+// AsyncStorage, então usamos o mock oficial do pacote.
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);
 
 jest.mock("@/src/features/user/auth/hooks/useTouristMe", () => ({
   useTouristMe: jest.fn(),
@@ -105,14 +116,14 @@ describe("useRouteSocket", () => {
       poiCallback?.({
         body: JSON.stringify({
           action: "checkin-result",
-          data: { xp_concedido: 50, motivo_bloqueio: null },
+          data: checkinApiResponse,
         }),
       });
     });
 
     // Assert
     expect(client.getQueryData(["tourist-me"])).toEqual({ currentXP: 150 });
-    expect(onCheckin).toHaveBeenCalledWith({ xp_concedido: 50, motivo_bloqueio: null });
+    expect(onCheckin).toHaveBeenCalledWith(checkinResult);
   });
 
   it("recebe checkin-result com XP = 0, não chama onCheckin nem altera o cache", () => {
@@ -127,7 +138,12 @@ describe("useRouteSocket", () => {
       poiCallback?.({
         body: JSON.stringify({
           action: "checkin-result",
-          data: { xp_concedido: 0, motivo_bloqueio: "cidade repetida" },
+          data: {
+            xp_granted: 0,
+            calculation: null,
+            applied_rules: { anti_farming_active: true, invalid_gps: false },
+            block_reason: "Cooldown active",
+          },
         }),
       });
     });
@@ -161,7 +177,7 @@ describe("useRouteSocket", () => {
     act(() => connectedCallback?.());
     act(() => {
       poiCallback?.({
-        body: JSON.stringify({ action: "checkin-rejected", data: { xp_concedido: 50 } }),
+        body: JSON.stringify({ action: "checkin-rejected", data: { xp_granted: 50 } }),
       });
     });
     act(() => {

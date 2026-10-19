@@ -4,7 +4,7 @@ import type { LocationObject } from "expo-location";
 import MapScreen from "@/src/features/user/map/screens/MapScreen";
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
-import { Map, Marker } from "@maplibre/maplibre-react-native";
+import { Map, Marker, GeoJSONSource } from "@maplibre/maplibre-react-native";
 import { poiNearby, storePoi } from "@/src/features/user/map/__tests__/fixtures/map";
 
 jest.mock("@maplibre/maplibre-react-native", () => {
@@ -168,6 +168,7 @@ const baseMock = {
   shopPois: [],
   routeCoords: [],
   setRouteCoords: jest.fn(),
+  remainingRouteCoords: [],
   stop: false,
   setStop: jest.fn(),
   showAlertModal: false,
@@ -230,6 +231,39 @@ describe("MapScreen", () => {
     // Assert
     // 1 user marker + 1 tourist POI + 1 shop POI = 3
     expect(markers).toHaveLength(3);
+  });
+
+  it("renderiza apenas o trecho restante da rota quando a navegação está ativa", () => {
+    // Arrange
+    const remainingRouteCoords = [
+      { latitude: -8.0675, longitude: -34.9067 },
+      { latitude: -8.0675, longitude: -34.8967 },
+    ];
+    mockMapScreen({ stop: true, remainingRouteCoords });
+
+    // Act
+    render(<MapScreen />);
+    const source = screen.UNSAFE_getByType(GeoJSONSource);
+
+    // Assert
+    expect(source.props.data.features[0].geometry.coordinates).toEqual([
+      [-34.9067, -8.0675],
+      [-34.8967, -8.0675],
+    ]);
+  });
+
+  it("não renderiza a linha da rota quando o trecho restante tem menos de 2 pontos", () => {
+    // Arrange
+    mockMapScreen({
+      stop: true,
+      remainingRouteCoords: [{ latitude: -8.0675, longitude: -34.9067 }],
+    });
+
+    // Act
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.UNSAFE_queryByType(GeoJSONSource)).toBeNull();
   });
 
   it("mostra o ActivityIndicator quando loadingRoute é true", () => {

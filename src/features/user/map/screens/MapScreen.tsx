@@ -41,7 +41,7 @@ export default function MapScreen() {
     setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
     touristPois, shopPois,
-    routeCoords,
+    remainingRouteCoords,
     stop,
     showAlertModal, setShowAlertModal,
     handleNavigation,
@@ -160,7 +160,7 @@ export default function MapScreen() {
               </Marker>
             ))}
 
-            {routeCoords.length > 0 && stop && (
+            {remainingRouteCoords.length > 1 && stop && (
               <GeoJSONSource
                 id="route-source"
                 data={{
@@ -171,7 +171,7 @@ export default function MapScreen() {
                       properties: {},
                       geometry: {
                         type: "LineString",
-                        coordinates: routeCoords.map(toLngLat), // Conversão: LatLng[] → [lng, lat][]
+                        coordinates: remainingRouteCoords.map(toLngLat), // Conversão: LatLng[] → [lng, lat][]
                       },
                     },
                   ],

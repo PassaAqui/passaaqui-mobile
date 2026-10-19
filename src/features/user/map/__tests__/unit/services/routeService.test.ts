@@ -3,10 +3,13 @@ import {
   endRouteSession,
   getCurrentRouteSession,
   getDirection,
+  checkinAtPoi,
   startRouteSession,
   updateRouteLocation,
 } from "@/src/services/routeService";
 import {
+  checkinApiResponse,
+  checkinResult,
   directionResponse,
   routeSession,
 } from "@/src/features/user/map/__tests__/fixtures/map";
@@ -142,6 +145,43 @@ describe("routeService", () => {
 
       // Assert
       expect(mockedApi.post).toHaveBeenCalledWith("/route/location", coords);
+    });
+  });
+
+  describe("checkinAtPoi", () => {
+    it("envia a distância e normaliza o payload do backend para o contrato do app", async () => {
+      // Arrange
+      mockedApi.post.mockResolvedValueOnce({ data: checkinApiResponse });
+
+      // Act
+      const result = await checkinAtPoi(1, 1.2);
+
+      // Assert
+      expect(mockedApi.post).toHaveBeenCalledWith("/pois/1/checkin", { distanceKm: 1.2 });
+      expect(result).toEqual(checkinResult);
+    });
+
+    it("normaliza cálculo nulo mantendo XP e motivo de bloqueio", async () => {
+      // Arrange
+      mockedApi.post.mockResolvedValueOnce({
+        data: {
+          xp_granted: 0,
+          calculation: null,
+          applied_rules: { anti_farming_active: true, invalid_gps: false },
+          block_reason: "Cooldown active",
+        },
+      });
+
+      // Act
+      const result = await checkinAtPoi(2);
+
+      // Assert
+      expect(result).toEqual({
+        xp_concedido: 0,
+        calculo: null,
+        regras_aplicadas: { anti_farming_ativo: true, gps_invalido: false },
+        motivo_bloqueio: "Cooldown active",
+      });
     });
   });
 });
