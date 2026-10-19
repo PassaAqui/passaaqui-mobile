@@ -2,13 +2,15 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { connectStomp, disconnectStomp } from "@/src/services/socket/stompClient";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
+import {
+  normalizeCheckinResult,
+  type CheckinApiResponse,
+  type CheckinResult,
+} from "@/src/services/routeService";
 
 interface CheckinPush {
   action: "checkin-result";
-  data: {
-    xp_concedido: number;
-    motivo_bloqueio: string | null;
-  };
+  data?: CheckinApiResponse;
 }
 
 interface RoutePush {
@@ -17,7 +19,7 @@ interface RoutePush {
 }
 
 interface UseRouteSocketParams {
-  onCheckin: (result: CheckinPush["data"]) => void;
+  onCheckin: (result: CheckinResult) => void;
   onRouteEnded: () => void;
 }
 
@@ -32,12 +34,15 @@ export function useRouteSocket({ onCheckin, onRouteEnded }: UseRouteSocketParams
     const client = connectStomp(() => {
       client?.subscribe(`/user/${user.id}/queue/poi`, (message) => {
         const payload: CheckinPush = JSON.parse(message.body);
-        if (payload.action === "checkin-result" && payload.data.xp_concedido > 0) {
-          queryClient.setQueryData(["tourist-me"], (old: any) =>
-            old ? { ...old, currentXP: old.currentXP + payload.data.xp_concedido } : old
-          );
-          onCheckin(payload.data);
-        }
+        if (payload.action !== "checkin-result" || !payload.data) return;
+
+        const result = normalizeCheckinResult(payload.data);
+        if (result.xp_concedido <= 0) return;
+
+        queryClient.setQueryData(["tourist-me"], (old: any) =>
+          old ? { ...old, currentXP: (old.currentXP ?? 0) + result.xp_concedido } : old
+        );
+        onCheckin(result);
       });
 
       client?.subscribe(`/user/${user.id}/queue/route`, (message) => {

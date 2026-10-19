@@ -10,14 +10,14 @@ import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
 import { useAutoFollowDuringNavigation } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
 import { useRouteProgress } from "@/src/features/user/map/hooks/useRouteProgress";
-import { RouteMode } from "@/src/services/routeService";
+import { RouteMode, checkinAtPoi } from "@/src/services/routeService";
 import { useMemo, useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { type CameraRef } from "@maplibre/maplibre-react-native";
 import { MARCO_ZERO_RECIFE } from "@/src/constants/user/map/coordinates";
 import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
 import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging/useDebugRouteSimulation";
-import { checkinAtPoi } from "@/src/services/routeService";
 
 export function useMapScreen() {
   const cameraRef = useRef<CameraRef>(null);
@@ -32,6 +32,20 @@ export function useMapScreen() {
   const cityEntry = useCityEntry(location);
   const simulationAlert = useSimulationAlert();
   const [checkinReward, setCheckinReward] = useState<{ xp: number } | null>(null);
+  const queryClient = useQueryClient();
+
+  // Atualiza a modal e o cache do turista no mesmo instante em que o XP é
+  // confirmado por uma resposta HTTP de check-in (o push WebSocket já faz a
+  // atualização do cache diretamente no useRouteSocket).
+  // Check-ins sem XP (ex.: POI de lojista) não devem abrir o modal de recompensa.
+  const applyCheckinReward = (result: { xp_concedido: number }) => {
+    if (result.xp_concedido <= 0) return;
+
+    setCheckinReward({ xp: result.xp_concedido });
+    queryClient.setQueryData(["tourist-me"], (old: any) =>
+      old ? { ...old, currentXP: (old.currentXP ?? 0) + result.xp_concedido } : old
+    );
+  };
 
   // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha e o import
   const { simulating, startSimulation, stopSimulation, currentSimPosition, simulatedDistanceKm } = useDebugRouteSimulation({
@@ -41,7 +55,7 @@ export function useMapScreen() {
         try {
           // Em DEV, usa a distância simulada
           const result = await checkinAtPoi(navigation.currentPoiId, simulatedDistanceKm);
-          setCheckinReward({ xp: result.xp_concedido });
+          applyCheckinReward(result);
         } catch (e) {
           console.log("[checkin SIM ERROR]", e);
         }
@@ -71,6 +85,8 @@ export function useMapScreen() {
 
   useRouteSocket({
     onCheckin: (result) => {
+      if (result.xp_concedido <= 0) return;
+
       setCheckinReward({ xp: result.xp_concedido });
       navigation.handleStopNavigation();
     },
@@ -84,7 +100,7 @@ export function useMapScreen() {
             : (simulatedDistanceKm ?? navigation.plannedDistanceKm ?? undefined);
 
           const result = await checkinAtPoi(navigation.currentPoiId, distanceKm);
-          setCheckinReward({ xp: result.xp_concedido });
+          applyCheckinReward(result);
         } catch (e) {
           console.log("[checkin ERROR]", e);
         }
