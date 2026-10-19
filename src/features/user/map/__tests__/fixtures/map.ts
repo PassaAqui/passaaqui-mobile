@@ -68,6 +68,21 @@ export const directionResponse = {
   ],
 };
 
+// Rotas sintéticas usadas nos testes de progresso (traçado reto e "U" com
+// trechos paralelos próximos).
+export const straightRouteCoords = [
+  { latitude: -8.0675, longitude: -34.9167 },
+  { latitude: -8.0675, longitude: -34.9067 },
+  { latitude: -8.0675, longitude: -34.8967 },
+];
+
+export const uTurnRouteCoords = [
+  { latitude: -8.0, longitude: -34.9 },
+  { latitude: -8.0, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.9 },
+];
+
 export const routeSession: RouteSession = {
   status: "ACTIVE",
   destination: {

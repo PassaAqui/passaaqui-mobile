@@ -9,8 +9,9 @@ import { useSimulationAlert } from "@/src/features/user/map/hooks/useSimulationA
 import { useNearbyPois } from "@/src/features/user/map/poi/hooks/useNearbyPois";
 import { useRouteSocket } from "@/src/features/user/map/hooks/useRouteSocket";
 import { useAutoFollowDuringNavigation } from "@/src/features/user/map/hooks/useAutoFollowDuringNavigation";
+import { useRouteProgress } from "@/src/features/user/map/hooks/useRouteProgress";
 import { RouteMode } from "@/src/services/routeService";
-import { useState, useRef } from "react";
+import { useMemo, useState, useRef } from "react";
 import { type CameraRef } from "@maplibre/maplibre-react-native";
 import { MARCO_ZERO_RECIFE } from "@/src/constants/user/map/coordinates";
 import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
@@ -52,6 +53,22 @@ export function useMapScreen() {
 
   const { getAccumulatedDistance } = useLocationTracking(location, navigation.stop, simulating); // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o argumento 'simulating'
 
+  // Posição usada para recortar a linha da rota: a posição simulada tem
+  // prioridade durante a simulação; caso contrário, usa o GPS real.
+  const progressPosition = useMemo<{ latitude: number; longitude: number } | null>(() => {
+    if (currentSimPosition) return currentSimPosition;
+    if (location?.coords) {
+      return { latitude: location.coords.latitude, longitude: location.coords.longitude };
+    }
+    return null;
+  }, [currentSimPosition, location]);
+
+  const { remainingRouteCoords } = useRouteProgress({
+    routeCoords: navigation.routeCoords,
+    position: progressPosition,
+    active: navigation.stop,
+  });
+
   useRouteSocket({
     onCheckin: (result) => {
       setCheckinReward({ xp: result.xp_concedido });
@@ -92,6 +109,7 @@ export function useMapScreen() {
     gpsActive,
     touristPois, shopPois,
     checkinReward, setCheckinReward,
+    remainingRouteCoords,
     simulating, startSimulation, stopSimulation, currentSimPosition, simulatedDistanceKm, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER o essa linha
     ...poi,
     ...navigation,
