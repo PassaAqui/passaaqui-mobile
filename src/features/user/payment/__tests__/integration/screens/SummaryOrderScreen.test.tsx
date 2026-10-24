@@ -4,12 +4,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SummaryOrderScreen from "@/src/features/user/payment/screens/SummaryOrderScreen";
 import { useCheckout } from "@/src/features/user/payment/hooks/useCheckout";
+import { useOrderSummary } from "@/src/features/user/payment/hooks/useOrderSummary";
 import { useOrderStore } from "@/src/stores/user/payment/orderStore";
-import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
 import { productDetail } from "@/src/features/user/shop/__tests__/fixtures/shop";
 import {
   order,
+  orderSummary,
   createAxiosError,
 } from "@/src/features/user/payment/__tests__/fixtures/payment";
 
@@ -42,12 +43,12 @@ jest.mock("@/src/features/user/shop/components/Header", () => {
   };
 });
 
-jest.mock("@/src/features/user/auth/hooks/useTouristMe", () => ({
-  useTouristMe: jest.fn(),
-}));
-
 jest.mock("@/src/features/user/shop/hooks/products/useProductDetail", () => ({
   useProductDetail: jest.fn(),
+}));
+
+jest.mock("@/src/features/user/payment/hooks/useOrderSummary", () => ({
+  useOrderSummary: jest.fn(),
 }));
 
 jest.mock("@/src/features/user/payment/hooks/useCheckout", () => ({
@@ -61,9 +62,11 @@ const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockedUseSafeAreaInsets = useSafeAreaInsets as jest.MockedFunction<
   typeof useSafeAreaInsets
 >;
-const mockedUseTouristMe = useTouristMe as jest.MockedFunction<typeof useTouristMe>;
 const mockedUseProductDetail = useProductDetail as jest.MockedFunction<
   typeof useProductDetail
+>;
+const mockedUseOrderSummary = useOrderSummary as jest.MockedFunction<
+  typeof useOrderSummary
 >;
 const mockedUseCheckout = useCheckout as jest.MockedFunction<typeof useCheckout>;
 const mockedPush = jest.fn();
@@ -80,7 +83,7 @@ describe("SummaryOrderScreen", () => {
     jest.clearAllMocks();
     useOrderStore.setState({ order: null });
     savedCallbacks = null;
-    mutate = jest.fn((_id: number, callbacks?: any) => {
+    mutate = jest.fn((_variables: any, callbacks?: any) => {
       savedCallbacks = callbacks ?? null;
     });
     mockedUseLocalSearchParams.mockReturnValue({ id: "1" });
@@ -94,7 +97,7 @@ describe("SummaryOrderScreen", () => {
       right: 0,
     });
     mockedUseProductDetail.mockReturnValue({ data: productDetail } as any);
-    mockedUseTouristMe.mockReturnValue({ data: { currentXP: 120 } } as any);
+    mockedUseOrderSummary.mockReturnValue({ data: orderSummary } as any);
     mockedUseCheckout.mockReturnValue({ mutate, isPending: false } as any);
   });
 
@@ -105,6 +108,18 @@ describe("SummaryOrderScreen", () => {
   it("renderiza null quando não há produto", () => {
     // Arrange
     mockedUseProductDetail.mockReturnValue({ data: undefined } as any);
+
+    // Act
+    render(<SummaryOrderScreen />);
+
+    // Assert
+    expect(screen.queryByText("RESUMO DO PEDIDO")).toBeNull();
+    expect(screen.queryByText("Pagar com PIX")).toBeNull();
+  });
+
+  it("renderiza null quando não há resumo do pedido", () => {
+    // Arrange
+    mockedUseOrderSummary.mockReturnValue({ data: undefined } as any);
 
     // Act
     render(<SummaryOrderScreen />);
@@ -132,8 +147,8 @@ describe("SummaryOrderScreen", () => {
     expect(screen.getByText("TOTAL")).toBeTruthy();
     expect(screen.getByText("Subtotal")).toBeTruthy();
     expect(screen.getByText("Desconto XP")).toBeTruthy();
-    expect(screen.getAllByText("- R$ 5,00 (MOCKADO)").length).toBe(2);
-    expect(screen.getByText("R$ 14,90 (MOCKADO)")).toBeTruthy();
+    expect(screen.getAllByText("- R$ 0,30").length).toBe(2);
+    expect(screen.getByText("R$ 19,60")).toBeTruthy();
     expect(screen.getByText("Pagar com PIX")).toBeTruthy();
     expect(
       screen.getByText("Você será redirecionado para o QR Code do PIX")
@@ -158,7 +173,10 @@ describe("SummaryOrderScreen", () => {
     fireEvent.press(screen.getByText("Pagar com PIX"));
 
     // Assert
-    expect(mutate).toHaveBeenCalledWith(1, expect.anything());
+    expect(mutate).toHaveBeenCalledWith(
+      { productId: 1, xpToUse: 30 },
+      expect.anything()
+    );
 
     // Act — simula o onSuccess do checkout
     act(() => {

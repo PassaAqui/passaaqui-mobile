@@ -54,10 +54,10 @@ describe("useCheckout", () => {
 
     // Act
     const { result } = renderUseCheckout();
-    await result.current.mutateAsync(1);
+    await result.current.mutateAsync({ productId: 1 });
 
     // Assert
-    expect(mockedCheckoutOrder).toHaveBeenCalledWith(1);
+    expect(mockedCheckoutOrder).toHaveBeenCalledWith(1, undefined);
     expect(useOrderStore.getState().order).toBe(order);
   });
 
@@ -68,7 +68,9 @@ describe("useCheckout", () => {
 
     // Act
     const { result } = renderUseCheckout();
-    await expect(result.current.mutateAsync(1)).rejects.toBe(error);
+    await expect(
+      result.current.mutateAsync({ productId: 1 })
+    ).rejects.toBe(error);
 
     // Assert
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -76,16 +78,16 @@ describe("useCheckout", () => {
     expect(useOrderStore.getState().order).toBeNull();
   });
 
-  it("chama o service com o productId passado à mutation", async () => {
+  it("chama o service com productId e xpToUse passados à mutation", async () => {
     // Arrange
     mockedCheckoutOrder.mockResolvedValueOnce(order);
 
     // Act
     const { result } = renderUseCheckout();
-    await result.current.mutateAsync(7);
+    await result.current.mutateAsync({ productId: 7, xpToUse: 30 });
 
     // Assert
-    expect(mockedCheckoutOrder).toHaveBeenCalledWith(7);
+    expect(mockedCheckoutOrder).toHaveBeenCalledWith(7, 30);
   });
 
   it("sai de isPending após o sucesso do checkout", async () => {
@@ -94,10 +96,40 @@ describe("useCheckout", () => {
 
     // Act
     const { result } = renderUseCheckout();
-    await result.current.mutateAsync(1);
+    await result.current.mutateAsync({ productId: 1 });
 
     // Assert
     await waitFor(() => expect(result.current.isPending).toBe(false));
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("debita o XP usado do cache de tourist-me após o checkout", async () => {
+    // Arrange
+    client.setQueryData(["tourist-me"], { currentXP: 120 });
+    mockedCheckoutOrder.mockResolvedValueOnce({
+      ...order,
+      xpUsed: 30,
+      cashDiscount: 0.3,
+    });
+
+    // Act
+    const { result } = renderUseCheckout();
+    await result.current.mutateAsync({ productId: 1, xpToUse: 30 });
+
+    // Assert
+    expect(client.getQueryData(["tourist-me"])).toEqual({ currentXP: 90 });
+  });
+
+  it("não altera o cache de tourist-me quando nenhum XP foi usado", async () => {
+    // Arrange
+    client.setQueryData(["tourist-me"], { currentXP: 120 });
+    mockedCheckoutOrder.mockResolvedValueOnce(order);
+
+    // Act
+    const { result } = renderUseCheckout();
+    await result.current.mutateAsync({ productId: 1 });
+
+    // Assert
+    expect(client.getQueryData(["tourist-me"])).toEqual({ currentXP: 120 });
   });
 });

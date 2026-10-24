@@ -1,6 +1,7 @@
 import type {
   Order,
   OrderStatusUpdate,
+  OrderSummary,
 } from "@/src/features/user/payment/types/order";
 
 export const order: Order = {
@@ -19,6 +20,18 @@ export const order: Order = {
   qrCodeBase64: "base64-seed",
   pixExpiresAt: "2026-08-10T00:10:00.000Z",
   pickupCode: null,
+  xpUsed: null,
+  cashDiscount: 0,
+};
+
+export const orderSummary: OrderSummary = {
+  productId: 1,
+  unitPrice: 19.9,
+  maxXp: 30,
+  availableXp: 120,
+  xpToUse: 30,
+  xpDiscount: 0.3,
+  totalAmount: 19.6,
 };
 
 export const paidOrder: Order = {

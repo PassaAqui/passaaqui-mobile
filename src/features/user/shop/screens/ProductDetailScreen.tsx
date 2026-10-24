@@ -9,10 +9,9 @@ import Header from "@/src/features/user/shop/components/Header";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
+import { useOrderSummary } from "@/src/features/user/payment/hooks/useOrderSummary";
 import { ProductImageCarousel } from "@/src/features/user/shop/components/ProductImageCarousel";
 import { ProductRatingsPreview } from "@/src/features/user/shop/components/ProductRatingsPreview";
-
-const discount = 5.00;
 
 export default function ProductDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -23,9 +22,11 @@ export default function ProductDetailScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: product } = useProductDetail(Number(id));
+  const { data: summary } = useOrderSummary(product?.id);
 
-  if (!product) return null;
+  if (!product || !summary) return null;
 
+  const discount = summary.xpDiscount;
   const canRescue = (user?.currentXP ?? 0) >= Number(product.maxXp);
 
   return (
