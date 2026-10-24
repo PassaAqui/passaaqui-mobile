@@ -86,6 +86,19 @@ describe("poiService", () => {
         params: { latitude: -8.0632, longitude: -34.8711, mode: "driving-car" },
       });
     });
+
+    it("normaliza estimated_xp e mantém null quando ausente", async () => {
+      // Arrange
+      const storeWithoutEstimatedXp = { ...rawPoiNearby, type: "STORE" as const };
+      delete (storeWithoutEstimatedXp as { estimated_xp?: number }).estimated_xp;
+      mockedApi.get.mockResolvedValueOnce({ data: [storeWithoutEstimatedXp] });
+
+      // Act
+      const result = await getPoisNearby(-8.0632, -34.8711);
+
+      // Assert
+      expect(result[0].estimatedXp).toBeNull();
+    });
   });
 
   describe("getPoiById", () => {

@@ -219,7 +219,7 @@ export default function MapScreen() {
           title={openTouristPOIMarker.name}
           description={openTouristPOIMarker.description ?? ""}
           distance={openTouristPOIMarker.distanceLabel}
-          xpQuantity={openTouristPOIMarker.xpReward ?? 0}
+          xpQuantity={openTouristPOIMarker.estimatedXp ?? openTouristPOIMarker.xpReward ?? 0}
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
           onNavigate={(mode) => {

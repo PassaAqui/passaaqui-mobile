@@ -17,6 +17,7 @@ export const rawPoiNearby = {
   ratings_count: 120,
   image: "https://cdn.example.com/marco-zero.jpg",
   distance_km: 1.24,
+  estimated_xp: 50,
 };
 
 export const poiNearby: PoiNearby = {
@@ -24,6 +25,7 @@ export const poiNearby: PoiNearby = {
   name: "Marco Zero",
   description: "Praça histórica do Recife",
   xpReward: 50,
+  estimatedXp: 50,
   type: "TOURIST_POINT",
   latitude: -8.0632,
   longitude: -34.8711,
@@ -39,6 +41,7 @@ export const storePoi: PoiNearby = {
   name: "Café do Recife",
   description: "Cafeteria no bairro do Recife",
   xpReward: 30,
+  estimatedXp: null,
   type: "STORE",
   latitude: -8.0569,
   longitude: -34.8712,
@@ -158,6 +161,7 @@ export const rawPoiDetail = {
   average_rating: 4.8,
   ratings_count: 120,
   image: "https://cdn.example.com/marco-zero.jpg",
+  estimated_xp: 50,
   products: [
     {
       id: 10,
@@ -178,6 +182,7 @@ export const poiDetail: PoiDetail = {
   name: "Marco Zero",
   description: "Praça histórica do Recife",
   xpReward: 50,
+  estimatedXp: 50,
   type: "TOURIST_POINT",
   latitude: -8.0632,
   longitude: -34.8711,

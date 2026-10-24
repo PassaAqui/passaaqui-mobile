@@ -16,6 +16,7 @@ export interface PoiNearby {
   name: string;
   description: string | null;
   xpReward: number | null;
+  estimatedXp: number | null;
   type: "STORE" | "TOURIST_POINT";
   latitude: number;
   longitude: number;
@@ -31,6 +32,7 @@ interface PoiNearbyRaw {
   name: string;
   description: string | null;
   xp_reward: number | null;
+  estimated_xp: number | null;
   type: "STORE" | "TOURIST_POINT";
   latitude: number;
   longitude: number;
@@ -46,6 +48,7 @@ function normalizePoi(raw: PoiNearbyRaw): PoiNearby {
     name: raw.name,
     description: raw.description,
     xpReward: raw.xp_reward,
+    estimatedXp: raw.estimated_xp ?? null,
     type: raw.type,
     latitude: raw.latitude,
     longitude: raw.longitude,
@@ -75,6 +78,7 @@ export interface PoiDetail {
   name: string;
   description: string | null;
   xpReward: number | null;
+  estimatedXp: number | null;
   type: "STORE" | "TOURIST_POINT";
   latitude: number;
   longitude: number;
@@ -101,6 +105,7 @@ interface PoiDetailRaw {
   name: string;
   description: string | null;
   xp_reward: number | null;
+  estimated_xp: number | null;
   type: "STORE" | "TOURIST_POINT";
   latitude: number;
   longitude: number;
@@ -130,6 +135,7 @@ function normalizePoiDetail(raw: PoiDetailRaw): PoiDetail {
     name: raw.name,
     description: raw.description,
     xpReward: raw.xp_reward,
+    estimatedXp: raw.estimated_xp ?? null,
     type: raw.type,
     latitude: raw.latitude,
     longitude: raw.longitude,
