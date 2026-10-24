@@ -18,10 +18,10 @@ export default function RedemptionAlertModal({ img, title, discount, visible, on
         <View className="w-full bg-white px-6 p-4 items-center justify-center gap-2 rounded-2xl border-2 border-[#EAAA6A]">
           <View className="items-center justify-center gap-0">
             <Image className="w-28 h-28" source={require("@/assets/user/map/poi/shop/clock2.png")} />
-            <Text className="font-itim text-3xl text-black text-center">Resgate Pendente</Text>
+            <Text className="font-itim text-3xl text-black text-center">Pagamento Pendente</Text>
           </View>
             
-          <Text className="text-center font-itim text-lg opacity-75 ">Você já possui um código ativo. Utilize-o para realizar outra compra!</Text>
+          <Text className="text-center font-itim text-lg opacity-75 ">Você já possui um pagamento pendente. Finalize-o antes de comprar outro.</Text>
           <View>
             <Pressable
               onPress={() => router.push({
@@ -30,7 +30,7 @@ export default function RedemptionAlertModal({ img, title, discount, visible, on
               })}
               className="bg-[#3D2408] px-10 p-1 items-center justify-center rounded-2xl active:opacity-65"
             >
-              <Text className="text-xl font-itim text-center text-white">Ver me código</Text>
+              <Text className="text-xl font-itim text-center text-white">Ver meu pagamento</Text>
             </Pressable>
 
             <Pressable onPress={onClose} className="bg-transparent px-10 p-1 items-center justify-center rounded-2xl active:opacity-65">

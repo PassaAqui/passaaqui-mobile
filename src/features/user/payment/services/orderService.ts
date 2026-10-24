@@ -36,3 +36,8 @@ export async function getOrder(orderId: string): Promise<Order> {
   const { data } = await api.get<Order>(`/orders/${orderId}`);
   return data;
 }
+
+export async function getMyOrders(): Promise<Order[]> {
+  const { data } = await api.get<Order[]>("/orders/my-history");
+  return data;
+}

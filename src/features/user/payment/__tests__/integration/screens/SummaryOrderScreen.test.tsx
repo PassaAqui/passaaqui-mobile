@@ -190,7 +190,7 @@ describe("SummaryOrderScreen", () => {
     });
   });
 
-  it("abre o modal de resgate pendente no erro 409 e fecha com Agora não", () => {
+  it("abre o modal de pagamento pendente no erro 409 e fecha com Agora não", () => {
     // Act
     render(<SummaryOrderScreen />);
     fireEvent.press(screen.getByText("Pagar com PIX"));
@@ -199,14 +199,14 @@ describe("SummaryOrderScreen", () => {
     });
 
     // Assert
-    expect(screen.getByText("Resgate Pendente")).toBeTruthy();
+    expect(screen.getByText("Pagamento Pendente")).toBeTruthy();
     expect(alertSpy).not.toHaveBeenCalled();
 
     // Act — fecha o modal
     fireEvent.press(screen.getByText("Agora não"));
 
     // Assert
-    expect(screen.queryByText("Resgate Pendente")).toBeNull();
+    expect(screen.queryByText("Pagamento Pendente")).toBeNull();
   });
 
   it("exibe Alert de erro no status 400", () => {

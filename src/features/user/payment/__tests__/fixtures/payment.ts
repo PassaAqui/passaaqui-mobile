@@ -34,6 +34,11 @@ export const orderSummary: OrderSummary = {
   totalAmount: 19.6,
 };
 
+export const pendingOrder: Order = {
+  ...order,
+  pixExpiresAt: "2099-12-31T23:59:59.000Z",
+};
+
 export const paidOrder: Order = {
   ...order,
   status: "PAID",

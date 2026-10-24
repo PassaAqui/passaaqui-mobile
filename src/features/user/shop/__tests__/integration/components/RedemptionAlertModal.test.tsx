@@ -30,29 +30,31 @@ describe("RedemptionAlertModal", () => {
     render(<RedemptionAlertModal {...props} visible={false} onClose={onClose} />);
 
     // Act
-    const title = screen.queryByText("Resgate Pendente");
+    const title = screen.queryByText("Pagamento Pendente");
 
     // Assert
     expect(title).toBeNull();
   });
 
-  it("renderiza o aviso de resgate pendente quando visible é true", () => {
+  it("renderiza o aviso de pagamento pendente quando visible é true", () => {
     // Arrange
     render(<RedemptionAlertModal {...props} visible onClose={onClose} />);
 
     // Assert
-    expect(screen.getByText("Resgate Pendente")).toBeTruthy();
+    expect(screen.getByText("Pagamento Pendente")).toBeTruthy();
     expect(
-      screen.getByText("Você já possui um código ativo. Utilize-o para realizar outra compra!")
+      screen.getByText(
+        "Você já possui um pagamento pendente. Finalize-o antes de comprar outro."
+      )
     ).toBeTruthy();
   });
 
-  it("navega para o código ao pressionar 'Ver me código'", () => {
+  it("navega para o pagamento ao pressionar 'Ver meu pagamento'", () => {
     // Arrange
     render(<RedemptionAlertModal {...props} visible onClose={onClose} />);
 
     // Act
-    fireEvent.press(screen.getByText("Ver me código"));
+    fireEvent.press(screen.getByText("Ver meu pagamento"));
 
     // Assert
     expect(mockedPush).toHaveBeenCalledWith({

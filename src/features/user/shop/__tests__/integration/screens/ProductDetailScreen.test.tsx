@@ -208,7 +208,7 @@ describe("ProductDetailScreen", () => {
     ).toBeTruthy();
   });
 
-  it("abre o modal de resgate pendente quando hasRedeemed é true", () => {
+  it("abre o modal de pagamento pendente quando hasRedeemed é true", () => {
     // Arrange
     mockedUseTouristMe.mockReturnValue({ data: { currentXP: 120 } } as any);
     mockedUseRedemptionCheck.mockReturnValue({
@@ -220,7 +220,7 @@ describe("ProductDetailScreen", () => {
     render(<ProductDetailScreen />);
 
     // Assert
-    expect(screen.getByText("Resgate Pendente")).toBeTruthy();
+    expect(screen.getByText("Pagamento Pendente")).toBeTruthy();
 
     // Act
     fireEvent.press(screen.getByText("Agora não"));

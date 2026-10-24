@@ -1,6 +1,7 @@
 import { api } from "@/src/services/api/api";
 import {
   checkoutOrder,
+  getMyOrders,
   getOrder,
   getOrderSummary,
 } from "@/src/features/user/payment/services/orderService";
@@ -128,6 +129,32 @@ describe("orderService", () => {
 
       // Act
       const promise = getOrder("ord-1");
+
+      // Assert
+      await expect(promise).rejects.toBe(error);
+    });
+  });
+
+  describe("getMyOrders", () => {
+    it("busca o histórico de pedidos do turista", async () => {
+      // Arrange
+      mockedApi.get.mockResolvedValueOnce({ data: [order] });
+
+      // Act
+      const result = await getMyOrders();
+
+      // Assert
+      expect(mockedApi.get).toHaveBeenCalledWith("/orders/my-history");
+      expect(result).toEqual([order]);
+    });
+
+    it("relança o erro HTTP recebido", async () => {
+      // Arrange
+      const error = createAxiosError(500);
+      mockedApi.get.mockRejectedValueOnce(error);
+
+      // Act
+      const promise = getMyOrders();
 
       // Assert
       await expect(promise).rejects.toBe(error);
