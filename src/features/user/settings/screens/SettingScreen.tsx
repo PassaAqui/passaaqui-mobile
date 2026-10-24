@@ -81,6 +81,11 @@ export default function SettingScreen() {
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
 
+              <Pressable onPress={() => router.push("/user/(private)/shop/code")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
+                <Text className="font-itim text-lg opacity-75">Ver pagamentos pendentes</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
+
             </View>
           </View>
         </View>
