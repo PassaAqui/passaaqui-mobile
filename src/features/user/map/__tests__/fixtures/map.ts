@@ -17,6 +17,7 @@ export const rawPoiNearby = {
   ratings_count: 120,
   image: "https://cdn.example.com/marco-zero.jpg",
   distance_km: 1.24,
+  estimated_xp: 50,
 };
 
 export const poiNearby: PoiNearby = {
@@ -24,6 +25,7 @@ export const poiNearby: PoiNearby = {
   name: "Marco Zero",
   description: "Praça histórica do Recife",
   xpReward: 50,
+  estimatedXp: 50,
   type: "TOURIST_POINT",
   latitude: -8.0632,
   longitude: -34.8711,
@@ -39,6 +41,7 @@ export const storePoi: PoiNearby = {
   name: "Café do Recife",
   description: "Cafeteria no bairro do Recife",
   xpReward: 30,
+  estimatedXp: null,
   type: "STORE",
   latitude: -8.0569,
   longitude: -34.8712,
@@ -66,6 +69,55 @@ export const directionResponse = {
       },
     },
   ],
+};
+
+// Rotas sintéticas usadas nos testes de progresso (traçado reto e "U" com
+// trechos paralelos próximos).
+export const straightRouteCoords = [
+  { latitude: -8.0675, longitude: -34.9167 },
+  { latitude: -8.0675, longitude: -34.9067 },
+  { latitude: -8.0675, longitude: -34.8967 },
+];
+
+export const uTurnRouteCoords = [
+  { latitude: -8.0, longitude: -34.9 },
+  { latitude: -8.0, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.89 },
+  { latitude: -8.001, longitude: -34.9 },
+];
+
+export const checkinApiResponse = {
+  xp_granted: 50,
+  calculation: {
+    distance_km: 1.2,
+    displacement_factor: 3,
+    recent_visits: 0,
+    invisibility_factor: 100,
+    raw_xp: 300,
+    final_xp: 50,
+  },
+  applied_rules: {
+    anti_farming_active: false,
+    invalid_gps: false,
+  },
+  block_reason: null,
+};
+
+export const checkinResult = {
+  xp_concedido: 50,
+  calculo: {
+    distancia_km: 1.2,
+    fator_deslocamento: 3,
+    visitas_recentes: 0,
+    fator_invisibilidade: 100,
+    xp_bruto: 300,
+    xp_final: 50,
+  },
+  regras_aplicadas: {
+    anti_farming_ativo: false,
+    gps_invalido: false,
+  },
+  motivo_bloqueio: null,
 };
 
 export const routeSession: RouteSession = {
@@ -109,6 +161,7 @@ export const rawPoiDetail = {
   average_rating: 4.8,
   ratings_count: 120,
   image: "https://cdn.example.com/marco-zero.jpg",
+  estimated_xp: 50,
   products: [
     {
       id: 10,
@@ -129,6 +182,7 @@ export const poiDetail: PoiDetail = {
   name: "Marco Zero",
   description: "Praça histórica do Recife",
   xpReward: 50,
+  estimatedXp: 50,
   type: "TOURIST_POINT",
   latitude: -8.0632,
   longitude: -34.8711,

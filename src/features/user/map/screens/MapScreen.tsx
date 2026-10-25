@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
+import { useEffect } from "react";
 import { Map, Camera, Marker, GeoJSONSource, Layer, type ViewStateChangeEvent } from "@maplibre/maplibre-react-native";
 import type { NativeSyntheticEvent } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -30,6 +31,7 @@ export default function MapScreen() {
     loadingRoute,
     cameraRef,
     mapRef,
+    mapReady,
     setMapReady,
     gpsActive,
     isFollowing, setIsFollowing,
@@ -41,7 +43,7 @@ export default function MapScreen() {
     setOpenShopPOIMarker, openShopPOIMarker,
     setOpenPOIMarker,
     touristPois, shopPois,
-    routeCoords,
+    remainingRouteCoords,
     stop,
     showAlertModal, setShowAlertModal,
     handleNavigation,
@@ -57,6 +59,12 @@ export default function MapScreen() {
   } = useMapScreen();
 
   const { data: user } = useTouristMe();
+  const is3D = user?.mapView !== "2D";
+
+  useEffect(() => {
+    if (!mapReady) return;
+    cameraRef.current?.easeTo({ center: toLngLat(MARCO_ZERO_RECIFE), pitch: is3D ? 60 : 0, duration: 0 });
+  }, [cameraRef, is3D, mapReady]);
 
   // Apenas em dev pra testar o checkin
   const userMarkerCoordinate = currentSimPosition ?? MARCO_ZERO_RECIFE;
@@ -95,7 +103,14 @@ export default function MapScreen() {
         ref={mapRef}
         mapStyle={MAP_STYLE_URL}
         style={styles.map}
-        onDidFinishLoadingMap={() => setMapReady(true)}
+        onDidFinishLoadingMap={() => {
+          setMapReady(true);
+          cameraRef.current?.easeTo({
+            center: toLngLat(MARCO_ZERO_RECIFE),
+            pitch: is3D ? 60 : 0,
+            duration: 0,
+          });
+        }}
         onRegionDidChange={(event: NativeSyntheticEvent<ViewStateChangeEvent>) => {
           if (event.nativeEvent.userInteraction) {
             const { center } = event.nativeEvent;
@@ -109,7 +124,7 @@ export default function MapScreen() {
           ref={cameraRef}
           initialViewState={{
             center: toLngLat(MARCO_ZERO_RECIFE),
-            pitch: 60,
+            pitch: is3D ? 60 : 0,
             zoom: 40,
           }}
         />
@@ -160,7 +175,7 @@ export default function MapScreen() {
               </Marker>
             ))}
 
-            {routeCoords.length > 0 && stop && (
+            {remainingRouteCoords.length > 1 && stop && (
               <GeoJSONSource
                 id="route-source"
                 data={{
@@ -171,7 +186,7 @@ export default function MapScreen() {
                       properties: {},
                       geometry: {
                         type: "LineString",
-                        coordinates: routeCoords.map(toLngLat), // Conversão: LatLng[] → [lng, lat][]
+                        coordinates: remainingRouteCoords.map(toLngLat), // Conversão: LatLng[] → [lng, lat][]
                       },
                     },
                   ],
@@ -219,7 +234,7 @@ export default function MapScreen() {
           title={openTouristPOIMarker.name}
           description={openTouristPOIMarker.description ?? ""}
           distance={openTouristPOIMarker.distanceLabel}
-          xpQuantity={openTouristPOIMarker.xpReward ?? 0}
+          xpQuantity={openTouristPOIMarker.estimatedXp ?? openTouristPOIMarker.xpReward ?? 0}
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
           onNavigate={(mode) => {

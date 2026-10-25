@@ -97,13 +97,12 @@ describe("PixPaymentScreen", () => {
     jest.useRealTimers();
   });
 
-  function findQrImage() {
+  function findQrImage(uri = "data:image/png;base64,base64-seed") {
     return screen
       .UNSAFE_getAllByType(Image)
       .find(
         (img) =>
-          typeof img.props.source === "object" &&
-          img.props.source?.uri === "data:image/png;base64,base64-seed"
+          typeof img.props.source === "object" && img.props.source?.uri === uri
       );
   }
 
@@ -145,6 +144,37 @@ describe("PixPaymentScreen", () => {
     expect(screen.getByText(order.pix)).toBeTruthy();
     expect(screen.getByText(/O código expira em:/)).toBeTruthy();
     expect(screen.getByText(/\d{2}:\d{2}/)).toBeTruthy();
+  });
+
+  it("não duplica o prefixo quando o QR Code já vem como data URI", () => {
+    // Arrange
+    useOrderStore.setState({
+      order: {
+        ...order,
+        qrCodeBase64: "data:image/png;base64,prefixed-seed",
+      },
+    });
+
+    // Act
+    render(<PixPaymentScreen />);
+
+    // Assert
+    expect(findQrImage("data:image/png;base64,prefixed-seed")).toBeTruthy();
+    expect(
+      findQrImage("data:image/png;base64,data:image/png;base64,prefixed-seed")
+    ).toBeUndefined();
+  });
+
+  it("exibe fallback quando o QR Code não está disponível", () => {
+    // Arrange
+    useOrderStore.setState({ order: { ...order, qrCodeBase64: "" } });
+
+    // Act
+    render(<PixPaymentScreen />);
+
+    // Assert
+    expect(screen.getByText("QR Code indisponível")).toBeTruthy();
+    expect(findQrImage()).toBeUndefined();
   });
 
   it("atualiza a contagem regressiva a cada segundo", () => {

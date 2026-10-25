@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useOrderStore } from "@/src/stores/user/payment/orderStore";
 import { useOrder } from "@/src/features/user/payment/hooks/useOrder";
 import { useOrderSocket } from "@/src/features/user/payment/hooks/useOrderSocket";
+import { buildQrCodeUri } from "@/src/features/user/payment/utils/qrCode";
 
 export default function PixPaymentScreen() {
   const router = useRouter();
@@ -68,6 +69,7 @@ export default function PixPaymentScreen() {
     );
   }
 
+  const qrCodeUri = buildQrCodeUri(order.qrCodeBase64);
   const expired = order.status === "EXPIRED" || timeLeft === 0;
 
   return (
@@ -83,11 +85,22 @@ export default function PixPaymentScreen() {
           </View>
 
           <View className="border border-gray-300 w-full rounded-xl px-4 py-12 items-center justify-center gap-3">
-            <Image
-              source={{ uri: `data:image/png;base64,${order.qrCodeBase64}` }}
-              style={{ width: 200, height: 200 }}
-              resizeMode="contain"
-            />
+            {qrCodeUri ? (
+              <Image
+                source={{ uri: qrCodeUri }}
+                style={{ width: 200, height: 200 }}
+                resizeMode="contain"
+              />
+            ) : (
+              <View
+                style={{ width: 200, height: 200 }}
+                className="items-center justify-center"
+              >
+                <Text className="font-inter text-center opacity-55">
+                  QR Code indisponível
+                </Text>
+              </View>
+            )}
 
             <Text className="font-inter text-center">Copie o código abaixo para pagar no app do seu banco:</Text>
             <View className="bg-gray-200 w-full p-4 border border-dashed border-gray-400 rounded-xl items-center">
