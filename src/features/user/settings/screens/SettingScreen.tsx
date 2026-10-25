@@ -52,7 +52,7 @@ export default function SettingScreen() {
 
         <SettingsHeader title="Perfil" />
 
-        <View className="items-center justify-center mb-14 gap-4">
+        <View className="items-center justify-center mb-8 gap-4">
           <View className="mb-7">
             <Image
               testID="settings-avatar"
@@ -67,25 +67,33 @@ export default function SettingScreen() {
           </View>
         </View>
 
-        <View className="gap-10 w-full">
+        <View className="gap-6 w-full">
           <View className="bg-white p-5 gap-4 rounded-lg">
             <Text className="font-itim text-xl">Informações da conta</Text>
             <View className="gap-1">
-              <Pressable onPress={() => router.push("/user/(private)/settings/edit-profile")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
-                <Text className="font-itim text-lg opacity-75">Editar perfil</Text>
+              <Pressable onPress={() => router.push("/user/(private)/settings/travel-history")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
+                <Text className="font-itim text-base opacity-75">Ver histórico de viagens</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
 
-              <Pressable onPress={() => router.push("/user/(private)/settings/travel-history")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
-                <Text className="font-itim text-lg opacity-75">Ver histórico de viagens</Text>
+              <Pressable onPress={() => router.push("/user/(private)/shop/code")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
+                <Text className="font-itim text-base opacity-75">Ver pagamentos pendentes</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
+            </View>
+          </View>
 
-              <Pressable onPress={() => router.push("/user/(private)/shop/code")} className="flex-row items-center justify-between active:opacity-30 min-h-10">
-                <Text className="font-itim text-lg opacity-75">Ver pagamentos pendentes</Text>
+          <View className="bg-white p-5 gap-4 rounded-lg">
+            <Text className="font-itim text-xl">Preferências</Text>
+            <View className="gap-1">
+              <Pressable onPress={() => router.push("/user/(private)/settings/edit-profile")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
+                <Text className="font-itim text-base opacity-75">Editar perfil</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
-
+              <Pressable onPress={() => router.push("/user/(private)/settings/map-view")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
+                <Text className="font-itim text-base opacity-75">Alterar modo de visualização do mapa</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
             </View>
           </View>
         </View>

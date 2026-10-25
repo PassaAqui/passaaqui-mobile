@@ -8,6 +8,7 @@ export interface TouristProfile {
   currentXP: number;
   role?: string;
   theme?: "LIGHT" | "DARK";
+  mapView?: "2D" | "3D";
   image?: string | null;
   imageUrl?: string | null;
   createdAt?: string;
@@ -16,6 +17,13 @@ export interface TouristProfile {
   documentId?: string;
   lastKnownLocation?: string | null;
   level?: number;
+}
+
+export type MapView = "2D" | "3D";
+
+export async function updateMapView(mapView: MapView): Promise<TouristProfile> {
+  const { data } = await api.patch<TouristProfile>("/users/map-view", { mapView });
+  return data;
 }
 
 export async function getTouristMe(): Promise<TouristProfile> {
