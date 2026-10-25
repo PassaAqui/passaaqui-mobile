@@ -35,6 +35,7 @@ function makePoi(id: number): PoiNearby {
     name: `POI ${id}`,
     description: null,
     xpReward: null,
+    estimatedXp: null,
     type: "TOURIST_POINT",
     latitude: -8.0 + id / 10000,
     longitude: -34.9 + id / 10000,

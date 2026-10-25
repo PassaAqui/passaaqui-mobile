@@ -4,8 +4,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ProductDetailScreen from "@/src/features/user/shop/screens/ProductDetailScreen";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
+import { useOrderSummary } from "@/src/features/user/payment/hooks/useOrderSummary";
 import { useRedemptionCheck } from "@/src/hooks/user/map/shop/useRedemptionCheck";
 import { productDetail } from "@/src/features/user/shop/__tests__/fixtures/shop";
+import { orderSummary } from "@/src/features/user/payment/__tests__/fixtures/payment";
 
 jest.mock("expo-router", () => ({
   useRouter: jest.fn(),
@@ -58,6 +60,10 @@ jest.mock("@/src/features/user/shop/hooks/products/useProductDetail", () => ({
   useProductDetail: jest.fn(),
 }));
 
+jest.mock("@/src/features/user/payment/hooks/useOrderSummary", () => ({
+  useOrderSummary: jest.fn(),
+}));
+
 jest.mock("@/src/hooks/user/map/shop/useRedemptionCheck", () => ({
   useRedemptionCheck: jest.fn(),
 }));
@@ -72,6 +78,9 @@ const mockedUseSafeAreaInsets = useSafeAreaInsets as jest.MockedFunction<
 const mockedUseTouristMe = useTouristMe as jest.MockedFunction<typeof useTouristMe>;
 const mockedUseProductDetail = useProductDetail as jest.MockedFunction<
   typeof useProductDetail
+>;
+const mockedUseOrderSummary = useOrderSummary as jest.MockedFunction<
+  typeof useOrderSummary
 >;
 const mockedUseRedemptionCheck = useRedemptionCheck as jest.MockedFunction<
   typeof useRedemptionCheck
@@ -93,6 +102,7 @@ describe("ProductDetailScreen", () => {
       right: 0,
     });
     mockedUseProductDetail.mockReturnValue({ data: productDetail } as any);
+    mockedUseOrderSummary.mockReturnValue({ data: orderSummary } as any);
     mockedUseRedemptionCheck.mockReturnValue({
       hasRedeemed: false,
       setRedeemed: mockedSetRedeemed,
@@ -103,6 +113,17 @@ describe("ProductDetailScreen", () => {
   it("renderiza null quando não há produto", () => {
     // Arrange
     mockedUseProductDetail.mockReturnValue({ data: undefined } as any);
+
+    // Act
+    render(<ProductDetailScreen />);
+
+    // Assert
+    expect(screen.queryByText("Resgatar")).toBeNull();
+  });
+
+  it("renderiza null quando não há resumo do pedido", () => {
+    // Arrange
+    mockedUseOrderSummary.mockReturnValue({ data: undefined } as any);
 
     // Act
     render(<ProductDetailScreen />);
@@ -136,7 +157,7 @@ describe("ProductDetailScreen", () => {
     // Assert
     expect(screen.getByText("DETALHES DO DESCONTO")).toBeTruthy();
     expect(screen.getByText("Valor do desconto")).toBeTruthy();
-    expect(screen.getByText("- R$ 5,00")).toBeTruthy();
+    expect(screen.getByText("- R$ 0,30")).toBeTruthy();
     expect(screen.getByText("Validade")).toBeTruthy();
     expect(screen.getByText("30 dias após o resgate")).toBeTruthy();
     expect(screen.getByText("Uso")).toBeTruthy();
@@ -154,7 +175,7 @@ describe("ProductDetailScreen", () => {
     // Assert
     expect(mockedPush).toHaveBeenCalledWith({
       pathname: "/user/(private)/payment",
-      params: { id: productDetail.id, discount: 5 },
+      params: { id: productDetail.id, discount: 0.3 },
     });
   });
 
@@ -187,7 +208,7 @@ describe("ProductDetailScreen", () => {
     ).toBeTruthy();
   });
 
-  it("abre o modal de resgate pendente quando hasRedeemed é true", () => {
+  it("abre o modal de pagamento pendente quando hasRedeemed é true", () => {
     // Arrange
     mockedUseTouristMe.mockReturnValue({ data: { currentXP: 120 } } as any);
     mockedUseRedemptionCheck.mockReturnValue({
@@ -199,7 +220,7 @@ describe("ProductDetailScreen", () => {
     render(<ProductDetailScreen />);
 
     // Assert
-    expect(screen.getByText("Resgate Pendente")).toBeTruthy();
+    expect(screen.getByText("Pagamento Pendente")).toBeTruthy();
 
     // Act
     fireEvent.press(screen.getByText("Agora não"));

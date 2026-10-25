@@ -6,11 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useProductDetail } from "@/src/features/user/shop/hooks/products/useProductDetail";
-import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useCheckout } from "@/src/features/user/payment/hooks/useCheckout";
-
-// quantidade de desconto por hora fixa enquanto o backend ainda n retorna
-const MOCKED_XP_DISCOUNT = 5.0;
+import { useOrderSummary } from "@/src/features/user/payment/hooks/useOrderSummary";
 
 export default function SummaryOrderScreen() {
   const router = useRouter();
@@ -18,17 +15,15 @@ export default function SummaryOrderScreen() {
 
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: product } = useProductDetail(Number(id));
-  const { data: user } = useTouristMe();
+  const { data: summary } = useOrderSummary(Number(id));
   const { mutate: checkout, isPending } = useCheckout();
 
   const [showActiveOrderModal, setShowActiveOrderModal] = useState(false);
 
-  if (!product) return null;
-
-  const total = product.price - MOCKED_XP_DISCOUNT;
+  if (!product || !summary) return null;
 
   const handlePay = () => {
-    checkout(Number(id), {
+    checkout({ productId: Number(id), xpToUse: summary.xpToUse }, {
       onSuccess: (order) => {
         router.push({
           pathname: "/user/(private)/payment/pix-payment",
@@ -66,7 +61,7 @@ export default function SummaryOrderScreen() {
                 <Text className="opacity-75 font-inter" adjustsFontSizeToFit>{product.poi.name}</Text>
               </View>
               <Text className="font-interBold text-lg">
-                R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                R$ {summary.unitPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </Text>
             </View>
           </View>
@@ -85,7 +80,7 @@ export default function SummaryOrderScreen() {
                 <View className="flex-row gap-1 items-center">
                   <Image className="w-6 h-6" source={require("@/assets/user/map/poi/shop/coin.png")} />
                   <Text className="text-[#A86830] font-interBold" adjustsFontSizeToFit numberOfLines={1}>
-                    {(user?.currentXP ?? 0).toLocaleString("pt-BR")} XP
+                    {summary.availableXp.toLocaleString("pt-BR")} XP
                   </Text>
                 </View>
               </View>
@@ -94,10 +89,10 @@ export default function SummaryOrderScreen() {
             <View className="w-full flex-row bg-[#FEF3E2] border border-[#F0D49A] p-3 justify-between rounded-xl">
               <View className="flex-1 flex-row gap-2 items-center">
                 <Image className="w-4 h-4" source={require("@/assets/user/map/poi/shop/check.png")} />
-                <Text className="font-interBold text-[#7A5C1E] flex-1" adjustsFontSizeToFit>{product.maxXp} XP aplicados</Text>
+                <Text className="font-interBold text-[#7A5C1E] flex-1" adjustsFontSizeToFit>{summary.xpToUse} XP aplicados</Text>
               </View>
               <Text className="text-green-600 font-interBold" adjustsFontSizeToFit>
-                - R$ {MOCKED_XP_DISCOUNT.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (MOCKADO)
+                - R$ {summary.xpDiscount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
               </Text>
             </View>
           </View>
@@ -125,7 +120,7 @@ export default function SummaryOrderScreen() {
                 <View className="flex-row justify-between">
                   <Text className="opacity-75 font-inter flex-1" adjustsFontSizeToFit>Subtotal</Text>
                   <Text className="font-inter" adjustsFontSizeToFit>
-                    R$ {product.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {summary.unitPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </Text>
                 </View>
 
@@ -135,7 +130,7 @@ export default function SummaryOrderScreen() {
                     <Text className="text-[#A86830] font-interBold text-lg flex-1" adjustsFontSizeToFit>Desconto XP</Text>
                   </View>
                   <Text className="font-interBold text-green-600" adjustsFontSizeToFit>
-                    - R$ {MOCKED_XP_DISCOUNT.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (MOCKADO)
+                    - R$ {summary.xpDiscount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </Text>
                 </View>
 
@@ -144,7 +139,7 @@ export default function SummaryOrderScreen() {
                 <View className="flex-row justify-between items-center flex-1">
                   <Text className="font-interBold text-lg">Total</Text>
                   <Text className="font-interBold text-xl">
-                    R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} (MOCKADO)
+                    R$ {summary.totalAmount.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </Text>
                 </View>
               </View>
@@ -170,7 +165,7 @@ export default function SummaryOrderScreen() {
       <RedemptionAlertModal
         img={product.images && product.images.length > 0 ? product.images[0] : null}
         title={product.name}
-        discount={MOCKED_XP_DISCOUNT}
+        discount={summary.xpDiscount}
         visible={showActiveOrderModal}
         onClose={() => setShowActiveOrderModal(false)}
       />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, Modal, Dimensions } from "react-native";
+import { View, Text, Pressable, Modal, Dimensions, useWindowDimensions } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -37,6 +37,16 @@ export default function AnimatedPostcardModal({
   const scale = useSharedValue(0.92);
   const opacity = useSharedValue(0);
   const flipRotation = useSharedValue(0); // 0 = frente | 180 = verso
+
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
+  // Mantém a proporção 3/4 do cartão sem que ele ultrapasse o ecrã (telas menores).
+  const maxCardWidth = Math.min(windowWidth - 64, 384);
+  const heightFromWidth = maxCardWidth * (4 / 3);
+  const maxCardHeight = windowHeight * 0.82;
+  const isHeightLimited = heightFromWidth > maxCardHeight;
+  const cardWidth = isHeightLimited ? maxCardHeight * (3 / 4) : maxCardWidth;
+  const cardHeight = isHeightLimited ? maxCardHeight : heightFromWidth;
 
   useEffect(() => {
     if (visible) {
@@ -111,28 +121,28 @@ export default function AnimatedPostcardModal({
   return (
     <Modal transparent animationType="none" visible={isModalVisible} onRequestClose={() => {}}>
       <View className="flex-1 bg-black/60 items-center justify-center px-8">
-        <Animated.View style={containerStyle} className="w-full aspect-[3/4] max-w-sm">
-          <Pressable onPress={handleFlip} className="flex-1">
-            <View className="flex-1">
-              <Animated.View
-                style={[
-                  { backfaceVisibility: "hidden", position: "absolute", width: "100%", height: "100%" },
-                  frontFaceStyle,
-                ]}
-              >
+        <Animated.View style={[containerStyle, { width: cardWidth, height: cardHeight }]}>
+          <View className="flex-1">
+            <Animated.View
+              style={[
+                { backfaceVisibility: "hidden", position: "absolute", width: "100%", height: "100%" },
+                frontFaceStyle,
+              ]}
+            >
+              <Pressable onPress={handleFlip} className="flex-1">
                 <PostcardFront cityImage={cityImage} cityName={cityName} />
-              </Animated.View>
+              </Pressable>
+            </Animated.View>
 
-              <Animated.View
-                style={[
-                  { backfaceVisibility: "hidden", position: "absolute", width: "100%", height: "100%" },
-                  backFaceStyle,
-                ]}
-              >
-                <PostcardBack cityImage={cityImage} cityName={cityName} chronicle={chronicle} />
-              </Animated.View>
-            </View>
-          </Pressable>
+            <Animated.View
+              style={[
+                { backfaceVisibility: "hidden", position: "absolute", width: "100%", height: "100%" },
+                backFaceStyle,
+              ]}
+            >
+              <PostcardBack cityImage={cityImage} cityName={cityName} chronicle={chronicle} onFlip={handleFlip} />
+            </Animated.View>
+          </View>
 
           <Pressable onPress={onClose} className="absolute -top-4 -right-4 w-9 h-9 bg-[#F4F1EA] rounded-full items-center justify-center shadow-md active:opacity-60">
             <Text className="font-itim text-lg text-gray-700">✕</Text>

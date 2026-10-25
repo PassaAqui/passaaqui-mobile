@@ -20,6 +20,18 @@ export interface Order {
   qrCodeBase64: string;
   pixExpiresAt: string;
   pickupCode: string | null;
+  xpUsed: number | null;
+  cashDiscount: number;
+}
+
+export interface OrderSummary {
+  productId: number;
+  unitPrice: number;
+  maxXp: number;
+  availableXp: number;
+  xpToUse: number;
+  xpDiscount: number;
+  totalAmount: number;
 }
 
 export interface OrderStatusUpdate {
