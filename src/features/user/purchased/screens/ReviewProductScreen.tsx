@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, Image, Pressable, TextInput, ActivityIndicator } from "react-native";
+import { Modal, ScrollView, View, Text, Image, Pressable, TextInput, ActivityIndicator } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/src/features/user/shop/components/Header";
@@ -22,6 +22,7 @@ export default function ReviewProductScreen() {
   const [ratingError, setRatingError] = useState<string>("");
   const [mediaError, setMediaError] = useState<string>("");
   const [commentError, setCommentError] = useState<string>("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { photos, videos, maxPhotos, maxVideos, pickPhotos, pickVideos, removePhoto, removeVideo } = useReviewMedia();
 
   const handlePickPhotos = () => { setMediaError(""); pickPhotos(); };
@@ -61,7 +62,7 @@ export default function ReviewProductScreen() {
 
     mutate(
       { productId: orderId, rating, comment, photos, videos },
-      { onSuccess: () => router.back() }
+      { onSuccess: () => setShowSuccessModal(true) }
     );
   }
 
@@ -208,6 +209,29 @@ export default function ReviewProductScreen() {
           </Pressable>
         </View>
       </KeyboardAwareScrollView>
+
+      <Modal
+        transparent
+        animationType="fade"
+        visible={showSuccessModal}
+        onRequestClose={() => router.back()}
+      >
+        <View className="flex-1 bg-black/40 items-center justify-center px-6">
+          <View className="w-full bg-white rounded-2xl border-2 border-[#EAAA6A] p-6 items-center gap-4">
+            <Ionicons name="checkmark-circle" size={64} color="#22C55E" />
+            <Text className="font-itim text-3xl text-black text-center">Avaliação enviada!</Text>
+            <Text className="font-inter text-base text-gray-600 text-center">
+              Sua avaliação foi feita com sucesso. Obrigado por compartilhar sua opinião!
+            </Text>
+            <Pressable
+              onPress={() => router.back()}
+              className="bg-[#EAAA6A] px-10 py-3 rounded-2xl active:opacity-70"
+            >
+              <Text className="font-itim text-xl text-white">Concluir</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
