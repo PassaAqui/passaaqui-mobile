@@ -107,6 +107,11 @@ describe("useLocation", () => {
   it("com permissão concedida, observa a posição e atualiza location no callback", async () => {
     // Act
     const { result } = await renderLocation();
+
+    // A primeira posição deve ser aproveitada imediatamente, sem aguardar o
+    // primeiro callback do watcher para disponibilizar a localização.
+    expect(result.current.location).toBe(fakeLocation);
+
     act(() => watchCallback?.(fakeLocation));
 
     // Assert

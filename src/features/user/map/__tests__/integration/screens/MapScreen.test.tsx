@@ -220,6 +220,26 @@ describe("MapScreen", () => {
     expect(xp).toBeTruthy();
   });
 
+  it("mostra o modal de localização enquanto o PIN ainda não apareceu", () => {
+    // Arrange
+    mockMapScreen({ location: null });
+
+    // Act
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.getByText("Obtendo sua localização")).toBeTruthy();
+    expect(screen.getByText("Aguarde um momento enquanto localizamos você no mapa.")).toBeTruthy();
+  });
+
+  it("não mostra o modal de localização quando a posição já está disponível", () => {
+    // Act
+    render(<MapScreen />);
+
+    // Assert
+    expect(screen.queryByText("Obtendo sua localização")).toBeNull();
+  });
+
   it("renderiza os markers dos POIs turísticos e lojas", () => {
     // Arrange
     mockMapScreen({ touristPois: [poiNearby], shopPois: [storePoi] });

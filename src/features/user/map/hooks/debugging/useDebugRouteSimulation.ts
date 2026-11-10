@@ -27,7 +27,9 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
     intervalRef.current = setInterval(async () => {
       const point = routeCoords[indexRef.current];
       if (!point) {
-        stopSimulation();
+        // Reaching the end of the list is the only successful completion.
+        // Calling stopSimulation from the UI must be treated as cancellation.
+        stopSimulation(true);
         return;
       }
 
@@ -44,14 +46,20 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
     }, 1000);
   }
 
-  function stopSimulation() {
+  function stopSimulation(completed = false) {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = null;
     setSimulating(false);
     setCurrentSimPosition(null);
-    // Calcular distância total simulada ao finalizar
+
+    if (!completed) {
+      // A cancellation must not look like an arrival to the check-in flow.
+      setSimulatedDistanceKm(null);
+      return;
+    }
+
     const totalDistance = routeCoords.length > 1 ? calculateAccumulatedDistance(routeCoords) : 0;
     setSimulatedDistanceKm(totalDistance);
-    // Trigger callback for DEV checkin
     onSimulationEnd?.(totalDistance);
   }
 

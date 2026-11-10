@@ -10,20 +10,19 @@ import { Camera, type CameraRef, type MapRef } from "@maplibre/maplibre-react-na
 import { MARCO_ZERO_RECIFE, toLngLat } from "@/src/constants/user/map/coordinates";
 import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
 
-async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<boolean> {
+async function waitForLocation(maxRetries: number = 5, delayMs: number = 1000): Promise<LocationObject | null> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      await getCurrentPositionAsync({ accuracy: LocationAccuracy.Balanced });
-      return true;
+      return await getCurrentPositionAsync({ accuracy: LocationAccuracy.Balanced });
     } catch {
       console.log(`[waitForLocation WARN] Falhou na tentativa ${attempt}. Tentando novamente...`)
-      if (attempt <= maxRetries) {
+      if (attempt < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, delayMs));
       }
     }
   }
 
-  return false;
+  return null;
 }
 
 export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
@@ -71,6 +70,7 @@ export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
 
   useEffect(() => {
       let subscription: {remove: () => void } | null = null;
+      let cancelled = false;
   
       async function getLocation() {
         const { granted } = await requestForegroundPermissionsAsync();
@@ -81,15 +81,22 @@ export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
           return;
         }
   
-        const locationReady = await waitForLocation();
+        const initialLocation = await waitForLocation();
   
-        if (!locationReady) {
+        if (!initialLocation) {
           // Colocar um modal aqui falando que não foi possivel obter a localização do usuário e que é necessário tentar novamente...
           console.log("[ERROR LOCATION]: Não foi possivel obter a localização do usuário")
           return;
         }
   
-subscription = await watchPositionAsync({
+        if (cancelled) return;
+
+        // Aproveita a primeira posição em vez de descartá-la e aguardar uma
+        // segunda atualização do watcher para renderizar o PIN.
+        setLocation(initialLocation);
+        setLastUpdate(Date.now());
+
+        const nextSubscription = await watchPositionAsync({
           accuracy: LocationAccuracy.High,
           timeInterval: 1000,
           distanceInterval: 2
@@ -111,12 +118,19 @@ subscription = await watchPositionAsync({
               center: toLngLat({ latitude: userLat, longitude: userLng }),
             });
           }
-});
+        });
+
+        if (cancelled) {
+          nextSubscription.remove();
+        } else {
+          subscription = nextSubscription;
+        }
       }
 
       getLocation();
 
       return () => {
+        cancelled = true;
         subscription?.remove();
       }
     }, []);
