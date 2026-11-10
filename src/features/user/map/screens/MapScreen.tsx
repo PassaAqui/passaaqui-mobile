@@ -13,6 +13,7 @@ import StopConfirmation from "@/src/features/user/map/poi/components/StopConfirm
 import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import GpsDisabledModal from "@/src/features/user/map/components/GpsDisabledModal";
+import LocationLoadingModal from "@/src/features/user/map/components/LocationLoadingModal";
 import SimulationAlertModal from "@/src/features/user/map/components/SimulationAlertModal";
 import AnimatedPostcardModal from "@/src/features/user/map/postcard/components/AnimatedPostcardModal";
 import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRewardModal";
@@ -209,7 +210,7 @@ export default function MapScreen() {
 
       {isSimulatingEnable && stop && (
         <Pressable
-          onPress={simulating ? stopSimulation : startSimulation}
+          onPress={() => (simulating ? stopSimulation() : startSimulation())}
           className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
         >
           <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
@@ -292,6 +293,8 @@ export default function MapScreen() {
       {!gpsActive && !shouldShowSimulationAlert && (
         <GpsDisabledModal />
       )}
+
+      <LocationLoadingModal visible={!location} />
 
       {checkinReward && (
         <CheckinRewardModal

@@ -24,4 +24,6 @@ export interface TouristProfileResponse {
 
 export interface UpdateProfilePayload {
   name?: string;
+  /** Required by the backend update DTO, even when only the avatar changes. */
+  documentId?: string;
 }
