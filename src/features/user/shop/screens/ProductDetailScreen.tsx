@@ -1,4 +1,4 @@
-import { ScrollView, View, Image, Text, Pressable } from "react-native";
+import { ScrollView, View, Image, Text, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import XpBar from "@/src/features/user/shop/components/XpBar";
 import CompleteRequiredXp from "@/src/features/user/shop/components/CompleteRequiredXp";
@@ -21,12 +21,29 @@ export default function ProductDetailScreen() {
   const { data: user } = useTouristMe();
 
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: product } = useProductDetail(Number(id));
+  const { data: product, isLoading: isProductLoading, isError: isProductError } = useProductDetail(Number(id));
   const { data: summary } = useOrderSummary(product?.id);
 
-  if (!product || !summary) return null;
+  // O resumo é usado apenas para exibir o desconto. Ele não pode impedir a
+  // renderização da tela: essa requisição pode falhar independentemente da
+  // consulta do produto (por exemplo, por expiração da sessão).
+  if (isProductLoading) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white items-center justify-center">
+        <ActivityIndicator size="large" color="#EAAA6A" />
+      </SafeAreaView>
+    );
+  }
 
-  const discount = summary.xpDiscount;
+  if (isProductError || !product) {
+    return (
+      <SafeAreaView edges={["top"]} className="flex-1 bg-white items-center justify-center p-6">
+        <Text className="text-center text-black font-inter">Não foi possível carregar este produto.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const discount = summary?.xpDiscount ?? 0;
   const canRescue = (user?.currentXP ?? 0) >= Number(product.maxXp);
 
   return (
