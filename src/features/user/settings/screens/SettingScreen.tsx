@@ -8,6 +8,7 @@ import { logout } from "@/src/features/user/auth/services/authService";
 import { useRouter } from "expo-router";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { getTouristAvatarUrl } from "@/src/features/user/settings/utils/touristAvatar";
+import { useTouristTutorial } from "@/src/features/user/tutorial/TutorialContext";
 
 export default function SettingScreen() {
   const insets = useSafeAreaInsets();
@@ -15,6 +16,7 @@ export default function SettingScreen() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   const { data: tourist } = useTouristMe();
+  const { reopen } = useTouristTutorial();
 
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark")
@@ -92,6 +94,10 @@ export default function SettingScreen() {
               </Pressable>
               <Pressable onPress={() => router.push("/user/(private)/settings/map-view")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
                 <Text className="font-itim text-base opacity-75">Alterar modo de visualização do mapa</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
+              <Pressable onPress={reopen} className="flex-row items-center justify-between active:opacity-30 min-h-8">
+                <Text className="font-itim text-base opacity-75">Ver tutorial novamente</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
             </View>

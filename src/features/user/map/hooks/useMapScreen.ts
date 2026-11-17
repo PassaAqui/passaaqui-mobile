@@ -21,7 +21,7 @@ import { useDebugRouteSimulation } from "@/src/features/user/map/hooks/debugging
 
 export function useMapScreen() {
   const cameraRef = useRef<CameraRef>(null);
-  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow } = useLocation(cameraRef);
+  const { location, mapRef, mapReady, setMapReady, lastUpdate, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow, permissionGranted } = useLocation(cameraRef);
   const { gpsActive } = useGpsStatus(lastUpdate);
   const [mapCenter, setMapCenter] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locomotionMode, setLocomotionMode] = useState<RouteMode | null>(null);
@@ -119,7 +119,7 @@ export function useMapScreen() {
   });
 
   return {
-    location, mapRef, cameraRef, mapReady, setMapReady, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow,
+    location, mapRef, cameraRef, mapReady, setMapReady, isFollowing, setIsFollowing, enableAutoFollow, disableAutoFollow, permissionGranted,
     mapCenter, setMapCenter,
     locomotionMode, setLocomotionMode,
     gpsActive,

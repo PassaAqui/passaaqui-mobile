@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Map, Camera, Marker, GeoJSONSource, Layer, type ViewStateChangeEvent } from "@maplibre/maplibre-react-native";
 import type { NativeSyntheticEvent } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -20,6 +20,7 @@ import CheckinRewardModal from "@/src/features/user/map/poi/components/CheckinRe
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { MARCO_ZERO_RECIFE, toLngLat, fromLngLat } from "@/src/constants/user/map/coordinates";
 import { isSimulatingEnable } from "@/src/constants/user/map/simulation";
+import { useTouristTutorial } from "@/src/features/user/tutorial/TutorialContext";
 
 const MAPTILER_API_KEY = process.env.EXPO_PUBLIC_MAPTILER_API_KEY;
 const MAP_STYLE_URL = `https://api.maptiler.com/maps/01a08c63-b260-733f-8081-77da900e16c0/style.json?key=${MAPTILER_API_KEY}`;
@@ -38,6 +39,7 @@ export default function MapScreen() {
     isFollowing, setIsFollowing,
     enableAutoFollow,
     disableAutoFollow,
+    permissionGranted,
     setMapCenter,
     setLocomotionMode,
     setOpenTouristPOIMarker, openTouristPOIMarker,
@@ -58,9 +60,25 @@ export default function MapScreen() {
     simulating, startSimulation, stopSimulation, currentSimPosition, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
     shouldShowSimulationAlert, acknowledgeSimulationAlert
   } = useMapScreen();
+  const { start, completeStep } = useTouristTutorial();
+  const tutorialStartedRef = useRef(false);
 
   const { data: user } = useTouristMe();
   const is3D = user?.mapView !== "2D";
+
+  useEffect(() => {
+    if (!permissionGranted || !location || !mapReady) return;
+    let cancelled = false;
+    if (!cancelled && !tutorialStartedRef.current) {
+      tutorialStartedRef.current = true;
+      start();
+    }
+    return () => { cancelled = true; };
+  }, [location, mapReady, permissionGranted, start]);
+
+  useEffect(() => {
+    if (checkinReward) completeStep("progress");
+  }, [checkinReward, completeStep]);
 
   useEffect(() => {
     if (!mapReady) return;
@@ -114,6 +132,7 @@ export default function MapScreen() {
         }}
         onRegionDidChange={(event: NativeSyntheticEvent<ViewStateChangeEvent>) => {
           if (event.nativeEvent.userInteraction) {
+            completeStep("welcome");
             const { center } = event.nativeEvent;
             const coord = fromLngLat(center); // center vem como [lng, lat]
             disableAutoFollow();
@@ -148,6 +167,7 @@ export default function MapScreen() {
                 id={`tourist-poi-${touristPoi.id}`}
                 lngLat={toLngLat({ latitude: touristPoi.latitude, longitude: touristPoi.longitude })}
                 onPress={() => {
+                  completeStep("poi");
                   setOpenTouristPOIMarker(touristPoi);
                   setOpenPOIMarker(touristPoi);
                 }}
@@ -210,7 +230,11 @@ export default function MapScreen() {
 
       {isSimulatingEnable && stop && (
         <Pressable
-          onPress={() => (simulating ? stopSimulation() : startSimulation())}
+          onPress={() => {
+            if (!simulating) completeStep("simulation");
+            if (simulating) stopSimulation();
+            else startSimulation();
+          }}
           className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
         >
           <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
@@ -239,6 +263,8 @@ export default function MapScreen() {
           visible={!!openTouristPOIMarker}
           onClose={() => setOpenTouristPOIMarker(null)}
           onNavigate={(mode) => {
+            completeStep("destination");
+            completeStep("route");
             setLocomotionMode(mode);
             handleNavigation({ latitude: openTouristPOIMarker.latitude, longitude: openTouristPOIMarker.longitude }, mode, openTouristPOIMarker.id);
           }}
@@ -256,6 +282,8 @@ export default function MapScreen() {
           visible={!!openShopPOIMarker}
           onClose={() => setOpenShopPOIMarker(null)}
           onNavigate={(mode) => {
+            completeStep("destination");
+            completeStep("route");
             setLocomotionMode(mode);
             handleNavigation({ latitude: openShopPOIMarker.latitude, longitude: openShopPOIMarker.longitude }, mode, openShopPOIMarker.id);
           }}
