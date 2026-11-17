@@ -32,6 +32,7 @@ export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
   const [lastUpdate, setLastUpdate] = useState<number>(Date.now);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [initialPosition, setInitialPosition] = useState<boolean>(false);
+  const [permissionGranted, setPermissionGranted] = useState(false);
   const hasUserManuallyDisabledFollow = useRef(false);
   const isFollowingRef = useRef(isFollowing);
 
@@ -80,6 +81,8 @@ export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
           console.log("[WARN LOCATION]: Permissão negada");
           return;
         }
+
+        setPermissionGranted(true);
   
         const initialLocation = await waitForLocation();
   
@@ -143,5 +146,6 @@ export function useLocation(cameraRef: React.RefObject<CameraRef | null>) {
       isFollowing, setIsFollowing,
       enableAutoFollow,
       disableAutoFollow,
+      permissionGranted,
     }
 }

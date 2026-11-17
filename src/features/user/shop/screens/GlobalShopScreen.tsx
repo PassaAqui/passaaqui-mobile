@@ -10,10 +10,12 @@ import { useAllCategories } from "@/src/features/category/hooks/useAllCategories
 import { useCategoryProducts } from "@/src/features/user/shop/hooks/categories/useCategoryProducts";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { useResponsiveGrid } from "@/src/features/user/shop/hooks/useResponsiveGrid";
+import { useTouristTutorial } from "@/src/features/user/tutorial/TutorialContext";
 
 export default function GlobalShopScreen() {
   const router = useRouter();
   const { data: user } = useTouristMe();
+  const { registerFirstProduct, completeStep, stepIndex } = useTouristTutorial();
   const { data: categories } = useAllCategories();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | "TODOS">("TODOS");
@@ -26,6 +28,11 @@ export default function GlobalShopScreen() {
   const products = selectedCategoryId === "TODOS"
     ? allProducts
     : categoryData?.products.content;
+
+  useEffect(() => {
+    registerFirstProduct(products?.[0]?.id ?? null);
+    completeStep("shop");
+  }, [completeStep, products, registerFirstProduct]);
 
   const isLoading = selectedCategoryId === "TODOS" ? isLoadingAll : isLoadingCategory;
 
@@ -85,11 +92,14 @@ export default function GlobalShopScreen() {
                 {row.map((product) => (
                   <Pressable
                     key={product.id}
-                    onPress={() => router.push({
-                      pathname: "/user/(private)/shop/product",
-                      params: { id: product.id }
-                    })}
-                    className="border-2 border-[#EAAA6A] rounded-lg overflow-hidden"
+                    onPress={() => {
+                      completeStep("productList");
+                      router.push({
+                        pathname: "/user/(private)/shop/product",
+                        params: { id: product.id }
+                      });
+                    }}
+                    className={`${stepIndex === 8 && product.id === products?.[0]?.id ? "border-4 border-[#FFD166]" : "border-2 border-[#EAAA6A]"} rounded-lg overflow-hidden`}
                     style={{ width: getItemWidth(row) }}
                   >
                     <Image className="w-full h-28 border border-gray-300" source={product.images && product.images.length > 0 ? { uri: product.images[0] } : require("@/assets/user/map/tmp/no-image.png")} resizeMode="cover" />
