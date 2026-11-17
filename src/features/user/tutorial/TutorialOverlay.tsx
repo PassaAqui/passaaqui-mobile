@@ -23,13 +23,8 @@ export default function TutorialOverlay() {
           <>
             <View className="absolute inset-0 bg-black/45" pointerEvents="none" />
             <View
-              className="absolute rounded-xl border-4 border-[#FFD166]"
-              style={{ top: 76, right: 10, width: Math.min(width * 0.42, 150), height: 56 }}
-              pointerEvents="none"
-            />
-            <View
               className="absolute rounded-xl bg-[#3D2408] px-3 py-2"
-              style={{ top: 138, right: 18, width: Math.min(width * 0.55, 210) }}
+              style={{ top: Math.max(108, 80 - insets.top + 52), right: 16, width: Math.min(width * 0.55, 210) }}
               pointerEvents="none"
             >
               <Text className="text-center font-interBold text-sm text-white">Toque aqui para simular</Text>
@@ -39,7 +34,7 @@ export default function TutorialOverlay() {
         {isShopStep && (
           <View
             className="absolute rounded-xl border-4 border-[#FFD166]"
-            style={{ bottom: insets.bottom + 6, left: width * 0.2 + 4, width: width * 0.2 - 8, height: 62 }}
+            style={{ bottom: insets.bottom + 2, left: width * 0.2 + 12, width: width * 0.2 - 24, height: 50 }}
             pointerEvents="none"
           />
         )}

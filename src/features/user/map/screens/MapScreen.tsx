@@ -60,7 +60,7 @@ export default function MapScreen() {
     simulating, startSimulation, stopSimulation, currentSimPosition, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
     shouldShowSimulationAlert, acknowledgeSimulationAlert
   } = useMapScreen();
-  const { start, completeStep } = useTouristTutorial();
+  const { start, completeStep, stepIndex } = useTouristTutorial();
   const tutorialStartedRef = useRef(false);
 
   const { data: user } = useTouristMe();
@@ -229,16 +229,21 @@ export default function MapScreen() {
       </Map>
 
       {isSimulatingEnable && stop && (
-        <Pressable
-          onPress={() => {
-            if (!simulating) completeStep("simulation");
-            if (simulating) stopSimulation();
-            else startSimulation();
-          }}
-          className="absolute top-20 right-4 bg-red-500 p-3 rounded-full z-20"
+        <View
+          className={`absolute z-20 ${stepIndex === 4 ? "rounded-full border-4 border-[#FFD166] p-1" : ""}`}
+          style={stepIndex === 4 ? { top: 76, right: 12 } : { top: 80, right: 16 }}
         >
-          <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
-        </Pressable>
+          <Pressable
+            onPress={() => {
+              if (!simulating) completeStep("simulation");
+              if (simulating) stopSimulation();
+              else startSimulation();
+            }}
+            className="rounded-full bg-red-500 p-3"
+          >
+            <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
+          </Pressable>
+        </View>
       )}
 
       <AnimatedPostcardModal
