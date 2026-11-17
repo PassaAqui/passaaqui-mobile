@@ -6,6 +6,8 @@ interface Coordinate {
   longitude: number;
 }
 
+const MAX_SIMULATION_DURATION_MS = 15_000;
+
 interface UseDebugRouteSimulationParams {
   routeCoords: Coordinate[];
   onSimulationEnd?: (simulatedDistanceKm: number) => void;
@@ -23,6 +25,23 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
     indexRef.current = 0;
     setSimulating(true);
     setSimulatedDistanceKm(null);
+
+    const firstPoint = routeCoords[0];
+    setCurrentSimPosition(firstPoint);
+    void updateRouteLocation(firstPoint).catch((error) => {
+      console.log("[SIM ERROR]", error);
+    });
+
+    if (routeCoords.length === 1) {
+      stopSimulation(true);
+      return;
+    }
+
+    const intervalMs = Math.max(
+      1,
+      Math.floor(MAX_SIMULATION_DURATION_MS / (routeCoords.length - 1))
+    );
+    indexRef.current = 1;
 
     intervalRef.current = setInterval(async () => {
       const point = routeCoords[indexRef.current];
@@ -43,7 +62,10 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
       }
 
       indexRef.current += 1;
-    }, 1000);
+      if (indexRef.current >= routeCoords.length) {
+        stopSimulation(true);
+      }
+    }, intervalMs);
   }
 
   function stopSimulation(completed = false) {
