@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Image, ActivityIndicator, Pressable } from "react-native";
 import { useEffect, useRef } from "react";
+import { useLocalSearchParams } from "expo-router";
 import { Map, Camera, Marker, GeoJSONSource, Layer, type ViewStateChangeEvent } from "@maplibre/maplibre-react-native";
 import type { NativeSyntheticEvent } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -60,8 +61,9 @@ export default function MapScreen() {
     simulating, startSimulation, stopSimulation, currentSimPosition, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
     shouldShowSimulationAlert, acknowledgeSimulationAlert
   } = useMapScreen();
-  const { start, completeStep } = useTouristTutorial();
+  const { start, completeStep, reopen } = useTouristTutorial();
   const tutorialStartedRef = useRef(false);
+  const { reopenTutorial } = useLocalSearchParams<{ reopenTutorial?: string }>();
 
   const { data: user } = useTouristMe();
   const is3D = user?.mapView !== "2D";
@@ -75,6 +77,11 @@ export default function MapScreen() {
     }
     return () => { cancelled = true; };
   }, [location, mapReady, permissionGranted, start]);
+
+  useEffect(() => {
+    if (reopenTutorial !== "1" || !mapReady) return;
+    reopen();
+  }, [mapReady, reopen, reopenTutorial]);
 
   useEffect(() => {
     if (checkinReward) completeStep("progress");
