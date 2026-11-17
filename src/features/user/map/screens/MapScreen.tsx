@@ -60,7 +60,7 @@ export default function MapScreen() {
     simulating, startSimulation, stopSimulation, currentSimPosition, // Quando terminar de fazer o teste pra saber se o checkin ta pegando, REMOVER essa linha
     shouldShowSimulationAlert, acknowledgeSimulationAlert
   } = useMapScreen();
-  const { start, completeStep, stepIndex } = useTouristTutorial();
+  const { start, completeStep } = useTouristTutorial();
   const tutorialStartedRef = useRef(false);
 
   const { data: user } = useTouristMe();
@@ -104,12 +104,28 @@ export default function MapScreen() {
     <SafeAreaView edges={["top"]} className="bg-white flex-1 justify-center">
       <StatusBar style="dark" hidden/>
 
-      <View style={{ paddingTop: insets.top }} className="flex-row px-4 pb-4 items-center gap-3 bg-white">
+      <View
+        style={[styles.touristNavbar, { paddingTop: insets.top + 16 }]}
+        className="flex-row px-4 pb-6 items-center gap-3 bg-white"
+      >
         <Image className="w-16 h-16 rounded-full" source={require("@/assets/logo/logoOFC.png")} />
         <View className="flex-col">
           <Text className="font-itim text-xl">{user?.name ?? "..."}</Text>
           <Text>{user?.currentXP ?? 0} XP</Text>
         </View>
+
+        {isSimulatingEnable && stop && (
+          <Pressable
+            onPress={() => {
+              if (!simulating) completeStep("simulation");
+              if (simulating) stopSimulation();
+              else startSimulation();
+            }}
+            className="ml-auto rounded-full bg-red-500 p-3"
+          >
+            <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
+          </Pressable>
+        )}
       </View>
 
       {loadingRoute && (
@@ -228,24 +244,6 @@ export default function MapScreen() {
         )}
       </Map>
 
-      {isSimulatingEnable && stop && (
-        <View
-          className={`absolute z-20 ${stepIndex === 4 ? "rounded-full border-4 border-[#FFD166] p-1" : ""}`}
-          style={stepIndex === 4 ? { top: 76, right: 12 } : { top: 80, right: 16 }}
-        >
-          <Pressable
-            onPress={() => {
-              if (!simulating) completeStep("simulation");
-              if (simulating) stopSimulation();
-              else startSimulation();
-            }}
-            className="rounded-full bg-red-500 p-3"
-          >
-            <Text className="text-white text-xs font-interBold">{simulating ? "Parar sim." : "Simular rota"}</Text>
-          </Pressable>
-        </View>
-      )}
-
       <AnimatedPostcardModal
         visible={!!cityToShow && !shouldShowSimulationAlert}
         onClose={dismissCity}
@@ -348,6 +346,14 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
+  touristNavbar: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    elevation: 100,
+  },
   map: {
     flex: 1,
     width: "100%"
