@@ -6,6 +6,8 @@ interface Coordinate {
   longitude: number;
 }
 
+const MAX_SIMULATION_DURATION_MS = 15_000;
+
 interface UseDebugRouteSimulationParams {
   routeCoords: Coordinate[];
   onSimulationEnd?: (simulatedDistanceKm: number) => void;
@@ -24,10 +26,29 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
     setSimulating(true);
     setSimulatedDistanceKm(null);
 
+    const firstPoint = routeCoords[0];
+    setCurrentSimPosition(firstPoint);
+    void updateRouteLocation(firstPoint).catch((error) => {
+      console.log("[SIM ERROR]", error);
+    });
+
+    if (routeCoords.length === 1) {
+      stopSimulation(true);
+      return;
+    }
+
+    const intervalMs = Math.max(
+      1,
+      Math.floor(MAX_SIMULATION_DURATION_MS / (routeCoords.length - 1))
+    );
+    indexRef.current = 1;
+
     intervalRef.current = setInterval(async () => {
       const point = routeCoords[indexRef.current];
       if (!point) {
-        stopSimulation();
+        // Reaching the end of the list is the only successful completion.
+        // Calling stopSimulation from the UI must be treated as cancellation.
+        stopSimulation(true);
         return;
       }
 
@@ -41,17 +62,26 @@ export function useDebugRouteSimulation({ routeCoords, onSimulationEnd }: UseDeb
       }
 
       indexRef.current += 1;
-    }, 1000);
+      if (indexRef.current >= routeCoords.length) {
+        stopSimulation(true);
+      }
+    }, intervalMs);
   }
 
-  function stopSimulation() {
+  function stopSimulation(completed = false) {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = null;
     setSimulating(false);
     setCurrentSimPosition(null);
-    // Calcular distância total simulada ao finalizar
+
+    if (!completed) {
+      // A cancellation must not look like an arrival to the check-in flow.
+      setSimulatedDistanceKm(null);
+      return;
+    }
+
     const totalDistance = routeCoords.length > 1 ? calculateAccumulatedDistance(routeCoords) : 0;
     setSimulatedDistanceKm(totalDistance);
-    // Trigger callback for DEV checkin
     onSimulationEnd?.(totalDistance);
   }
 

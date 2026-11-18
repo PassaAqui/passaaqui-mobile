@@ -254,7 +254,7 @@ describe("useEditProfileForm", () => {
 
     // Assert
     expect(mutate).toHaveBeenCalledWith(
-      { payload: {}, imageUri: "file:///nova-foto.jpg" },
+      { payload: { name: "João Turista" }, imageUri: "file:///nova-foto.jpg" },
       expect.anything()
     );
   });

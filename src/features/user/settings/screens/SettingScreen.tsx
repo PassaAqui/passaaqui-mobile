@@ -15,7 +15,6 @@ export default function SettingScreen() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   const { data: tourist } = useTouristMe();
-
   useEffect(() => {
     NavigationBar.setButtonStyleAsync("dark")
   })
@@ -92,6 +91,16 @@ export default function SettingScreen() {
               </Pressable>
               <Pressable onPress={() => router.push("/user/(private)/settings/map-view")} className="flex-row items-center justify-between active:opacity-30 min-h-8">
                 <Text className="font-itim text-base opacity-75">Alterar modo de visualização do mapa</Text>
+                <Image source={require("@/assets/user/settings/go.png")} />
+              </Pressable>
+              <Pressable
+                onPress={() => router.replace({
+                  pathname: "/user/(private)/map/(tabs)",
+                  params: { reopenTutorial: "1" },
+                })}
+                className="flex-row items-center justify-between active:opacity-30 min-h-8"
+              >
+                <Text className="font-itim text-base opacity-75">Ver tutorial novamente</Text>
                 <Image source={require("@/assets/user/settings/go.png")} />
               </Pressable>
             </View>

@@ -6,6 +6,7 @@ import { useMapScreen } from "@/src/features/user/map/hooks/useMapScreen";
 import { useTouristMe } from "@/src/features/user/auth/hooks/useTouristMe";
 import { Map, Marker, GeoJSONSource } from "@maplibre/maplibre-react-native";
 import { poiNearby, storePoi } from "@/src/features/user/map/__tests__/fixtures/map";
+import { TouristTutorialProvider } from "@/src/features/user/tutorial/TutorialContext";
 
 jest.mock("@maplibre/maplibre-react-native", () => {
   const React = require("react");
@@ -118,6 +119,8 @@ jest.mock("expo-router", () => {
   const { View } = require("react-native");
   return {
     Link: ({ children, ...props }: any) => <View {...props}>{children}</View>,
+    useLocalSearchParams: () => ({}),
+    usePathname: () => "/user/(private)/map/(tabs)",
   };
 });
 
@@ -207,9 +210,17 @@ describe("MapScreen", () => {
     } as any);
   }
 
+  function renderMapScreen() {
+    return render(
+      <TouristTutorialProvider>
+        <MapScreen />
+      </TouristTutorialProvider>
+    );
+  }
+
   it("renderiza o nome do usuário e o XP no header", () => {
     // Arrange
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     const name = screen.getByText("Ana");
@@ -220,12 +231,32 @@ describe("MapScreen", () => {
     expect(xp).toBeTruthy();
   });
 
+  it("mostra o modal de localização enquanto o PIN ainda não apareceu", () => {
+    // Arrange
+    mockMapScreen({ location: null });
+
+    // Act
+    renderMapScreen();
+
+    // Assert
+    expect(screen.getByText("Obtendo sua localização")).toBeTruthy();
+    expect(screen.getByText("Aguarde um momento enquanto localizamos você no mapa.")).toBeTruthy();
+  });
+
+  it("não mostra o modal de localização quando a posição já está disponível", () => {
+    // Act
+    renderMapScreen();
+
+    // Assert
+    expect(screen.queryByText("Obtendo sua localização")).toBeNull();
+  });
+
   it("renderiza os markers dos POIs turísticos e lojas", () => {
     // Arrange
     mockMapScreen({ touristPois: [poiNearby], shopPois: [storePoi] });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
     const markers = screen.UNSAFE_getAllByType(Marker);
 
     // Assert
@@ -242,7 +273,7 @@ describe("MapScreen", () => {
     mockMapScreen({ stop: true, remainingRouteCoords });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
     const source = screen.UNSAFE_getByType(GeoJSONSource);
 
     // Assert
@@ -260,7 +291,7 @@ describe("MapScreen", () => {
     });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.UNSAFE_queryByType(GeoJSONSource)).toBeNull();
@@ -271,7 +302,7 @@ describe("MapScreen", () => {
     mockMapScreen({ loadingRoute: true });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
@@ -280,7 +311,7 @@ describe("MapScreen", () => {
   it("chama enableAutoFollow ao pressionar SEGUIR", () => {
     // Arrange
     mockMapScreen({ isFollowing: false, stop: false });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     fireEvent.press(screen.getByText("SEGUIR"));
@@ -292,7 +323,7 @@ describe("MapScreen", () => {
   it("mostra o botão PARAR com stop true e abre a confirmação ao pressionar", () => {
     // Arrange
     mockMapScreen({ stop: true });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     fireEvent.press(screen.getByText("PARAR"));
@@ -305,7 +336,7 @@ describe("MapScreen", () => {
   it("renderiza o OutsideRegionModal quando showAlertModal é true", () => {
     // Arrange
     mockMapScreen({ showAlertModal: true });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.getByText(/Parece que você está longe de Recife/)).toBeTruthy();
@@ -323,7 +354,7 @@ describe("MapScreen", () => {
     });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
     fireEvent.press(screen.getByText("✕"));
 
     // Assert
@@ -334,7 +365,7 @@ describe("MapScreen", () => {
   it("renderiza o CheckinRewardModal com o XP ganho", () => {
     // Arrange
     mockMapScreen({ checkinReward: { xp: 50 } });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.getByText("+50 XP")).toBeTruthy();
@@ -343,7 +374,7 @@ describe("MapScreen", () => {
   it("renderiza o GpsDisabledModal quando gpsActive é false", () => {
     // Arrange
     mockMapScreen({ gpsActive: false });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.getByText("Ir até as configurações")).toBeTruthy();
@@ -352,7 +383,7 @@ describe("MapScreen", () => {
   it("renderiza o SimulationAlertModal e chama acknowledgeSimulationAlert ao pressionar Entendido", () => {
     // Arrange
     mockMapScreen({ shouldShowSimulationAlert: true });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     fireEvent.press(screen.getByText("Entendido"));
@@ -365,7 +396,7 @@ describe("MapScreen", () => {
   it("não renderiza o SimulationAlertModal quando o alerta já foi acknowledged", () => {
     // Arrange
     mockMapScreen({ shouldShowSimulationAlert: false });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.queryByText(/Simular rota/)).toBeNull();
@@ -384,7 +415,7 @@ describe("MapScreen", () => {
     });
 
     // Act
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.queryByText("✕")).toBeNull();
@@ -394,7 +425,7 @@ describe("MapScreen", () => {
   it("não renderiza o OutsideRegionModal nem o GpsDisabledModal enquanto o alerta estiver aberto", () => {
     // Arrange
     mockMapScreen({ shouldShowSimulationAlert: true, showAlertModal: true, gpsActive: false });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Assert
     expect(screen.queryByText(/Parece que você está longe de Recife/)).toBeNull();
@@ -403,7 +434,7 @@ describe("MapScreen", () => {
 
   it("ao arrastar o mapa, chama setMapCenter e disableAutoFollow", () => {
     // Arrange
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     // MapLibre onRegionDidChange recebe NativeSyntheticEvent com nativeEvent.userInteraction e center [lng, lat]
@@ -430,7 +461,7 @@ describe("MapScreen", () => {
 
   it("não captura o centro do mapa quando o movimento não é um gesto", () => {
     // Arrange
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     fireEvent(
@@ -451,7 +482,7 @@ describe("MapScreen", () => {
   it("abre o TouristSpotPOI e navega ao escolher o modo", () => {
     // Arrange
     mockMapScreen({ openTouristPOIMarker: poiNearby });
-    render(<MapScreen />);
+    renderMapScreen();
 
     // Act
     fireEvent.press(screen.getByText("Ir agora"));

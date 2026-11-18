@@ -66,7 +66,12 @@ export function useEditProfileForm() {
 
     updateProfileMutation.mutate(
       {
-        payload: nameChanged ? { name: trimmedName } : {},
+        // The backend validates both name and documentId as non-blank fields
+        // on every multipart profile update.
+        payload: {
+          name: trimmedName,
+          ...(tourist?.documentId ? { documentId: tourist.documentId } : {}),
+        },
         imageUri: imageChanged ? imageUri : undefined,
       },
       {

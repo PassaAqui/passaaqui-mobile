@@ -121,7 +121,7 @@ describe("ProductDetailScreen", () => {
     expect(screen.queryByText("Resgatar")).toBeNull();
   });
 
-  it("renderiza null quando não há resumo do pedido", () => {
+  it("renderiza o produto quando não há resumo do pedido", () => {
     // Arrange
     mockedUseOrderSummary.mockReturnValue({ data: undefined } as any);
 
@@ -129,7 +129,8 @@ describe("ProductDetailScreen", () => {
     render(<ProductDetailScreen />);
 
     // Assert
-    expect(screen.queryByText("Resgatar")).toBeNull();
+    expect(screen.getByText("Café especial")).toBeTruthy();
+    expect(screen.getByText("Resgatar")).toBeTruthy();
   });
 
   it("renderiza as informações principais do produto", () => {
