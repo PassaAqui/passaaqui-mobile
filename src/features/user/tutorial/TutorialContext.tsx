@@ -72,6 +72,16 @@ export function TouristTutorialProvider({ children }: { children: React.ReactNod
 
 export function useTouristTutorial() {
   const context = useContext(TutorialContext);
-  if (!context) throw new Error("useTouristTutorial must be used inside TouristTutorialProvider");
-  return context;
+  if (context) return context;
+
+  return {
+    active: false,
+    stepIndex: 0,
+    start: () => undefined,
+    next: () => undefined,
+    completeStep: () => undefined,
+    skip: () => undefined,
+    reopen: () => undefined,
+    registerFirstProduct: () => undefined,
+  };
 }
